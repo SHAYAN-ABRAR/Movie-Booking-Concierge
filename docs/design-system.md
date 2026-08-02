@@ -163,8 +163,25 @@ checked by eye at review and is visible in any diff.
 Hairlines at `1px` in `--hairline`; structural rules at `2px` in `--content`. A heavy `2px` ink rule
 marks a real division — the top of the footer, the edge of the booking summary, the ticket.
 
-**Shadows are for overlays only.** Dialogs, sheets, popovers, the Max panel and the launcher. No
-card, button or section carries one. Printed matter does not float.
+### Depth
+
+Printed matter does not float — but it *lifts*, and a projector throws light. The revised scale is
+five steps, and most surfaces still sit at level 0.
+
+| Level | Surface | Treatment |
+|---|---|---|
+| 0 | Page paper | No shadow. The default, and still the majority |
+| 1 | Raised insert | A 1px contact shadow only — paper resting on paper |
+| 2 | Interactive artwork | Shadow appears **on hover/focus only**, with a 4px lift |
+| 3 | Sticky booking summary, action bars | A soft directional shadow to separate from scrolling content |
+| 4 | Overlay — dialog, sheet, Max panel, launcher | The only place a large, soft shadow is allowed |
+
+Shadows are warm-grey (`rgb(20 22 31 / …)`), never black, never coloured, never a glow. A shadow
+must read as paper lift, print registration or projector falloff — if it reads as elevation for its
+own sake, it is wrong.
+
+*Superseded:* the original rule was "shadows are for overlays only". That prevented slop but also
+prevented hierarchy; the scale above is the replacement.
 
 ## Material treatment
 
@@ -173,20 +190,45 @@ URI. It is the paper stock. There is no other texture, no gradient mesh, no blur
 
 ---
 
-## Plates — how films are shown
+## Art direction — how films are shown
 
-With no poster art, each film gets a **plate**: a composition of its own metadata.
+With no poster art, each film gets a **hand-authored visual identity**: seven structurally different
+composition families, drawn as SVG from the film's own art direction in
+[`src/data/artwork.ts`](../src/data/artwork.ts).
 
-Six plates = **three colour pairs × two structures**. Colour alone would have produced six versions
-of one layout; varying the structure is what stops a catalogue grid reading as a template.
-
-| | |
+| Family | The reading |
 |---|---|
-| Pairs | A ink ground / paper text / marigold rule · B projector ground / lit text · C paper-sunken ground / ink text / projector rule |
-| Structures | **offset** — title bottom-left, sprockets on the left edge, runtime set huge at 13% opacity top-right · **centred** — title centred between rules, sprockets on both edges, runtime bottom-centre |
+| **Aperture** | A projector iris opening off-centre. Headlights on a night road |
+| **Strata** | Topographic contours. Land, water, a coastline that has moved |
+| **Registration** | Off-register printing — the same block struck three times, out of alignment |
+| **Timecode** | Film leader: countdown numeral, frame bands, cue mark, perforations |
+| **Lattice** | A building at night. A grid of windows, a few of them lit |
+| **Arc** | Sweeping arcs. Sound as geometry, or an orbit seen edge-on |
+| **Thread** | The house motif at full scale — a kantha running-stitch field |
 
-The plate is `role="presentation"`: everything in it appears as real text beside it, so a screen
-reader gets one meaningful link rather than a duplicate.
+The family-to-film pairing is an **editorial judgement about the film**, not a hash of its id. Two
+films never share a family *and* a ground — asserted by test, because that is precisely the failure
+the previous six-plate system had.
+
+**Four variants, genuinely re-composed rather than scaled:**
+
+| Variant | Aspect | Role |
+|---|---|---|
+| `card` | 2:3 | Catalogue. Carries its own title |
+| `hero` | 5:3 | Detail page and home stage. No title — the page sets it far larger |
+| `tile` | 3:2 | Simplified, fewer layers |
+| `mark` | 1:1 | The motif reduced to an identity stamp |
+
+Each family draws to the variant's own viewBox, so the card is a condensed crop of the same identity
+rather than a shrunken copy of the hero.
+
+**Rules.** The SVG is always `aria-hidden` — every fact it depicts is real text beside it. At most
+**one** layer per family may move, and only when the surface asks for it (`animated`) and motion is
+allowed. Nothing is fetched, nothing is generated at runtime, and the same film always draws the
+same picture.
+
+*Superseded:* the original six-plate system (three colour pairs × two structures) is replaced. It
+varied colour and title position but not structure, so a grid of it read as one design recoloured.
 
 **Cinemas** get the same treatment differently — a true diagram of their own screens, one bar per
 house sized by seat count and coloured by format. It carries information a lobby photograph would
@@ -219,17 +261,26 @@ no lightning bolts, no sparkles.
 | `--ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` |
 | `--ease-in-out` | `cubic-bezier(0.65, 0, 0.35, 1)` |
 
-**What animates:** overlay entrances and exits; the Max panel and nudge; a 4px lift on catalogue
-cards; colour transitions on interactive elements.
+The full vocabulary now lives in [`motion-system.md`](./motion-system.md) — durations, easings,
+springs, primitives, and the per-surface rationale. The short version:
 
-**What does not:** section entrances. Nothing animates on scroll. There is no parallax, no scroll
-hijacking, no cursor-follower, no marquee, no floating objects, no WebGL.
+**What animates:** route changes; section and card reveals (once, never replayed); the featured
+stage; catalogue re-ordering under a filter; availability bars measuring out; seat states; the
+booking transport marker; running totals; the confirmation ticket; overlays; the Max panel, nudge
+and launcher.
 
-`prefers-reduced-motion: reduce` collapses every duration to `0.01ms` globally, and Framer Motion's
-`useReducedMotion` disables the panel and nudge transforms independently.
+**What does not:** parallax · scroll hijacking · cursor followers · WebGL · marquees · floating
+objects · confetti · pulsing controls · anything that replays on scroll-back · anything that delays
+a state change.
 
-Framer Motion earns its place on exactly two elements — the Max panel and nudge — where React needs
-a genuine exit animation. Everything else is CSS.
+`prefers-reduced-motion: reduce` operates on two layers: the global CSS override collapses every
+duration, and `useMotionPreferences()` changes component *behaviour* — the hero stops auto-advancing,
+reveals render their children directly, route transitions become a plain swap, and numbers print
+instead of counting.
+
+*Superseded:* the original rules were "nothing animates on scroll" and "Framer Motion earns its place
+on exactly two elements". Both were guardrails that became a ceiling. The anti-slop principles they
+protected are unchanged and are now enforced by named rules rather than by prohibition.
 
 ---
 

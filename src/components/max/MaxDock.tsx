@@ -1,16 +1,22 @@
 import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { Loader2, X } from 'lucide-react';
 import { MaxMark } from '@/components/brand/Logo';
 import { Sheet, SheetContent } from '@/components/ui/overlay';
+import { useMax } from '@/store/max';
+import { useBooking } from '@/store/booking';
+import { useActiveSeconds, useIsDesktop, useSessionFlag } from '@/hooks';
+import { useMotionPreferences } from '@/motion';
+import { ease, spring } from '@/motion/tokens';
+import { cn } from '@/lib/utils';
 
 /**
  * Max's engine — the language pipeline, the skills and the block renderers —
  * is a few tens of kilobytes that nobody needs before they ask a question. The
  * launcher ships in the entry chunk; the panel arrives when it is opened.
  */
-const MaxPanel = lazy(() => import('./MaxPanel').then((m) => ({ default: m.MaxPanel })));
+const MaxPanel = lazy(() => import('./MaxPanel').then((mod) => ({ default: mod.MaxPanel })));
 
 function PanelFallback() {
   return (
@@ -20,10 +26,6 @@ function PanelFallback() {
     </div>
   );
 }
-import { useMax } from '@/store/max';
-import { useBooking } from '@/store/booking';
-import { useActiveSeconds, useIsDesktop, useSessionFlag } from '@/hooks';
-import { cn } from '@/lib/utils';
 
 const NUDGE_AFTER_SECONDS = 120;
 
@@ -50,11 +52,33 @@ export function MaxDock() {
 
   const launcherRef = useRef<HTMLButtonElement>(null);
   const headingId = useId();
-  const reduceMotion = useReducedMotion();
+  const motion = useMotionPreferences();
 
   const [nudgeVisible, setNudgeVisible] = useState(false);
   const [nudgeDone, markNudgeDone] = useSessionFlag('nokshi.max.nudge');
   const activeSeconds = useActiveSeconds(!nudgeDone);
+
+  /**
+   * One light sweep across the launcher, and only when something genuinely
+   * new has arrived: the nudge appearing, or an unread reply landing while
+   * the panel is closed. It runs once per event and never loops — a control
+   * that pulses forever is asking for attention it has not earned.
+   */
+  const [sweep, setSweep] = useState(false);
+  const [sweepKey, setSweepKey] = useState(0);
+  const previousUnread = useRef(unread);
+
+  useEffect(() => {
+    const gainedUnread = unread > previousUnread.current;
+    previousUnread.current = unread;
+    if (!gainedUnread && !nudgeVisible) return;
+    if (open) return;
+
+    setSweepKey((key) => key + 1);
+    setSweep(true);
+    const timer = window.setTimeout(() => setSweep(false), 950);
+    return () => window.clearTimeout(timer);
+  }, [unread, nudgeVisible, open]);
 
   /* ── Deep link: ?max=open ─────────────────────────────────────────── */
   useEffect(() => {
@@ -145,13 +169,13 @@ export function MaxDock() {
           {/* ── Nudge ─────────────────────────────────────────────── */}
           <AnimatePresence>
             {nudgeVisible && !open ? (
-              <motion.div
+              <m.div
                 role="status"
                 aria-live="polite"
-                initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                initial={motion.reduced ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}
-                transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.16, 1, 0.3, 1] }}
+                exit={motion.reduced ? { opacity: 0 } : { opacity: 0, y: 6 }}
+                transition={{ duration: motion.reduced ? 0 : 0.24, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   'relative max-w-[min(20rem,calc(100vw-2rem))] border-2 border-ink bg-paper-raised p-3.5 pr-9',
                   'shadow-[0_16px_40px_-16px_rgb(20_22_31_/_0.4)]',
@@ -175,20 +199,20 @@ export function MaxDock() {
                   aria-hidden="true"
                   className="absolute -bottom-[7px] right-8 size-3 rotate-45 border-b-2 border-r-2 border-ink bg-paper-raised"
                 />
-              </motion.div>
+              </m.div>
             ) : null}
           </AnimatePresence>
 
           {/* ── Desktop panel: anchored, non-modal ────────────────── */}
           <AnimatePresence>
             {open && isDesktop ? (
-              <motion.aside
+              <m.aside
                 role="complementary"
                 aria-labelledby={headingId}
-                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+                initial={motion.reduced ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
-                transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.16, 1, 0.3, 1] }}
+                exit={motion.reduced ? { opacity: 0 } : { opacity: 0, y: 10 }}
+                transition={{ duration: motion.reduced ? 0 : 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   'flex h-[min(38rem,calc(100dvh-8rem))] w-[26rem] max-w-[calc(100vw-2rem)] flex-col',
                   'border-2 border-ink bg-surface',
@@ -198,12 +222,16 @@ export function MaxDock() {
                 <Suspense fallback={<PanelFallback />}>
                   <MaxPanel onClose={() => setOpen(false)} headingId={headingId} />
                 </Suspense>
-              </motion.aside>
+              </m.aside>
             ) : null}
           </AnimatePresence>
 
-          {/* ── Launcher ──────────────────────────────────────────── */}
-          <button
+          {/* ── Launcher ──────────────────────────────────────────────
+              Physical rather than decorative: it presses 1px under the
+              pointer, lifts on hover, and settles with a spring when it moves
+              above a sticky action bar. The one light sweep fires only when
+              there is genuinely something new — never on a loop. */}
+          <m.button
             ref={launcherRef}
             type="button"
             onClick={() => setOpen(!open)}
@@ -211,27 +239,45 @@ export function MaxDock() {
             aria-label={
               unread > 0 ? `Ask Max — ${unread} new ${unread === 1 ? 'reply' : 'replies'}` : 'Ask Max'
             }
+            layout={motion.reduced ? false : 'position'}
+            transition={motion.reduced ? { duration: 0 } : spring.marker}
+            whileHover={motion.reduced ? undefined : { y: -2 }}
+            whileTap={motion.reduced ? undefined : { y: 1, scale: 0.985 }}
             className={cn(
-              'group relative inline-flex min-h-11 items-center gap-2.5 border-2 border-ink px-3.5 py-2.5',
-              'font-sans text-sm font-semibold transition-colors duration-[--dur-fast]',
-              'shadow-[0_10px_30px_-12px_rgb(20_22_31_/_0.45)]',
-              open ? 'bg-ink text-paper' : 'bg-paper-raised text-ink hover:bg-ink hover:text-paper',
+              'group relative inline-flex min-h-11 items-center gap-2.5 overflow-hidden border-2 border-ink px-3.5 py-2.5',
+              'font-sans text-sm font-semibold',
+              'transition-[background-color,color,box-shadow] duration-[--dur-fast]',
+              open
+                ? 'bg-ink text-paper shadow-[0_6px_18px_-10px_rgb(20_22_31_/_0.5)]'
+                : 'bg-paper-raised text-ink shadow-[0_10px_30px_-12px_rgb(20_22_31_/_0.45)] hover:bg-ink hover:text-paper hover:shadow-[0_16px_34px_-14px_rgb(20_22_31_/_0.55)]',
             )}
           >
-            <MaxMark
-              className="size-6 text-[0.875rem]"
-              tone={open ? 'inverse' : 'default'}
-            />
-            <span>{open ? 'Close Max' : 'Ask Max'}</span>
-            {unread > 0 && !open ? (
-              <span
+            {/* A single projected sweep when something new has arrived. */}
+            {sweep && !motion.reduced ? (
+              <m.span
                 aria-hidden="true"
-                className="numeral grid min-w-[1.15rem] place-items-center bg-marigold px-1 text-[0.6875rem] font-bold leading-[1.15rem] text-paper"
+                key={sweepKey}
+                initial={{ x: '-120%' }}
+                animate={{ x: '120%' }}
+                transition={{ duration: 0.9, ease: ease.projection }}
+                className="pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-marigold/35 to-transparent"
+              />
+            ) : null}
+
+            <MaxMark className="relative size-6 text-[0.875rem]" tone={open ? 'inverse' : 'default'} />
+            <span className="relative">{open ? 'Close Max' : 'Ask Max'}</span>
+            {unread > 0 && !open ? (
+              <m.span
+                aria-hidden="true"
+                initial={motion.reduced ? false : { scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={motion.reduced ? { duration: 0 } : spring.press}
+                className="numeral relative grid min-w-[1.15rem] place-items-center bg-marigold px-1 text-[0.6875rem] font-bold leading-[1.15rem] text-paper"
               >
                 {unread}
-              </span>
+              </m.span>
             ) : null}
-          </button>
+          </m.button>
         </div>
       </div>
 

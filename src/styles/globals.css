@@ -172,6 +172,15 @@
     scroll-behavior: smooth;
   }
 
+  /* A backstop against horizontal scroll from a bleeding artwork bed or a
+     wide table. `clip` rather than `hidden`: `hidden` establishes a scroll
+     container, which silently breaks every `position: sticky` on the page —
+     and this product relies on sticky summaries and action bars. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--paper);
     color: var(--ink);
@@ -459,6 +468,90 @@
   &[data-state='closed'] {
     animation: o-slide-out-bottom var(--dur-base) var(--ease-in-out);
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AUDITORIUM
+   Arriving at the seat map should feel like the lights going down. These are
+   CSS rather than JS because a seat map is 200+ nodes and every one of them
+   would otherwise become a motion component.
+   ═══════════════════════════════════════════════════════════════════════ */
+@keyframes lights-down {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+
+@keyframes row-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes screen-warm {
+  from {
+    opacity: 0;
+  }
+}
+
+@utility auditorium-enter {
+  animation: lights-down 520ms var(--ease-out) both;
+}
+
+@utility screen-enter {
+  animation: screen-warm 900ms var(--ease-out) 120ms both;
+}
+
+/* Rows arrive front-to-back, as a house fills. `--row` is set per row. */
+@utility row-enter {
+  animation: row-arrive 380ms var(--ease-out) both;
+  animation-delay: calc(var(--row, 0) * 28ms + 160ms);
+}
+
+/**
+ * Seat state. The transform is the *only* animated property — the button's
+ * state, aria-selected and the running total all update on the same frame as
+ * the click. Motion never gates interaction here.
+ */
+@utility seat {
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &[aria-selected='true'] {
+    transform: scale(1.1);
+  }
+
+  &:not([aria-disabled='true']):hover {
+    transform: scale(1.08);
+  }
+
+  &:not([aria-disabled='true']):active {
+    transform: scale(0.94);
+    transition-duration: 90ms;
+  }
+}
+
+/**
+ * An availability bar measuring itself out once.
+ *
+ * CSS rather than JS because a busy showtimes page carries forty of these, and
+ * forty motion components to draw forty 3px bars is not a trade worth making.
+ * The width is set inline; this only scales it up from nothing.
+ */
+@keyframes fill-in {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@utility fill-bar {
+  transform-origin: left;
+  animation: fill-in 620ms var(--ease-out) 160ms both;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════

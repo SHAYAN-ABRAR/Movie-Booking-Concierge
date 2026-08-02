@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { m, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, RotateCcw } from 'lucide-react';
+import { AnimatedNumber, stepTransition, useMotionPreferences } from '@/motion';
+import { spring } from '@/motion/tokens';
 import { Button } from '@/components/ui/button';
 import { DemoNote } from '@/components/ui/misc';
 import { Announcer, DataRow } from '@/components/common';
@@ -48,6 +51,7 @@ export function Booking() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { message, announce } = useAnnouncer();
+  const motionPrefs = useMotionPreferences();
 
   const movie = movieSlug ? getMovie(movieSlug) : null;
 
@@ -141,8 +145,13 @@ export function Booking() {
     }
   }, [booking.step, booking.ageAcknowledged, booking.paymentMethod, booking.seatIds.length, showtime, ticketCount, ageCheck, guestValid, staleSeats.length]);
 
+  // Which way the customer is travelling, so the step transition can express
+  // "onward" and "back" differently.
+  const [stepDirection, setStepDirection] = useState(1);
+
   const goTo = useCallback(
     (step: BookingStep) => {
+      setStepDirection(stepIndex(step) >= stepIndex(booking.step) ? 1 : -1);
       booking.setStep(step);
       announce(`Step ${stepIndex(step) + 1} of ${bookingSteps.length}: ${stepLabels[step]}`);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -238,51 +247,113 @@ export function Booking() {
         </Button>
       </div>
 
-      {/* ── Stepper ──────────────────────────────────────────────── */}
+      {/* ── The transport ─────────────────────────────────────────────
+          A strip of film moving through a gate: perforations above, one frame
+          per step, and a marker that travels rather than jumps. On small
+          screens it collapses to a legible progress strip instead of a row of
+          unreadable dots. */}
       <nav aria-label="Booking steps" className="border-b border-hairline py-4">
-        <ol className="flex flex-wrap items-center gap-x-1 gap-y-2">
+        {/* Perforation rail */}
+        <div aria-hidden="true" className="mb-2.5 flex gap-[7px]">
+          {Array.from({ length: 28 }, (_, i) => (
+            <span
+              key={i}
+              className={cn(
+                'block h-[5px] w-[5px] shrink-0 rounded-[1px] transition-colors duration-[--dur-base]',
+                i / 28 <= (index + 1) / bookingSteps.length ? 'bg-marigold' : 'bg-hairline-strong',
+              )}
+            />
+          ))}
+        </div>
+
+        {/* Desktop: every frame, with a travelling marker */}
+        <ol className="hidden items-stretch gap-1 sm:flex">
           {bookingSteps.map((step, i) => {
             const done = i < index;
             const current = i === index;
             const reachable = i <= index;
             return (
-              <li key={step} className="flex items-center">
+              <li key={step} className="min-w-0 flex-1">
                 <button
                   type="button"
                   disabled={!reachable}
                   onClick={() => reachable && goTo(step)}
                   aria-current={current ? 'step' : undefined}
                   className={cn(
-                    'flex items-center gap-1.5 px-2 py-1 text-[0.8125rem] font-semibold transition-colors',
-                    current
-                      ? 'text-content'
-                      : done
-                        ? 'text-content-muted hover:text-content'
-                        : 'cursor-not-allowed text-content-faint',
+                    'group relative flex w-full flex-col items-start gap-1.5 px-1 pb-2.5 pt-1 text-left',
+                    reachable ? '' : 'cursor-not-allowed',
                   )}
                 >
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      'numeral grid size-5 shrink-0 place-items-center border text-[0.625rem]',
-                      current
-                        ? 'border-content bg-content text-surface'
-                        : done
-                          ? 'border-content bg-transparent text-content'
-                          : 'border-hairline-strong text-content-faint',
-                    )}
-                  >
-                    {done ? <Check className="size-3" /> : i + 1}
+                  <span className="flex items-center gap-1.5">
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'numeral grid size-5 shrink-0 place-items-center border text-[0.625rem] transition-colors duration-[--dur-fast]',
+                        current
+                          ? 'border-content bg-content text-surface'
+                          : done
+                            ? 'border-content bg-transparent text-content'
+                            : 'border-hairline-strong text-content-faint',
+                      )}
+                    >
+                      {done ? <Check className="size-3" /> : i + 1}
+                    </span>
+                    <span
+                      className={cn(
+                        'truncate text-[0.8125rem] font-semibold transition-colors duration-[--dur-fast]',
+                        current
+                          ? 'text-content'
+                          : done
+                            ? 'text-content-muted group-hover:text-content'
+                            : 'text-content-faint',
+                      )}
+                    >
+                      {stepLabels[step]}
+                    </span>
                   </span>
-                  <span className={cn(current ? '' : 'hidden sm:inline')}>{stepLabels[step]}</span>
+
+                  {/* The gate. One marker, shared across all steps. */}
+                  <span aria-hidden="true" className="relative block h-[2px] w-full bg-hairline">
+                    {current ? (
+                      <m.span
+                        layoutId="booking-transport"
+                        className="absolute inset-0 bg-marigold"
+                        transition={motionPrefs.reduced ? { duration: 0 } : spring.marker}
+                      />
+                    ) : done ? (
+                      <span className="absolute inset-0 bg-content/35" />
+                    ) : null}
+                  </span>
                 </button>
-                {i < bookingSteps.length - 1 ? (
-                  <span aria-hidden="true" className="mx-0.5 h-px w-3 bg-hairline-strong sm:w-5" />
-                ) : null}
               </li>
             );
           })}
         </ol>
+
+        {/* Mobile: the same information, readable */}
+        <div className="sm:hidden">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-sm font-semibold text-content">
+              <span className="numeral text-content-muted">
+                {index + 1}/{bookingSteps.length}
+              </span>{' '}
+              {stepLabels[booking.step]}
+            </p>
+            {index < bookingSteps.length - 1 ? (
+              <p className="text-[0.75rem] text-content-faint">
+                Next: {stepLabels[bookingSteps[index + 1]!]}
+              </p>
+            ) : null}
+          </div>
+          <div aria-hidden="true" className="mt-2 h-[2px] w-full bg-hairline">
+            <m.span
+              className="block h-full bg-marigold"
+              initial={false}
+              animate={{ width: `${((index + 1) / bookingSteps.length) * 100}%` }}
+              transition={motionPrefs.reduced ? { duration: 0 } : spring.marker}
+            />
+          </div>
+        </div>
       </nav>
 
       <div className="grid gap-10 py-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14">
@@ -304,19 +375,34 @@ export function Booking() {
             </div>
           ) : null}
 
-          {booking.step === 'session' ? <SessionStep movie={movie} showtime={showtime} /> : null}
-          {booking.step === 'tickets' && showtime ? (
-            <TicketsStep movie={movie} showtime={showtime} quote={quote} />
-          ) : null}
-          {booking.step === 'seats' && showtime ? (
-            <SeatsStep showtime={showtime} onAnnounce={announce} />
-          ) : null}
-          {booking.step === 'concessions' ? <ConcessionsStep quote={quote} /> : null}
-          {booking.step === 'guest' ? <GuestStep onValid={setGuestValid} /> : null}
-          {booking.step === 'payment' ? <PaymentStep quote={quote} /> : null}
-          {booking.step === 'review' && showtime ? (
-            <ReviewStep movie={movie} showtime={showtime} quote={quote} onEdit={goTo} />
-          ) : null}
+          {/* Steps enter from the direction you are travelling and leave the
+              opposite way, so forward and back feel different. `mode="wait"`
+              keeps only one step mounted, and form state lives in the store,
+              so nothing valid is lost across the transition. */}
+          <AnimatePresence mode="wait" custom={stepDirection} initial={false}>
+            <m.div
+              key={booking.step}
+              custom={stepDirection}
+              variants={motionPrefs.reduced ? undefined : stepTransition}
+              initial={motionPrefs.reduced ? false : 'initial'}
+              animate="animate"
+              exit={motionPrefs.reduced ? undefined : 'exit'}
+            >
+              {booking.step === 'session' ? <SessionStep movie={movie} showtime={showtime} /> : null}
+              {booking.step === 'tickets' && showtime ? (
+                <TicketsStep movie={movie} showtime={showtime} quote={quote} />
+              ) : null}
+              {booking.step === 'seats' && showtime ? (
+                <SeatsStep showtime={showtime} onAnnounce={announce} />
+              ) : null}
+              {booking.step === 'concessions' ? <ConcessionsStep quote={quote} /> : null}
+              {booking.step === 'guest' ? <GuestStep onValid={setGuestValid} /> : null}
+              {booking.step === 'payment' ? <PaymentStep quote={quote} /> : null}
+              {booking.step === 'review' && showtime ? (
+                <ReviewStep movie={movie} showtime={showtime} quote={quote} onEdit={goTo} />
+              ) : null}
+            </m.div>
+          </AnimatePresence>
 
           {/* ── Navigation ───────────────────────────────────────── */}
           <div className="mt-10 hidden items-center justify-between gap-4 border-t border-hairline pt-6 lg:flex">
@@ -414,7 +500,7 @@ export function Booking() {
               ) : null}
               {method ? <DataRow label="Payment">{method.label}</DataRow> : null}
               <DataRow label="Total" emphasis>
-                {money(quote.total)}
+                <AnimatedNumber value={quote.total} format={(n) => money(n)} />
               </DataRow>
             </dl>
 
@@ -443,7 +529,9 @@ export function Booking() {
           </Button>
 
           <div className="min-w-0 flex-1">
-            <p className="numeral text-lg font-semibold leading-none">{money(quote.total)}</p>
+            <p className="numeral text-lg font-semibold leading-none">
+              <AnimatedNumber value={quote.total} format={(n) => money(n)} />
+            </p>
             <p className="truncate text-[0.6875rem] text-content-muted">
               {blocker ?? `${stepLabels[booking.step]} · step ${index + 1} of ${bookingSteps.length}`}
             </p>

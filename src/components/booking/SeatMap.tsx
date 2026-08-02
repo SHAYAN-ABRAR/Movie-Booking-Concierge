@@ -180,9 +180,20 @@ export function SeatMap({
   }, 0);
 
   return (
-    <div className="auditorium border border-house-rule">
+    <div className="auditorium auditorium-enter relative overflow-hidden border border-house-rule">
+      {/* Light thrown from the screen, falling off toward the back of the
+          house. Purely atmospheric; it sits behind everything and is inert. */}
+      <div
+        aria-hidden="true"
+        className="screen-enter pointer-events-none absolute inset-x-0 top-0 h-2/3"
+        style={{
+          background:
+            'radial-gradient(120% 70% at 50% 0%, rgb(147 178 243 / 0.16) 0%, rgb(147 178 243 / 0.05) 42%, transparent 72%)',
+        }}
+      />
+
       {/* ── Screen ──────────────────────────────────────────────────── */}
-      <div className="px-4 pt-6 sm:px-6">
+      <div className="relative px-4 pt-6 sm:px-6">
         <svg
           viewBox="0 0 600 42"
           className="mx-auto block h-8 w-full max-w-2xl"
@@ -240,7 +251,7 @@ export function SeatMap({
       </div>
 
       {/* ── The map ─────────────────────────────────────────────────── */}
-      <div className="overflow-x-auto overscroll-x-contain px-4 py-5 sm:px-6">
+      <div className="relative overflow-x-auto overscroll-x-contain px-4 py-5 sm:px-6">
         <div
           role="listbox"
           aria-multiselectable="true"
@@ -249,7 +260,13 @@ export function SeatMap({
           style={{ zoom }}
         >
           {rows.map((row: SeatRow, rowIndex) => (
-            <div key={row.row} role="group" aria-label={`Row ${row.row}`} className="flex items-center gap-1.5">
+            <div
+              key={row.row}
+              role="group"
+              aria-label={`Row ${row.row}`}
+              className="row-enter flex items-center gap-1.5"
+              style={{ '--row': rowIndex } as React.CSSProperties}
+            >
               <span
                 aria-hidden="true"
                 className="numeral w-5 shrink-0 text-center text-[0.6875rem] font-semibold text-house-faint"
@@ -294,7 +311,7 @@ export function SeatMap({
                           .filter(Boolean)
                           .join(', ')}
                         className={cn(
-                          'relative grid place-items-center border transition-colors duration-[--dur-fast]',
+                          'seat relative grid place-items-center border',
                           'text-[0.5rem] font-bold leading-none',
                           seat.seatClass === 'recliner' ? 'h-7 w-7' : 'h-6 w-6',
                           seat.seatClass === 'premium' ? 'rounded-t-[4px] rounded-b-xs' : 'rounded-xs',

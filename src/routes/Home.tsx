@@ -1,19 +1,19 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowUpRight } from 'lucide-react';
 import { SectionHeading } from '@/components/common';
+import { Stagger, StaggerItem } from '@/motion';
 import { MovieCard } from '@/components/movie/MovieCard';
 import { CertificateChip } from '@/components/movie/Chips';
 import { ShowtimePill } from '@/components/showtime/ShowtimeButton';
 import { OfferPlate } from '@/components/brand/Plate';
 import { QuickBook } from '@/components/home/QuickBook';
+import { FeaturedStage } from '@/components/home/FeaturedStage';
 import {
   cinemas,
   comingSoon,
   formatBlurbs,
   formatLabels,
-  genreLabels,
   languageLabels,
   movieById,
   nowShowing,
@@ -22,21 +22,9 @@ import {
 } from '@/data';
 import { usePreferences } from '@/store/preferences';
 import { dateWindow, formatRuntime, longDayLabel, minutesFromTime, todayIso } from '@/lib/datetime';
-import { rngFor } from '@/lib/deterministic';
 import { format } from 'date-fns';
 
-/** Tonight's headline film — stable for the whole day, different tomorrow. */
-function useFeatured() {
-  return useMemo(() => {
-    const today = todayIso();
-    const pool = nowShowing.filter((m) => m.programmeNote);
-    const index = Math.floor(rngFor(`featured|${today}`)() * pool.length);
-    return pool[index] ?? nowShowing[0]!;
-  }, []);
-}
-
 export function Home() {
-  const featured = useFeatured();
   const preferredCinemaId = usePreferences((s) => s.cinemaId);
   const cinema = cinemas.find((c) => c.id === preferredCinemaId) ?? cinemas[0]!;
   const today = todayIso();
@@ -64,65 +52,27 @@ export function Home() {
 
   return (
     <>
-      {/* ── Masthead ──────────────────────────────────────────────────── */}
-      <section className="border-b-2 border-ink">
-        <div className="shell grid gap-10 py-10 lg:grid-cols-[1.35fr_1fr] lg:gap-14 lg:py-16">
-          <div className="flex flex-col">
-            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <p className="eyebrow">The Programme</p>
-              <p className="numeral text-[0.6875rem] uppercase tracking-[0.14em] text-ink-muted">
-                {format(new Date(), 'd MMM')} – {format(new Date(weekEnd), 'd MMM yyyy')}
-              </p>
-            </div>
-
-            <h1 className="mt-5 font-display text-[2.75rem] leading-[0.95] tracking-[-0.035em] sm:text-[4rem] lg:text-[5.25rem]">
-              {featured.title}
-            </h1>
-            {featured.titleBn ? (
-              <p lang="bn" className="mt-2 font-display text-2xl text-ink-muted sm:text-3xl">
-                {featured.titleBn}
-              </p>
-            ) : null}
-
-            <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
-              <CertificateChip code={featured.certificate} />
-              <span className="numeral">{formatRuntime(featured.runtimeMinutes)}</span>
-              <span aria-hidden="true">·</span>
-              <span>{languageLabels[featured.language]}</span>
-              <span aria-hidden="true">·</span>
-              <span>{featured.genres.map((g) => genreLabels[g]).join(' / ')}</span>
-              <span aria-hidden="true">·</span>
-              <span>dir. {featured.director}</span>
-            </p>
-
-            <blockquote className="mt-7 max-w-xl border-l-2 border-marigold pl-5">
-              <p className="font-display text-[1.25rem] leading-[1.45] tracking-[-0.01em] sm:text-[1.4rem]">
-                {featured.programmeNote}
-              </p>
-              <footer className="eyebrow mt-3">From this week's programme notes</footer>
-            </blockquote>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Button asChild size="lg">
-                <Link to={`/booking/${featured.slug}`}>
-                  Book {featured.title}
-                  <ArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to={`/movies/${featured.slug}`}>Read more</Link>
-              </Button>
-            </div>
-
-            <p className="mt-6 max-w-md text-xs leading-5 text-ink-muted">
-              Nokshi Cinemas is a demonstration build — the films, schedules and prices are sample
-              data. You can complete a booking as a guest; no payment is taken.
+      {/* ── The stage ─────────────────────────────────────────────────── */}
+      <section aria-label="This week's featured films" className="relative overflow-hidden">
+        <div className="shell">
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 pt-8">
+            <p className="eyebrow">The Programme</p>
+            <p className="numeral text-[0.6875rem] uppercase tracking-[0.14em] text-ink-muted">
+              {format(new Date(), 'd MMM')} – {format(new Date(weekEnd), 'd MMM yyyy')}
             </p>
           </div>
+          <FeaturedStage />
+        </div>
+      </section>
 
-          <div className="lg:pt-2">
-            <QuickBook />
-          </div>
+      {/* ── The booking stub ──────────────────────────────────────────
+          Quick Book is treated as a programme insert torn along a
+          perforation: it belongs to the hero above it, and its full width
+          gives the four dependent fields room to sit on one line. */}
+      <section className="relative border-b-2 border-ink bg-paper-sunken/50">
+        <div aria-hidden="true" className="sprocket-t h-3 bg-paper" />
+        <div className="shell pb-9 pt-2">
+          <QuickBook />
         </div>
       </section>
 
@@ -194,13 +144,17 @@ export function Home() {
           to="/movies"
           linkLabel="Full programme"
         />
-        <ul className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-5">
+        <Stagger
+          as="ul"
+          count={5}
+          className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-5"
+        >
           {nowShowing.slice(0, 5).map((movie) => (
-            <li key={movie.id}>
+            <StaggerItem as="li" key={movie.id}>
               <MovieCard movie={movie} />
-            </li>
+            </StaggerItem>
           ))}
-        </ul>
+        </Stagger>
       </section>
 
       {/* ── The houses — editorial, set in two columns ────────────────── */}
@@ -246,9 +200,9 @@ export function Home() {
           to="/movies?status=coming-soon"
           linkLabel="All upcoming"
         />
-        <ol className="border-t-2 border-ink">
+        <Stagger as="ol" count={comingSoon.length} className="border-t-2 border-ink">
           {comingSoon.map((movie) => (
-            <li key={movie.id} className="border-b border-hairline">
+            <StaggerItem as="li" key={movie.id} className="border-b border-hairline">
               <Link
                 to={`/movies/${movie.slug}`}
                 className="group grid items-baseline gap-x-6 gap-y-1 py-5 sm:grid-cols-[8rem_minmax(0,1fr)_auto]"
@@ -269,9 +223,9 @@ export function Home() {
                   <ArrowUpRight aria-hidden="true" className="size-4 shrink-0" />
                 </span>
               </Link>
-            </li>
+            </StaggerItem>
           ))}
-        </ol>
+        </Stagger>
       </section>
 
       {/* ── Offers ────────────────────────────────────────────────────── */}

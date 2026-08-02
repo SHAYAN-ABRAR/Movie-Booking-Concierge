@@ -25,7 +25,7 @@ export function HouseDiagram({
   return (
     <div className={cn('w-full', className)}>
       <ul className="space-y-1.5">
-        {screens.map((screen) => (
+        {screens.map((screen, index) => (
           <li key={screen.id} className="flex items-center gap-3">
             <span
               className={cn(
@@ -35,6 +35,9 @@ export function HouseDiagram({
             >
               {screen.name}
             </span>
+            {/* The bar is measured out from the projection side once, so a
+                house diagram reads as a room being surveyed rather than a
+                static chart. It never re-runs on scroll. */}
             <span
               aria-hidden="true"
               className="relative h-3 flex-1 bg-content/[0.06]"
@@ -42,7 +45,7 @@ export function HouseDiagram({
             >
               <span
                 className={cn(
-                  'block h-full',
+                  'fill-bar block h-full motion-reduce:animate-none',
                   screen.format === 'velvet'
                     ? 'bg-marigold'
                     : screen.format === 'grandscreen'
@@ -51,7 +54,10 @@ export function HouseDiagram({
                         ? 'bg-projector/60'
                         : 'bg-content/45',
                 )}
-                style={{ width: `${Math.round((screen.capacity / largest) * 100)}%` }}
+                style={{
+                  width: `${Math.round((screen.capacity / largest) * 100)}%`,
+                  animationDelay: `${160 + index * 70}ms`,
+                }}
               />
             </span>
             <span className="numeral w-10 shrink-0 text-right text-[0.6875rem] text-content-muted">

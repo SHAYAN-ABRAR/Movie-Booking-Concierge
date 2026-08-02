@@ -154,6 +154,49 @@ export function useMounted(): boolean {
   return mounted;
 }
 
+/**
+ * Minutes since local midnight, ticking while the tab is visible.
+ *
+ * The showtimes page is about time, so it needs to actually know the time.
+ * One interval is shared by every consumer through React's own batching, it
+ * pauses when the tab is hidden, and it ticks once a minute rather than once a
+ * second — a screening does not change status inside sixty seconds.
+ */
+export function useNowMinutes(): number {
+  const read = () => {
+    const now = new Date();
+    return now.getHours() * 60 + now.getMinutes();
+  };
+  const [minutes, setMinutes] = useState(read);
+
+  useEffect(() => {
+    let interval: number | undefined;
+
+    const start = () => {
+      if (interval === undefined) {
+        setMinutes(read());
+        interval = window.setInterval(() => setMinutes(read()), 60_000);
+      }
+    };
+    const stop = () => {
+      if (interval !== undefined) {
+        window.clearInterval(interval);
+        interval = undefined;
+      }
+    };
+    const onVisibility = () => (document.hidden ? stop() : start());
+
+    if (!document.hidden) start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
+
+  return minutes;
+}
+
 /** A stable id for wiring labels and descriptions together. */
 export function useId(prefix: string): string {
   return useMemo(() => `${prefix}-${Math.random().toString(36).slice(2, 9)}`, [prefix]);

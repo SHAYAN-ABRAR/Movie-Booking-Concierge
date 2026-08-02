@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { m } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { AnimatedNumber, useMotionPreferences } from '@/motion';
+import { ease } from '@/motion/tokens';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -35,6 +38,7 @@ import { adultPriceRange } from '@/lib/bookingMath';
  */
 export function QuickBook() {
   const navigate = useNavigate();
+  const motion = useMotionPreferences();
   const preferredCinema = usePreferences((s) => s.cinemaId);
   const setPreferredCinema = usePreferences((s) => s.setCinema);
 
@@ -95,18 +99,17 @@ export function QuickBook() {
   }
 
   return (
-    <section
-      aria-labelledby="quick-book-heading"
-      className="border-2 border-ink bg-paper-raised p-5 sm:p-6"
-    >
-      <div className="mb-5 flex items-baseline justify-between gap-4">
+    <section aria-labelledby="quick-book-heading">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 id="quick-book-heading" className="font-display text-xl leading-none tracking-[-0.02em]">
           Book in four steps
         </h2>
-        <span className="eyebrow">No account needed</span>
+        <span className="eyebrow">No account needed · guest checkout</span>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* Four dependent fields on one line. Each completed field lights its
+          own marker, so progress through the stub is visible at a glance. */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1.5">
           <Label htmlFor="qb-cinema">Cinema</Label>
           <Select value={cinemaId} onValueChange={changeCinema}>
@@ -187,20 +190,48 @@ export function QuickBook() {
       </div>
 
       <div className="mt-5 flex flex-col gap-3 border-t border-hairline pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="numeral text-sm text-ink-muted" aria-live="polite">
+        <p className="text-sm text-ink-muted" aria-live="polite">
           {chosenShowtime ? (
             <>
-              Tickets from {money(adultPriceRange(chosenShowtime).min)} · {availabilityFor(chosenShowtime).available} seats
-              left
+              Tickets from{' '}
+              <AnimatedNumber
+                value={adultPriceRange(chosenShowtime).min}
+                format={(n) => money(n)}
+                className="font-semibold text-ink"
+              />{' '}
+              ·{' '}
+              <AnimatedNumber
+                value={availabilityFor(chosenShowtime).available}
+                className="font-semibold text-ink"
+              />{' '}
+              seats left
             </>
           ) : (
             <span className="text-ink-muted">{disabledReason}</span>
           )}
         </p>
-        <Button onClick={submit} disabled={Boolean(disabledReason)} size="lg" className="sm:min-w-44">
-          Choose seats
-          <ArrowRight aria-hidden="true" />
-        </Button>
+
+        {/* Enabling is worth noticing, so the control settles into place the
+            moment the last dependency is satisfied. */}
+        <m.div
+          animate={
+            motion.reduced || disabledReason
+              ? { scale: 1 }
+              : { scale: [1, 1.025, 1] }
+          }
+          transition={{ duration: motion.reduced ? 0 : 0.34, ease: ease.editorial }}
+          className="sm:shrink-0"
+        >
+          <Button
+            onClick={submit}
+            disabled={Boolean(disabledReason)}
+            size="lg"
+            className="w-full sm:w-auto sm:min-w-44"
+          >
+            Choose seats
+            <ArrowRight aria-hidden="true" />
+          </Button>
+        </m.div>
       </div>
     </section>
   );

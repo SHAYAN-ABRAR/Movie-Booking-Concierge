@@ -15,7 +15,13 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return undefined;
-          if (id.includes('framer-motion') || id.includes('/motion-')) return 'motion';
+          // framer-motion is deliberately handed back to Rollup rather than
+          // named here. `LazyMotion` dynamically imports its feature bundle,
+          // and claiming framer-motion for any manual chunk — including the
+          // catch-all `vendor` below — merges that import back into the eager
+          // graph and undoes the split. Returning undefined lets Rollup put
+          // the ~30 KB feature bundle in its own async chunk.
+          if (id.includes('framer-motion')) return undefined;
           if (id.includes('qrcode')) return 'qrcode';
           if (id.includes('@fontsource')) return 'fonts';
           if (id.includes('@radix-ui')) return 'radix';

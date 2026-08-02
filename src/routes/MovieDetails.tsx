@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge, DemoNote, RuleHeading } from '@/components/ui/misc';
 import { AccessibilityChips, AccessibilityLegend, CertificateChip } from '@/components/movie/Chips';
 import { ShowtimePill } from '@/components/showtime/ShowtimeButton';
+import { CinematicArtwork } from '@/components/visual/CinematicArtwork';
 import { DateStrip } from '@/components/showtime/DateStrip';
 import { EmptyState } from '@/components/common';
 import { NotFound } from './NotFound';
@@ -89,7 +90,22 @@ export function MovieDetails() {
           Deliberately no plate here. The catalogue card already carries the
           film's plate; repeating it would be the same visual twice. The
           details page is set as an editorial title page instead. */}
-      <header className="border-b-2 border-ink">
+      <header className="relative overflow-hidden border-b-2 border-ink">
+        {/* The same art direction as the catalogue card, expanded wide. The
+            card is a condensed vertical crop of this composition — one
+            identity, two framings, never the same rectangle twice. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-full lg:w-[52%]">
+          <CinematicArtwork
+            movie={movie}
+            variant="hero"
+            animated
+            className="size-full [&>svg]:size-full"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-paper from-8% via-paper/45 via-40% to-transparent to-78% lg:via-paper/20 lg:via-28%" />
+          <div className="absolute inset-0 bg-paper/68 lg:hidden" />
+          <div className="absolute inset-y-0 left-0 hidden w-px bg-ink/25 lg:block" />
+        </div>
+
         <div className="shell py-10 sm:py-14">
           <nav aria-label="Breadcrumb" className="mb-6">
             <Link to="/movies" className="eyebrow underline-offset-4 hover:underline">
@@ -254,17 +270,52 @@ export function MovieDetails() {
                 <track kind="captions" />
               </video>
             ) : (
-              <div className="flex max-w-prose items-start gap-4 border border-dashed border-hairline-strong bg-paper-sunken/50 px-5 py-6">
-                <Clapperboard aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-ink-muted" />
-                <div>
+              /* A screen with nothing running on it, rather than an error box.
+                 The frame is real, the leader marks are real, and the copy is
+                 unchanged — there is simply no film in the gate. */
+              <figure className="max-w-2xl">
+                <div className="auditorium relative aspect-[16/7] overflow-hidden border border-house-rule">
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'radial-gradient(120% 80% at 50% 0%, rgb(147 178 243 / 0.10) 0%, transparent 68%)',
+                    }}
+                  />
+                  {/* Leader perforations down both edges. */}
+                  {(['left-2', 'right-2'] as const).map((side) => (
+                    <span
+                      key={side}
+                      aria-hidden="true"
+                      className={cn(
+                        'absolute inset-y-0 flex w-[7px] flex-col items-center justify-around py-3',
+                        side,
+                      )}
+                    >
+                      {Array.from({ length: 9 }, (_, i) => (
+                        <span key={i} className="block size-[5px] rounded-[1px] bg-house-ink/25" />
+                      ))}
+                    </span>
+                  ))}
+                  {/* The gate: an empty aperture, crosshaired like a leader frame. */}
+                  <div className="absolute inset-0 grid place-items-center">
+                    <div className="relative grid size-20 place-items-center rounded-stub border border-house-ink/25">
+                      <Clapperboard aria-hidden="true" className="size-7 text-house-ink/40" />
+                    </div>
+                  </div>
+                  <span aria-hidden="true" className="absolute inset-x-8 top-1/2 h-px bg-house-ink/12" />
+                  <span aria-hidden="true" className="absolute inset-y-6 left-1/2 w-px bg-house-ink/12" />
+                </div>
+                <figcaption className="mt-3 max-w-prose">
                   <p className="font-semibold">No trailer available</p>
                   <p className="mt-1.5 text-[0.9375rem] leading-7 text-ink-muted">
                     We do not hold a trailer for {movie.title} in this build. Rather than link you to
                     something for a different film, there is nothing here. The synopsis and programme
                     notes above are the fullest description we have.
                   </p>
-                </div>
-              </div>
+                </figcaption>
+              </figure>
             )}
           </section>
 

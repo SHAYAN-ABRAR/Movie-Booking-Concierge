@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { m, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal } from 'lucide-react';
+import { AnimatedNumber, useMotionPreferences } from '@/motion';
+import { duration, ease } from '@/motion/tokens';
 import { PageHeader, EmptyState } from '@/components/common';
 import { MovieCard } from '@/components/movie/MovieCard';
 import { ActiveFilters, FilterPanel } from '@/components/movie/FilterPanel';
@@ -15,6 +18,7 @@ import { dateWindow } from '@/lib/datetime';
 import { pluralise } from '@/lib/format';
 
 export function Movies() {
+  const motionPrefs = useMotionPreferences();
   const controls = useMovieFilters({ status: 'now-showing' });
   const { filter, setFilter, clear } = controls;
   const status = filter.status ?? 'now-showing';
@@ -78,7 +82,10 @@ export function Movies() {
 
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-y border-hairline py-3">
             <p className="text-sm text-content-muted" aria-live="polite" role="status">
-              <span className="font-semibold text-content">{pluralise(results.length, 'film')}</span>
+              <span className="font-semibold text-content">
+                <AnimatedNumber value={results.length} />{' '}
+                {results.length === 1 ? 'film' : 'films'}
+              </span>
               {count > 0 ? ` matching ${pluralise(count, 'filter')}` : ''}
             </p>
 
@@ -140,13 +147,30 @@ export function Movies() {
               }
             />
           ) : (
-            <ul className="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 xl:grid-cols-4">
-              {results.map((movie) => (
-                <li key={movie.id}>
-                  <MovieCard movie={movie} showSynopsis />
-                </li>
-              ))}
-            </ul>
+            /* Filtering re-orders the shelf rather than replacing it: cards
+               travel to their new positions, arrivals fade up, departures fade
+               out. Fading the whole grid out and back in would lose the sense
+               that these are the same films being narrowed down. */
+            <m.ul layout className="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 xl:grid-cols-4">
+              <AnimatePresence mode="popLayout" initial={false}>
+                {results.map((movie) => (
+                  <m.li
+                    key={movie.id}
+                    layout={motionPrefs.reduced ? false : 'position'}
+                    initial={motionPrefs.reduced ? false : { opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={motionPrefs.reduced ? { opacity: 0 } : { opacity: 0, scale: 0.97 }}
+                    transition={
+                      motionPrefs.reduced
+                        ? { duration: 0 }
+                        : { duration: duration.layout, ease: ease.editorial }
+                    }
+                  >
+                    <MovieCard movie={movie} showSynopsis />
+                  </m.li>
+                ))}
+              </AnimatePresence>
+            </m.ul>
           )}
 
           {status === 'now-showing' ? (

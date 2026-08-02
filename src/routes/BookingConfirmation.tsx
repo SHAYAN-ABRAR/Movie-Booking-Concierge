@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
+import { m } from 'framer-motion';
 import { CalendarPlus, Home, MessageSquare, Printer, Ticket } from 'lucide-react';
+import { useMotionPreferences } from '@/motion';
+import { ease } from '@/motion/tokens';
 import { Button } from '@/components/ui/button';
 import { Badge, DemoNote } from '@/components/ui/misc';
 import { DataRow } from '@/components/common';
@@ -24,6 +27,7 @@ import { buildIcs, downloadUrl, mapUrl } from '@/lib/external';
 export function BookingConfirmation() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const [, setParams] = useSearchParams();
+  const motionPrefs = useMotionPreferences();
   const bookings = useBookings((s) => s.bookings);
   const booking = bookings.find((b) => b.reference === bookingId);
 
@@ -112,9 +116,31 @@ export function BookingConfirmation() {
         </p>
       </div>
 
-      {/* ── The ticket ───────────────────────────────────────────── */}
-      <div data-print="page" className="mt-8 max-w-3xl">
-        <div className="auditorium relative border-2 border-ink">
+      {/* ── The ticket ─────────────────────────────────────────────
+          A reveal rather than an appearance: the stock settles, a projection
+          light passes once across it, and the QR fades in only after the
+          surface is stable. Under reduced motion the finished ticket is
+          simply there, and the print layout is unaffected either way. */}
+      <m.div
+        data-print="page"
+        className="mt-8 max-w-3xl"
+        initial={motionPrefs.reduced ? false : { opacity: 0, y: 18, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={motionPrefs.reduced ? { duration: 0 } : { duration: 0.55, ease: ease.entrance }}
+      >
+        <div className="auditorium relative overflow-hidden border-2 border-ink">
+          {/* One pass of projected light across the stock. */}
+          {!motionPrefs.reduced ? (
+            <m.span
+              aria-hidden="true"
+              data-print="hide"
+              className="pointer-events-none absolute inset-y-0 z-20 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-projector-lit/20 to-transparent"
+              initial={{ left: '-40%' }}
+              animate={{ left: '130%' }}
+              transition={{ duration: 1.15, ease: ease.projection, delay: 0.45 }}
+            />
+          ) : null}
+
           {/* Perforated top edge */}
           <div aria-hidden="true" className="sprocket-t h-3 bg-ink" />
 
@@ -197,7 +223,14 @@ export function BookingConfirmation() {
 
             {/* Stub */}
             <div className="border-t border-dashed border-house-rule p-6 sm:border-l sm:border-t-0 sm:p-8">
-              <div className="flex flex-col items-center">
+              <m.div
+                className="flex flex-col items-center"
+                initial={motionPrefs.reduced ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={
+                  motionPrefs.reduced ? { duration: 0 } : { duration: 0.4, delay: 0.62 }
+                }
+              >
                 <div className="bg-paper p-2.5">
                   <QRCodeSVG
                     value={booking.reference}
@@ -221,13 +254,13 @@ export function BookingConfirmation() {
                     Not valid for entry
                   </span>
                 </p>
-              </div>
+              </m.div>
             </div>
           </div>
 
           <div aria-hidden="true" className="sprocket-b h-3 bg-ink" />
         </div>
-      </div>
+      </m.div>
 
       {/* ── Actions ──────────────────────────────────────────────── */}
       <div data-print="hide" className="mt-8 flex max-w-3xl flex-wrap gap-3">
