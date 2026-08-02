@@ -1,0 +1,167 @@
+import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { ExternalLink, MapPin, Phone } from 'lucide-react';
+import { PageHeader } from '@/components/common';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/misc';
+import { HouseDiagram } from '@/components/cinema/HouseDiagram';
+import { cinemas, cities, moviesAtCinema } from '@/data';
+import { todayIso } from '@/lib/datetime';
+import { mapUrl } from '@/lib/external';
+
+const amenityLabels: Record<string, string> = {
+  parking: 'Parking',
+  cafe: 'Café',
+  lounge: 'Lounge',
+  atm: 'ATM',
+  'prayer-room': 'Prayer room',
+  'baby-change': 'Baby change',
+  cloakroom: 'Cloakroom',
+  'gift-card': 'Gift cards',
+};
+
+const accessLabels: Record<string, string> = {
+  'step-free-access': 'Step-free access',
+  'accessible-toilet': 'Accessible toilet',
+  'hearing-loop': 'Hearing loop',
+  'companion-seat': 'Companion seats',
+  'assistance-dogs': 'Assistance dogs welcome',
+  'lift-access': 'Lift access',
+  'accessible-parking': 'Accessible parking',
+};
+
+export function Cinemas() {
+  const today = todayIso();
+  const showing = useMemo(
+    () => Object.fromEntries(cinemas.map((c) => [c.id, moviesAtCinema(c.id, today)])),
+    [today],
+  );
+
+  return (
+    <div className="shell">
+      <PageHeader
+        eyebrow="Five houses"
+        title="Our cinemas"
+        lede="Three cities, nineteen screens. Each house runs its own programme — the strands below are what makes each one different."
+      />
+
+      {cities.map((city) => (
+        <section key={city} aria-labelledby={`city-${city}`} className="py-10">
+          <h2 id={`city-${city}`} className="eyebrow mb-6 border-b border-hairline pb-2">
+            {city}
+          </h2>
+
+          <ul className="space-y-12">
+            {cinemas
+              .filter((cinema) => cinema.city === city)
+              .map((cinema) => (
+                <li key={cinema.id}>
+                  <article className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-14">
+                    <div>
+                      <h3 className="font-display text-[1.75rem] leading-tight tracking-[-0.025em] sm:text-[2.25rem]">
+                        <Link to={`/cinemas/${cinema.slug}`} className="underline-offset-4 hover:underline">
+                          {cinema.name}
+                        </Link>
+                      </h3>
+                      <p lang="bn" className="mt-1 text-base text-ink-muted">
+                        {cinema.nameBn}
+                      </p>
+
+                      <p className="mt-4 max-w-prose text-[0.9375rem] leading-7 text-ink-muted">
+                        {cinema.description}
+                      </p>
+
+                      <p className="mt-4 border-l-2 border-marigold pl-4 font-display text-lg leading-snug">
+                        {cinema.signature}
+                      </p>
+
+                      <address className="mt-5 not-italic text-[0.9375rem] leading-7 text-ink-muted">
+                        {cinema.addressLines.join(', ')}
+                      </address>
+
+                      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+                        <a
+                          href={`tel:${cinema.phone.replace(/\s/g, '')}`}
+                          className="inline-flex items-center gap-1.5 underline underline-offset-4"
+                        >
+                          <Phone aria-hidden="true" className="size-4" />
+                          {cinema.phone}
+                        </a>
+                        <a
+                          href={mapUrl(cinema.mapQuery)}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="inline-flex items-center gap-1.5 underline underline-offset-4"
+                        >
+                          <MapPin aria-hidden="true" className="size-4" />
+                          Directions
+                          <ExternalLink aria-hidden="true" className="size-3.5" />
+                        </a>
+                      </div>
+
+                      <p className="numeral mt-3 text-[0.8125rem] text-ink-muted">
+                        Open {cinema.openingHours} · Box office {cinema.boxOfficeHours}
+                      </p>
+
+                      <div className="mt-5 flex flex-wrap gap-1.5">
+                        {cinema.amenities.map((amenity) => (
+                          <Badge key={amenity} tone="outline">
+                            {amenityLabels[amenity] ?? amenity}
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {cinema.accessibility.map((feature) => (
+                          <Badge key={feature} tone="accent">
+                            {accessLabels[feature] ?? feature}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      <div className="mt-6 flex flex-wrap gap-3">
+                        <Button asChild>
+                          <Link to={`/cinemas/${cinema.slug}`}>This cinema</Link>
+                        </Button>
+                        <Button asChild variant="outline">
+                          <Link to={`/showtimes?cinema=${cinema.id}`}>Today's showtimes</Link>
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="lg:pt-3">
+                      <div className="border border-hairline-strong p-5">
+                        <h4 className="eyebrow mb-4">The houses</h4>
+                        <HouseDiagram screens={cinema.screens} />
+                      </div>
+
+                      <div className="mt-5 border border-hairline-strong p-5">
+                        <h4 className="eyebrow mb-3">On today</h4>
+                        {showing[cinema.id]?.length ? (
+                          <ul className="space-y-1.5">
+                            {showing[cinema.id]!.slice(0, 6).map((movie) => (
+                              <li key={movie.id}>
+                                <Link
+                                  to={`/movies/${movie.slug}`}
+                                  className="text-[0.9375rem] underline-offset-4 hover:underline"
+                                >
+                                  {movie.title}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-[0.9375rem] text-ink-muted">
+                            Nothing scheduled here today.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+}

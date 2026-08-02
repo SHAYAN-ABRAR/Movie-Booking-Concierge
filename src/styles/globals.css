@@ -1,0 +1,528 @@
+@import 'tailwindcss';
+
+/* Self-hosted variable fonts. Display = Fraunces (editorial, high contrast),
+   Text = Archivo (grotesque with true tabular figures for timetables),
+   Bangla = Anek Bangla (matched Indic superfamily), Mono = JetBrains Mono (references, seat IDs). */
+/* Fraunces is loaded with its full axis set — the design uses its optical-size,
+   SOFT and WONK axes. The others are weight-only, which is all they are asked
+   for. Each stylesheet declares unicode-range per subset, so a browser only
+   downloads the scripts a page actually renders. */
+@import '@fontsource-variable/fraunces/full.css';
+@import '@fontsource-variable/archivo/wght.css';
+@import '@fontsource-variable/anek-bangla/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RAW PALETTE — derived by sampling the supplied reference assets.
+   See docs/design-system.md §Colour for the sampled source values.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Programme paper (light world) — sampled #EEEEF5/#F1F4FA, warmed toward bone */
+  --paper: #f4f1ea;
+  --paper-raised: #fbf9f5;
+  --paper-sunken: #e9e4d9;
+  --paper-edge: #ded7c9;
+
+  /* Ink — sampled #12131A / #191E29 / #1E1F24 */
+  --ink: #14161f;
+  --ink-muted: #4c505e;
+  --ink-faint: #7b7f8c;
+  --rule: #d6cfc1;
+  --rule-strong: #b3aa98;
+
+  /* Auditorium (dark world) — sampled #0A101D / #060913 / #191D2A */
+  --house: #101322;
+  --house-raised: #1a1e2e;
+  --house-sunken: #080a13;
+  --house-ink: #f0ece3;
+  --house-muted: #a0a4b2;
+  --house-faint: #6f7484;
+  --house-rule: #2a2f40;
+
+  /* Projector blue — sampled periwinkle #93B2F3 / #7F9CD8, deepened for ink-on-paper contrast */
+  --projector: #35509c;
+  --projector-deep: #22346b;
+  --projector-lit: #93b2f3;
+  --projector-wash: #dfe6f8;
+
+  /* Marigold — the sparing vermilion accent in the references, read through
+     the nokshi-kantha craft palette. Signal colour only. */
+  --marigold: #c2491a;
+  --marigold-lit: #f0913c;
+  --marigold-wash: #f8e6da;
+
+  /* Status */
+  --ok: #2c6349;
+  --ok-wash: #dcebe3;
+  --warn: #97640b;
+  --warn-wash: #f7ecd4;
+  --danger: #9b2c1e;
+  --danger-wash: #f6dfda;
+
+  /* ── Semantic surface mapping (flipped by .auditorium) ── */
+  --surface: var(--paper);
+  --surface-raised: var(--paper-raised);
+  --surface-sunken: var(--paper-sunken);
+  --content: var(--ink);
+  --content-muted: var(--ink-muted);
+  --content-faint: var(--ink-faint);
+  --hairline: var(--rule);
+  --hairline-strong: var(--rule-strong);
+  --accent: var(--projector);
+  --accent-contrast: #ffffff;
+  --focus: var(--marigold);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 340ms;
+
+  /* Layout */
+  --header-h: 4rem;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+}
+
+/* The auditorium: lights down. Applied to the seat map, the booking wizard's
+   screening surfaces and the confirmation ticket — never to the whole app. */
+.auditorium {
+  --surface: var(--house);
+  --surface-raised: var(--house-raised);
+  --surface-sunken: var(--house-sunken);
+  --content: var(--house-ink);
+  --content-muted: var(--house-muted);
+  --content-faint: var(--house-faint);
+  --hairline: var(--house-rule);
+  --hairline-strong: #3b4257;
+  --accent: var(--projector-lit);
+  --accent-contrast: #0d1020;
+  --focus: var(--marigold-lit);
+  color: var(--content);
+  background-color: var(--surface);
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-content: var(--content);
+  --color-content-muted: var(--content-muted);
+  --color-content-faint: var(--content-faint);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-focus: var(--focus);
+
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-paper-sunken: var(--paper-sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-house: var(--house);
+  --color-house-raised: var(--house-raised);
+  --color-house-ink: var(--house-ink);
+
+  --color-projector: var(--projector);
+  --color-projector-deep: var(--projector-deep);
+  --color-projector-lit: var(--projector-lit);
+  --color-projector-wash: var(--projector-wash);
+  --color-marigold: var(--marigold);
+  --color-marigold-lit: var(--marigold-lit);
+  --color-marigold-wash: var(--marigold-wash);
+  --color-ok: var(--ok);
+  --color-ok-wash: var(--ok-wash);
+  --color-warn: var(--warn);
+  --color-warn-wash: var(--warn-wash);
+  --color-danger: var(--danger);
+  --color-danger-wash: var(--danger-wash);
+
+  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Archivo Variable', 'Anek Bangla Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-bangla: 'Anek Bangla Variable', 'Archivo Variable', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Radius policy: printed matter does not float and rarely curves.
+     Default is square; xs for seats/chips, sm for controls, stub only for
+     perforation notches. Nothing else is allowed to round. */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-stub: 999px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════════════════ */
+@layer base {
+  * {
+    border-color: var(--hairline);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* The grain of the paper stock. One repeating SVG, no image asset. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 0, 'WONK' 1;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :lang(bn) {
+    font-family: var(--font-bangla);
+    line-height: 1.75;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background: var(--marigold);
+    color: #fff;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SIGNATURE MOTIF — the running stitch
+   Nokshi kantha embroidery and 35mm film perforation are the same rhythm:
+   an interrupted line. It is the only ornament in the system, and it is
+   drawn, never imaged.
+   ═══════════════════════════════════════════════════════════════════════ */
+@utility stitch-x {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--hairline-strong) 0 6px,
+    transparent 6px 12px
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 1.5px;
+  background-position: 0 50%;
+}
+
+@utility stitch-y {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--hairline-strong) 0 6px,
+    transparent 6px 12px
+  );
+  background-repeat: no-repeat;
+  background-size: 1.5px 100%;
+  background-position: 50% 0;
+}
+
+/* Sprocket edge — a ticket stub's torn perforation. Used on ticket surfaces. */
+@utility sprocket-t {
+  --sprocket-bg: var(--surface);
+  mask-image: radial-gradient(circle 5px at 5px 0, transparent 98%, #000 100%);
+  mask-size: 18px 100%;
+  mask-repeat: repeat-x;
+  mask-position: 0 0;
+}
+
+@utility sprocket-b {
+  mask-image: radial-gradient(circle 5px at 5px 100%, transparent 98%, #000 100%);
+  mask-size: 18px 100%;
+  mask-repeat: repeat-x;
+  mask-position: 0 100%;
+}
+
+/* Editorial rules */
+@utility rule-hair {
+  border-top: 1px solid var(--hairline);
+}
+
+@utility rule-heavy {
+  border-top: 2px solid var(--content);
+}
+
+/* Eyebrow / small-caps metadata label — the programme's voice */
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--content-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+@utility numeral {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Container with editorial gutters */
+@utility shell {
+  width: 100%;
+  max-width: 82rem;
+  margin-inline: auto;
+  padding-inline: max(1rem, var(--safe-l));
+}
+
+@media (min-width: 48rem) {
+  .shell {
+    padding-inline: 2rem;
+  }
+}
+
+@media (min-width: 80rem) {
+  .shell {
+    padding-inline: 3rem;
+  }
+}
+
+/* Screen-reader only */
+@utility sr-only-focusable {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+
+  &:focus-visible {
+    position: fixed;
+    width: auto;
+    height: auto;
+    clip-path: none;
+    z-index: 200;
+  }
+}
+
+/* Hides scrollbars on deliberate horizontal rails while keeping them scrollable */
+@utility rail {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   OVERLAY MOTION
+   Radix drives `data-state`; these four utilities are the whole vocabulary.
+   No animation library is involved, and reduced-motion neutralises them all.
+   ═══════════════════════════════════════════════════════════════════════ */
+@keyframes o-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes o-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes o-pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+}
+@keyframes o-pop-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+}
+@keyframes o-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes o-slide-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes o-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+@keyframes o-slide-out-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes o-slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes o-slide-out-bottom {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes o-drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+}
+
+@utility o-fade {
+  &[data-state='open'] {
+    animation: o-fade-in var(--dur-base) var(--ease-out);
+  }
+  &[data-state='closed'] {
+    animation: o-fade-out var(--dur-fast) var(--ease-out);
+  }
+}
+
+@utility o-pop {
+  &[data-state='open'] {
+    animation: o-pop-in var(--dur-base) var(--ease-out);
+  }
+  &[data-state='closed'] {
+    animation: o-pop-out var(--dur-fast) var(--ease-out);
+  }
+}
+
+@utility o-drop {
+  &[data-state='open'] {
+    animation: o-drop-in var(--dur-fast) var(--ease-out);
+  }
+}
+
+@utility o-slide-right {
+  &[data-state='open'] {
+    animation: o-slide-in-right var(--dur-slow) var(--ease-out);
+  }
+  &[data-state='closed'] {
+    animation: o-slide-out-right var(--dur-base) var(--ease-in-out);
+  }
+}
+
+@utility o-slide-left {
+  &[data-state='open'] {
+    animation: o-slide-in-left var(--dur-slow) var(--ease-out);
+  }
+  &[data-state='closed'] {
+    animation: o-slide-out-left var(--dur-base) var(--ease-in-out);
+  }
+}
+
+@utility o-slide-bottom {
+  &[data-state='open'] {
+    animation: o-slide-in-bottom var(--dur-slow) var(--ease-out);
+  }
+  &[data-state='closed'] {
+    animation: o-slide-out-bottom var(--dur-base) var(--ease-in-out);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MOTION — respected globally
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PRINT — the confirmation ticket is a real deliverable
+   ═══════════════════════════════════════════════════════════════════════ */
+@media print {
+  :root {
+    --surface: #fff;
+    --surface-raised: #fff;
+    --content: #000;
+    --content-muted: #333;
+    --hairline: #999;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  body::before {
+    display: none;
+  }
+
+  .auditorium {
+    --surface: #fff;
+    --surface-raised: #fff;
+    --content: #000;
+    --content-muted: #333;
+    --hairline: #999;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  [data-print='hide'],
+  header[data-app-header],
+  footer[data-app-footer] {
+    display: none !important;
+  }
+
+  [data-print='page'] {
+    break-inside: avoid;
+  }
+
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.75em;
+    color: #555;
+  }
+}

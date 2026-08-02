@@ -1,0 +1,21 @@
+﻿node_modules
+dist
+dist-ssr
+coverage
+*.local
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Locally-installed agent tooling, not part of the project. The skills
+# installer writes to both of these paths; neither is ours to redistribute.
+# Project-level .claude settings are deliberately still committable.
+.agents/
+.claude/skills/
+skills-lock.json
+
+# Third-party design-reference material. Studied, never rendered, and not ours
+# to redistribute — see docs/asset-inventory.md. `npm run check:assets` runs
+# fine without it.
+reference-assets/
