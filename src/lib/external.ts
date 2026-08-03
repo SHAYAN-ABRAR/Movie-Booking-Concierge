@@ -60,11 +60,11 @@ export function buildIcs(event: {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Nokshi Cinemas//Demonstration Build//EN',
+    'PRODID:-//GrandPlex//Demonstration Build//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:${event.uid}@nokshicinemas.example`,
+    `UID:${event.uid}@grandplexcinemas.example`,
     `DTSTAMP:${stamp(new Date())}`,
     `DTSTART:${stamp(event.start)}`,
     `DTEND:${stamp(end)}`,

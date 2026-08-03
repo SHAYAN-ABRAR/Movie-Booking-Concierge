@@ -2,6 +2,11 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { z } from 'zod';
 import { hashString } from '@/lib/deterministic';
+import {
+  BOOKING_REFERENCE_PATTERN,
+  LEGACY_REFERENCE_PREFIXES,
+  brand,
+} from '@/config/brand';
 import type { Format, SeatClass, TicketCategory } from '@/data/types';
 import type { PaymentMethodId } from './booking';
 
@@ -135,6 +140,16 @@ export function parseStoredBookings(value: unknown): {
  *
  * Deterministic in its inputs — the same screening, seats and guest always
  * produce the same code — with an unambiguous alphabet (no I, O, 0 or 1).
+ *
+ * The prefix comes from `brand`, so new references read `GP-`. Only the prefix
+ * changed at the rebrand: the code after it is generated exactly as before, so
+ * a booking made yesterday and the same booking made today differ by three
+ * characters and nothing else.
+ *
+ * References already issued as `NK-` are **not** rewritten. They are printed on
+ * tickets, saved in calendars and quoted down the phone; changing one would
+ * break the only thing tying a customer to their booking. `isBookingReference`
+ * accepts both, and `docs/grandplex-migration.md` records the decision.
  */
 export function makeReference(input: {
   showtimeId: string;
@@ -150,7 +165,24 @@ export function makeReference(input: {
     code += alphabet[value % alphabet.length];
     value = Math.floor(value / alphabet.length) + hashString(`${seed}|${i}`) % 97;
   }
-  return `NK-${code}`;
+  return `${brand.bookingReferencePrefix}-${code}`;
+}
+
+/**
+ * True for any reference this build accepts — current `GP-` or historical `NK-`.
+ *
+ * Every lookup goes through this rather than testing the prefix inline, so
+ * there is one place that knows what the legacy prefixes are.
+ */
+export function isBookingReference(value: string): boolean {
+  return BOOKING_REFERENCE_PATTERN.test(value.trim().toUpperCase());
+}
+
+/** True for a reference issued before the GrandPlex rebrand. */
+export function isLegacyReference(value: string): boolean {
+  return LEGACY_REFERENCE_PREFIXES.some((prefix) =>
+    value.trim().toUpperCase().startsWith(`${prefix}-`),
+  );
 }
 
 export interface DuplicateMatch {
@@ -192,7 +224,7 @@ export const useBookings = create<BookingsState>()(
         const { bookings, discarded } = parseStoredBookings(raw);
         if (discarded > 0) {
           console.warn(
-            `Nokshi: ignored ${discarded} unreadable booking record(s) in local storage. ` +
+            `GrandPlex: ignored ${discarded} unreadable booking record(s) in local storage. ` +
               `${bookings.length} valid booking(s) kept.`,
           );
         }

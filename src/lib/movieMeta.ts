@@ -50,7 +50,7 @@ export function releaseLabel(movie: Movie): string {
 
 /**
  * The disclosure that must appear wherever this catalogue is presented.
- * Movie facts are real; everything Nokshi does with them is simulated.
+ * Movie facts are real; everything GrandPlex does with them is simulated.
  */
 export const CATALOGUE_DISCLOSURE =
-  'Movie information and artwork are based on public release sources. Nokshi showtimes, prices and seat availability are simulated for this demonstration.';
+  'Movie information and artwork are based on public release sources. GrandPlex showtimes, prices and seat availability are simulated for this demonstration.';

@@ -1,7 +1,7 @@
 import type { Cinema, Screen, ScreenSeatRule } from './types';
 
 /**
- * Venue seed data for the Nokshi Cinemas demonstration.
+ * Venue seed data for the GrandPlex demonstration.
  *
  * These are original venues written for this build. They are not the branches,
  * addresses, phone numbers or policies of any real cinema operator.
@@ -57,7 +57,7 @@ export const cinemas: Cinema[] = [
   {
     id: 'cin-dhanmondi',
     slug: 'dhanmondi',
-    name: 'Nokshi Dhanmondi',
+    name: 'GrandPlex Dhanmondi',
     nameBn: 'নকশী ধানমন্ডি',
     shortName: 'Dhanmondi',
     city: 'Dhaka',
@@ -65,7 +65,7 @@ export const cinemas: Cinema[] = [
     addressLines: ['Level 6, Shatabdi Centre', 'Road 27, Dhanmondi', 'Dhaka 1209'],
     mapQuery: 'Shatabdi Centre, Road 27, Dhanmondi, Dhaka 1209',
     phone: '+880 2 9110 480',
-    email: 'dhanmondi@nokshicinemas.example',
+    email: 'dhanmondi@grandplexcinemas.example',
     openingHours: 'Daily, 10:30 – 00:30',
     boxOfficeHours: 'Daily, 10:00 – 23:00',
     screens: [
@@ -116,7 +116,7 @@ export const cinemas: Cinema[] = [
       'Latecomers are seated at a natural break in the film, normally within the first 20 minutes. After that, staff will seat you at the rear of the house to avoid disturbing other guests. Tickets are not refundable for late arrival.',
     trailerMinutes: 12,
     lostAndFound: {
-      email: 'lostandfound.dhanmondi@nokshicinemas.example',
+      email: 'lostandfound.dhanmondi@grandplexcinemas.example',
       phone: '+880 2 9110 484',
       hours: 'Daily, 11:00 – 20:00',
       holdingPeriodDays: 21,
@@ -128,7 +128,7 @@ export const cinemas: Cinema[] = [
   {
     id: 'cin-bashundhara',
     slug: 'bashundhara',
-    name: 'Nokshi Bashundhara',
+    name: 'GrandPlex Bashundhara',
     nameBn: 'নকশী বসুন্ধরা',
     shortName: 'Bashundhara',
     city: 'Dhaka',
@@ -136,7 +136,7 @@ export const cinemas: Cinema[] = [
     addressLines: ['Level 9, Meridian Tower', 'Block C, Bashundhara R/A', 'Dhaka 1229'],
     mapQuery: 'Meridian Tower, Block C, Bashundhara R/A, Dhaka 1229',
     phone: '+880 2 8412 700',
-    email: 'bashundhara@nokshicinemas.example',
+    email: 'bashundhara@grandplexcinemas.example',
     openingHours: 'Daily, 10:00 – 01:00',
     boxOfficeHours: 'Daily, 09:30 – 23:30',
     screens: [
@@ -194,7 +194,7 @@ export const cinemas: Cinema[] = [
       'Our largest house holds latecomers in the corridor until the first scene change, usually inside 15 minutes. Staff will show you to your seat with a shaded torch. Tickets are not refundable for late arrival.',
     trailerMinutes: 15,
     lostAndFound: {
-      email: 'lostandfound.bashundhara@nokshicinemas.example',
+      email: 'lostandfound.bashundhara@grandplexcinemas.example',
       phone: '+880 2 8412 706',
       hours: 'Daily, 10:30 – 21:00',
       holdingPeriodDays: 30,
@@ -206,7 +206,7 @@ export const cinemas: Cinema[] = [
   {
     id: 'cin-uttara',
     slug: 'uttara',
-    name: 'Nokshi Uttara',
+    name: 'GrandPlex Uttara',
     nameBn: 'নকশী উত্তরা',
     shortName: 'Uttara',
     city: 'Dhaka',
@@ -214,7 +214,7 @@ export const cinemas: Cinema[] = [
     addressLines: ['Level 4, Sector 7 Arcade', 'Sonargaon Janapath, Uttara', 'Dhaka 1230'],
     mapQuery: 'Sector 7 Arcade, Sonargaon Janapath, Uttara, Dhaka 1230',
     phone: '+880 2 5895 220',
-    email: 'uttara@nokshicinemas.example',
+    email: 'uttara@grandplexcinemas.example',
     openingHours: 'Daily, 11:00 – 00:00',
     boxOfficeHours: 'Daily, 10:30 – 22:30',
     screens: [
@@ -256,7 +256,7 @@ export const cinemas: Cinema[] = [
       'Latecomers are seated at any point during the film in our smaller houses, using the rear aisle. Tickets are not refundable for late arrival.',
     trailerMinutes: 10,
     lostAndFound: {
-      email: 'lostandfound.uttara@nokshicinemas.example',
+      email: 'lostandfound.uttara@grandplexcinemas.example',
       phone: '+880 2 5895 224',
       hours: 'Daily, 12:00 – 20:00',
       holdingPeriodDays: 14,
@@ -268,7 +268,7 @@ export const cinemas: Cinema[] = [
   {
     id: 'cin-agrabad',
     slug: 'agrabad',
-    name: 'Nokshi Agrabad',
+    name: 'GrandPlex Agrabad',
     nameBn: 'নকশী আগ্রাবাদ',
     shortName: 'Agrabad',
     city: 'Chattogram',
@@ -276,7 +276,7 @@ export const cinemas: Cinema[] = [
     addressLines: ['Level 5, Harbour Point', 'Agrabad Commercial Area', 'Chattogram 4100'],
     mapQuery: 'Harbour Point, Agrabad Commercial Area, Chattogram 4100',
     phone: '+880 31 2510 900',
-    email: 'agrabad@nokshicinemas.example',
+    email: 'agrabad@grandplexcinemas.example',
     openingHours: 'Daily, 11:00 – 23:45',
     boxOfficeHours: 'Daily, 10:30 – 22:30',
     screens: [
@@ -319,7 +319,7 @@ export const cinemas: Cinema[] = [
       'Latecomers are seated at a natural break within the first 20 minutes. Tickets are not refundable for late arrival.',
     trailerMinutes: 12,
     lostAndFound: {
-      email: 'lostandfound.agrabad@nokshicinemas.example',
+      email: 'lostandfound.agrabad@grandplexcinemas.example',
       phone: '+880 31 2510 906',
       hours: 'Daily, 11:30 – 20:00',
       holdingPeriodDays: 21,
@@ -331,7 +331,7 @@ export const cinemas: Cinema[] = [
   {
     id: 'cin-zindabazar',
     slug: 'zindabazar',
-    name: 'Nokshi Zindabazar',
+    name: 'GrandPlex Zindabazar',
     nameBn: 'নকশী জিন্দাবাজার',
     shortName: 'Zindabazar',
     city: 'Sylhet',
@@ -339,7 +339,7 @@ export const cinemas: Cinema[] = [
     addressLines: ['Level 3, Kotwali Plaza', 'Zindabazar Road', 'Sylhet 3100'],
     mapQuery: 'Kotwali Plaza, Zindabazar Road, Sylhet 3100',
     phone: '+880 821 726 340',
-    email: 'zindabazar@nokshicinemas.example',
+    email: 'zindabazar@grandplexcinemas.example',
     openingHours: 'Daily, 11:30 – 23:30',
     boxOfficeHours: 'Daily, 11:00 – 22:00',
     screens: [
@@ -368,7 +368,7 @@ export const cinemas: Cinema[] = [
       'Latecomers are seated throughout the film. Staff will use the rear aisle. Tickets are not refundable for late arrival.',
     trailerMinutes: 10,
     lostAndFound: {
-      email: 'lostandfound.zindabazar@nokshicinemas.example',
+      email: 'lostandfound.zindabazar@grandplexcinemas.example',
       phone: '+880 821 726 344',
       hours: 'Daily, 12:00 – 19:30',
       holdingPeriodDays: 14,

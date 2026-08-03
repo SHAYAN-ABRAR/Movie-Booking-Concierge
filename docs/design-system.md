@@ -1,4 +1,4 @@
-# Design system — Nokshi Cinemas
+# Design system — GrandPlex
 
 The tokens live in [`src/styles/globals.css`](../src/styles/globals.css). This document explains
 them and, more usefully, explains what is *not* allowed and why.
@@ -7,7 +7,7 @@ them and, more usefully, explains what is *not* allowed and why.
 
 ## Brand premise
 
-Nokshi Cinemas publishes a programme. Five houses, nineteen screens, a slate that turns over every
+GrandPlex publishes a programme. Five houses, nineteen screens, a slate that turns over every
 Thursday, and notes written by someone who watched the films. The site is that programme, made
 bookable.
 

@@ -89,7 +89,7 @@ const IGNORE_VALUE = [
   /^[a-z][a-z0-9-]*$/, // kebab or single lower-case token: an id or enum
   /^[A-Z][A-Z0-9_]*$/, // SCREAMING_CASE constant
   /^\W+$/, // punctuation or an arrow only
-  /^Nokshi( Cinemas)?$/, // the brand, unchanged in both languages
+  /^GrandPlex( Cinemas)?$/, // the brand, unchanged in both languages
   /^Max$/, // the concierge's name
 ];
 

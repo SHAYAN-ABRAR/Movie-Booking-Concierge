@@ -67,7 +67,29 @@ const moviesSource = readFileSync('src/data/movies.ts', 'utf8');
 const manifestSource = readFileSync('src/data/mediaManifest.ts', 'utf8');
 const TODAY = '2026-08-03';
 
-const movieBlocks = [...moviesSource.matchAll(/\{\s*\n\s*id: '(mov-[^']+)',([\s\S]*?)\n  \},/g)];
+/**
+ * Splits the file at each movie's `id:` rather than matching up to the first
+ * `\n  },`.
+ *
+ * The lazy-terminator version broke the moment a movie gained a nested object:
+ * `trailer: { … }` closes with a brace at exactly the indentation used as the
+ * *movie* terminator, so every block was silently truncated after the trailer
+ * and the validator reported that fourteen films had no poster, no backdrop and
+ * no metadata source. It failed loudly, which is the only reason this was
+ * caught — but it was reporting a fiction.
+ *
+ * Splitting on the start marker has no terminator to be confused by, so it
+ * survives any nesting a movie record grows later.
+ */
+// `\r?\n`: the working tree is CRLF on Windows and LF in CI, and a validator
+// that only passes on one of them is worse than no validator.
+const MOVIE_START = /^ {2}\{\r?\n {4}id: '(mov-[^']+)',$/gm;
+const starts = [...moviesSource.matchAll(MOVIE_START)];
+const movieBlocks = starts.map((match, index) => {
+  const from = match.index;
+  const to = index + 1 < starts.length ? starts[index + 1].index : moviesSource.length;
+  return [moviesSource.slice(from, to), match[1], moviesSource.slice(from, to)];
+});
 if (movieBlocks.length === 0) fail('could not parse any movies from src/data/movies.ts');
 
 const field = (block, name) => block.match(new RegExp(`${name}: '([^']*)'`))?.[1] ?? null;
@@ -91,6 +113,59 @@ for (const [, id, block] of movieBlocks) {
   if (!backdrop) fail(`${title}: no backdrop`);
   if (!verifiedAt) fail(`${title}: no verification date`);
   if (!source?.startsWith('http')) fail(`${title}: no metadata source`);
+
+  /* ── Trailer ────────────────────────────────────────────────────────
+   * A film must either carry a verified official trailer or say plainly
+   * that none has been released. What it may not do is carry a trailer with
+   * no provenance — an unattributed video id is indistinguishable from a fan
+   * upload, and the whole point of the record is that the claim is checkable.
+   * `npm run verify:trailers` re-checks the channel against YouTube itself.
+   * ────────────────────────────────────────────────────────────────── */
+  const hasTrailer = /\btrailer: \{/.test(block);
+  const trailerStatus = field(block, 'trailerStatus');
+
+  if (!hasTrailer && !trailerStatus) {
+    fail(`${title}: no trailer and no trailerStatus explaining why`);
+  }
+  if (hasTrailer) {
+    const provider = field(block, 'provider');
+    const videoId = field(block, 'videoId');
+    const channel = field(block, 'officialChannel');
+    const trailerVerified = block.match(/officialChannel:[\s\S]*?verifiedAt: '([^']*)'/)?.[1];
+    const type = field(block, 'type');
+
+    if (provider !== 'youtube') fail(`${title}: unsupported trailer provider ${provider}`);
+    if (!videoId || !/^[\w-]{11}$/.test(videoId)) {
+      fail(`${title}: trailer videoId is not an 11-character YouTube id`);
+    }
+    if (!channel) fail(`${title}: trailer has no officialChannel — provenance is the evidence`);
+    if (!trailerVerified) fail(`${title}: trailer has no verifiedAt date`);
+    if (type !== 'official-trailer' && type !== 'official-teaser') {
+      fail(`${title}: trailer type must be official-trailer or official-teaser, not ${type}`);
+    }
+  }
+
+  /* ── Short story ──────────────────────────────────────────────────── */
+  const story = block.match(/shortStory:\s*\r?\n?\s*'([\s\S]*?)',\r?\n {2}shortStoryBn/)?.[1];
+  const storyBn = block.match(/shortStoryBn:\s*\r?\n?\s*'([\s\S]*?)',\r?\n/)?.[1];
+
+  if (!story) fail(`${title}: no shortStory`);
+  if (!storyBn) fail(`${title}: no shortStoryBn`);
+  if (storyBn && !/[ঀ-৿]/.test(storyBn)) {
+    fail(`${title}: shortStoryBn contains no Bengali characters`);
+  }
+  if (story) {
+    const words = story.split(/\s+/).length;
+    // The panel is a fixed slot under a selected film. Much shorter says
+    // nothing; much longer stops being read and starts needing a scrollbar.
+    if (words < 30) fail(`${title}: shortStory is only ${words} words — too thin to be useful`);
+    if (words > 95) fail(`${title}: shortStory is ${words} words — too long for the panel`);
+
+    const synopsis = field(block, 'synopsis');
+    if (synopsis && synopsis.trim() === story.trim()) {
+      fail(`${title}: shortStory is a copy of the synopsis, not a shorter telling`);
+    }
+  }
 
   if (status === 'coming-soon' && (!release || release <= TODAY)) {
     fail(`${title}: marked coming-soon but its release date (${release}) is not in the future`);

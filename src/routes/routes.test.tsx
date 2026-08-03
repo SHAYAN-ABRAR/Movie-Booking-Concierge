@@ -52,10 +52,17 @@ describe('every route renders', () => {
     expect(screen.getByRole('radiogroup', { name: /choose a date/i })).toBeInTheDocument();
   });
 
-  it('a film page, with an honest trailer state', () => {
+  it('a film page, offering the official trailer without loading it', () => {
     renderAt('/movies/the-odyssey', '/movies/:slug', <MovieDetails />);
     expect(screen.getByRole('heading', { name: 'The Odyssey', level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(/no trailer available/i)).toBeInTheDocument();
+
+    // The trailer is offered…
+    expect(screen.getAllByRole('button', { name: /watch/i }).length).toBeGreaterThan(0);
+    // …and attributed to the channel that actually published it.
+    expect(screen.getByText(/Universal Pictures/)).toBeInTheDocument();
+    // …but nothing has contacted YouTube. The iframe only exists inside an
+    // opened dialog, which is the whole point of the preview-first design.
+    expect(document.querySelector('iframe')).toBeNull();
   });
 
   it('a film page for an unknown slug falls back rather than throwing', () => {
@@ -75,7 +82,7 @@ describe('every route renders', () => {
 
   it('a cinema page', () => {
     renderAt('/cinemas/dhanmondi', '/cinemas/:slug', <CinemaDetails />);
-    expect(screen.getByRole('heading', { name: /nokshi dhanmondi/i, level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /grandplex dhanmondi/i, level: 1 })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /house policies/i })).toBeInTheDocument();
   });
 
@@ -103,7 +110,7 @@ describe('every route renders', () => {
 
   it('about', () => {
     renderAt('/about', '/about', <About />);
-    expect(screen.getByRole('heading', { name: /nokshi cinemas/i, level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /grandplex/i, level: 1 })).toBeInTheDocument();
   });
 
   it('contact', () => {

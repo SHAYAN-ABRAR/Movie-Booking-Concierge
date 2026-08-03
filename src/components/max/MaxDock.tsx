@@ -57,7 +57,7 @@ export function MaxDock() {
   const motion = useMotionPreferences();
 
   const [nudgeVisible, setNudgeVisible] = useState(false);
-  const [nudgeDone, markNudgeDone] = useSessionFlag('nokshi.max.nudge');
+  const [nudgeDone, markNudgeDone] = useSessionFlag('grandplex.max.nudge');
   const activeSeconds = useActiveSeconds(!nudgeDone);
 
   /**

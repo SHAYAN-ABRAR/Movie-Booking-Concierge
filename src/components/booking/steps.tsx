@@ -698,7 +698,7 @@ const paymentMethods: Array<{
   },
   {
     id: 'gift-card',
-    label: 'Nokshi gift card',
+    label: 'GrandPlex gift card',
     blurb: 'Redeem a gift card balance against the booking.',
     icon: Gift,
   },

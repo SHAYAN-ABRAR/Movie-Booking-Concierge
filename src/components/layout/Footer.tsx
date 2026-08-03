@@ -28,7 +28,7 @@ const columns = [
     heading: 'footer.columns.yourVisit',
     links: [
       { to: '/bookings', key: 'footer.links.myBookings' },
-      { to: '/about', key: 'footer.links.aboutNokshi' },
+      { to: '/about', key: 'footer.links.aboutGrandPlex' },
       { to: '/contact#access', key: 'footer.links.accessibility' },
       { to: '/contact#lost', key: 'footer.links.lostProperty' },
     ],

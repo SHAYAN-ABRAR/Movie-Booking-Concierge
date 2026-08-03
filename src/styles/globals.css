@@ -50,7 +50,7 @@
   --projector-wash: #dfe6f8;
 
   /* Marigold — the sparing vermilion accent in the references, read through
-     the nokshi-kantha craft palette. Signal colour only. */
+     the nakshi kantha craft palette. Signal colour only. */
   --marigold: #c2491a;
   --marigold-lit: #f0913c;
   --marigold-wash: #f8e6da;
@@ -367,7 +367,7 @@ html.theme-transition *::after {
 
 /* ═══════════════════════════════════════════════════════════════════════
    SIGNATURE MOTIF — the running stitch
-   Nokshi kantha embroidery and 35mm film perforation are the same rhythm:
+   Nakshi kantha embroidery and 35mm film perforation are the same rhythm:
    an interrupted line. It is the only ornament in the system, and it is
    drawn, never imaged.
    ═══════════════════════════════════════════════════════════════════════ */

@@ -51,7 +51,7 @@ async function search(query) {
   const url =
     `https://api.openverse.org/v1/images/?q=${encodeURIComponent(query)}` +
     `&license_type=commercial&size=large&mature=false&page_size=12`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'nokshi-cinemas-demo/1.0' } });
+  const res = await fetch(url, { headers: { 'User-Agent': 'grandplex-movie-booking-demo/1.0' } });
   if (!res.ok) throw new Error(`search ${res.status}`);
   const json = await res.json();
   return json.results ?? [];
@@ -87,7 +87,7 @@ for (const item of ITEMS) {
     if (!candidate.url) continue;
 
     try {
-      const res = await fetch(candidate.url, { headers: { 'User-Agent': 'nokshi-cinemas-demo/1.0' } });
+      const res = await fetch(candidate.url, { headers: { 'User-Agent': 'grandplex-movie-booking-demo/1.0' } });
       if (!res.ok) continue;
       const buf = Buffer.from(await res.arrayBuffer());
       const meta = await sharp(buf).metadata();

@@ -8,15 +8,15 @@ import type { FaqEntry, InsurancePolicy } from './types';
  */
 
 export const COMPANY = {
-  name: 'Nokshi Cinemas',
+  name: 'GrandPlex',
   nameBn: 'নকশী সিনেমাস',
   foundedYear: 2009,
-  supportEmail: 'hello@nokshicinemas.example',
+  supportEmail: 'hello@grandplexcinemas.example',
   supportPhone: '+880 9600 665 700',
   supportHours: 'Daily, 09:00 – 22:00',
-  pressEmail: 'press@nokshicinemas.example',
-  accessibilityEmail: 'access@nokshicinemas.example',
-  registeredOffice: ['Nokshi Cinemas Ltd.', 'Level 6, Shatabdi Centre', 'Road 27, Dhanmondi, Dhaka 1209'],
+  pressEmail: 'press@grandplexcinemas.example',
+  accessibilityEmail: 'access@grandplexcinemas.example',
+  registeredOffice: ['GrandPlex Ltd.', 'Level 6, Shatabdi Centre', 'Road 27, Dhanmondi, Dhaka 1209'],
 } as const;
 
 export const insurancePolicy: InsurancePolicy = {
@@ -59,7 +59,7 @@ export const insurancePolicy: InsurancePolicy = {
     'Concessions and add-ons — cover applies to the ticket value only.',
   ],
   claimWindowDays: 14,
-  contactEmail: 'ticketcover@nokshicinemas.example',
+  contactEmail: 'ticketcover@grandplexcinemas.example',
   contactPhone: '+880 9600 665 712',
 };
 
@@ -202,7 +202,7 @@ export const faq: FaqEntry[] = [
     question: 'Is this a real cinema site?',
     questionBn: 'এটি কি আসল সিনেমার সাইট?',
     answer:
-      'No. Nokshi Cinemas is a demonstration build. The films, venues, schedules, seat availability, prices, offers and policies are all sample data authored for this project. No payment is taken, nothing is sent anywhere, and every booking is stored only in this browser.',
+      'No. GrandPlex is a demonstration build. The films, venues, schedules, seat availability, prices, offers and policies are all sample data authored for this project. No payment is taken, nothing is sent anywhere, and every booking is stored only in this browser.',
     answerBn:
       'না। নকশী সিনেমাস একটি ডেমো সংস্করণ। এখানকার ছবি, হল, সময়সূচি, আসন, দাম, অফার ও নীতিমালা সবই এই প্রকল্পের জন্য তৈরি নমুনা তথ্য। কোনো পেমেন্ট নেওয়া হয় না, কিছু কোথাও পাঠানো হয় না, এবং প্রতিটি বুকিং শুধু এই ব্রাউজারেই সংরক্ষিত থাকে।',
     keywords: ['real', 'demo', 'fake', 'sample', 'actual', 'genuine', 'ডেমো'],

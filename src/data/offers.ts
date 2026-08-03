@@ -51,11 +51,11 @@ export const offers: Offer[] = [
     titleBn: 'নৈশ রেপার্টরি',
     summary: 'Thursday nights at Dhanmondi, every seat at the regular rate whatever the house.',
     detail:
-      'The 22:45 Thursday strand at Nokshi Dhanmondi is priced flat: premium and recliner seats are charged at the regular seat rate. Format uplifts still apply, so a 3D screening is still a 3D screening.',
+      'The 22:45 Thursday strand at GrandPlex Dhanmondi is priced flat: premium and recliner seats are charged at the regular seat rate. Format uplifts still apply, so a 3D screening is still a 3D screening.',
     mechanic: 'Premium and recliner seats charged at the regular seat base for Thursday screenings from 22:00 at Dhanmondi.',
     days: [4],
     terms: [
-      'Nokshi Dhanmondi only.',
+      'GrandPlex Dhanmondi only.',
       'Screenings starting at or after 22:00 on Thursdays.',
       'Format uplifts and the booking fee are unchanged.',
     ],
@@ -69,11 +69,11 @@ export const offers: Offer[] = [
     titleBn: 'সংবেদনশীল ম্যাটিনি',
     summary: 'First Saturday of the month at Bashundhara. House lights half up, sound brought down.',
     detail:
-      'A monthly screening in House Three at Nokshi Bashundhara with the house lights kept partly up, the volume reduced, no trailers before the feature, and freedom to move around or leave and return during the film. Companion tickets are free — ask the box office rather than booking them online.',
+      'A monthly screening in House Three at GrandPlex Bashundhara with the house lights kept partly up, the volume reduced, no trailers before the feature, and freedom to move around or leave and return during the film. Companion tickets are free — ask the box office rather than booking them online.',
     mechanic: 'Reduced-sensory presentation; companion entry free at the box office.',
     days: [6],
     terms: [
-      'Nokshi Bashundhara, House Three.',
+      'GrandPlex Bashundhara, House Three.',
       'Companion tickets are issued at the box office, not through this site.',
       'Standard seat pricing otherwise applies.',
     ],

@@ -8,7 +8,7 @@ import type { Movie } from './types';
  * film's public TMDB record, verified on 2026-08-03, and every one carries a
  * `metadataSource` pointing at the record it came from.
  *
- * Everything Nokshi-specific around them is simulated for this demonstration:
+ * Everything GrandPlex-specific around them is simulated for this demonstration:
  * showtimes, screens, seat availability, prices, offers and the intermission
  * guidance. `tagline` and `programmeNote` are this programme's own editorial
  * voice — opinions about real films, not claims of fact about them.
@@ -28,6 +28,21 @@ export const movies: Movie[] = [
     id: 'mov-the-odyssey',
     slug: 'the-odyssey',
     title: 'The Odyssey',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'Mzw2ttJD2qQ',
+    title: 'The Odyssey | Official Trailer',
+    type: 'official-trailer',
+    officialChannel: 'Universal Pictures',
+    sourceUrl: 'https://www.youtube.com/watch?v=Mzw2ttJD2qQ',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Ten years after the fall of Troy, Odysseus is still trying to reach Ithaca. The gods have other plans, the sea keeps taking his crew, and the kingdom he left behind has stopped waiting for him. Nolan shoots the oldest adventure story in the language on IMAX film.',
+  shortStoryBn:
+    'ট্রয়ের পতনের দশ বছর পরেও ওডিসিয়ুস ইথাকায় ফিরতে পারেননি। দেবতাদের পরিকল্পনা অন্যরকম, সমুদ্র একের পর এক সঙ্গীকে কেড়ে নিচ্ছে, আর যে রাজ্য তিনি ফেলে এসেছিলেন সেটি আর অপেক্ষা করছে না। ভাষার সবচেয়ে পুরনো অভিযানকাহিনি নোলান তুলেছেন আইম্যাক্স ফিল্মে।',
     tagline: 'Ten years from Troy, and the sea is still not finished with him.',
     synopsis:
       'Odysseus, the legendary King of Ithaca, embarks on a long and perilous journey home following the Trojan War. Throughout his voyage, he is forced to confront the whims of gods, mythological monsters, and trials that stretch both his cunning and his humanity to the breaking point.',
@@ -60,6 +75,21 @@ export const movies: Movie[] = [
     id: 'mov-spider-man-brand-new-day',
     slug: 'spider-man-brand-new-day',
     title: 'Spider-Man: Brand New Day',
+  trailer: {
+    provider: 'youtube',
+    videoId: '8TZMtslA3UY',
+    title: 'SPIDER-MAN: BRAND NEW DAY – Official Trailer (HD)',
+    type: 'official-trailer',
+    officialChannel: 'Spider-Man',
+    sourceUrl: 'https://www.youtube.com/watch?v=8TZMtslA3UY',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Nobody remembers Peter Parker. With his old life erased and no one left to call on, he is rebuilding from a rented room in New York — new job, new neighbourhood, same city that needs Spider-Man. Then something arrives that he cannot fight alone, and asking for help means being known again.',
+  shortStoryBn:
+    'পিটার পার্কারকে আর কেউ মনে রাখে না। পুরনো জীবন মুছে গেছে, ডাক দেওয়ার মতো কেউ নেই — নিউ ইয়র্কের একটি ভাড়া ঘর থেকে সে আবার শুরু করছে। নতুন কাজ, নতুন পাড়া, কিন্তু শহরটার স্পাইডার-ম্যানকে দরকার আগের মতোই। তারপর এমন কিছু আসে যার সঙ্গে একা লড়া যায় না — আর সাহায্য চাইলেই তাকে আবার চেনা যাবে।',
     tagline: 'A city that forgot him, and a boy starting over in it.',
     synopsis:
       'Fighting crime full-time as Spider-Man in a world that doesn\'t remember him—and the pressure of seeing his old friends move on without him—sparks a change in Peter Parker he may not have the power to control. But that transformation might also be the only thing that can stop a shocking new threat to the city and those he loves - a powerful villain no one can even see.',
@@ -89,6 +119,21 @@ export const movies: Movie[] = [
     id: 'mov-toy-story-5',
     slug: 'toy-story-5',
     title: 'Toy Story 5',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'c51ND9Hdbw0',
+    title: 'Toy Story 5 | Official Trailer | In Theaters June 19',
+    type: 'official-trailer',
+    officialChannel: 'Pixar',
+    sourceUrl: 'https://www.youtube.com/watch?v=c51ND9Hdbw0',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Woody, Buzz and Jessie face something no toy has beaten yet: a screen. Bonnie is given a tablet that talks back, and the toys find themselves competing for attention with a device that never runs out of ideas.',
+  shortStoryBn:
+    'উডি, বাজ আর জেসির সামনে এমন একটা প্রতিদ্বন্দ্বী, যাকে আজ পর্যন্ত কোনো খেলনা হারাতে পারেনি — একটা পর্দা। বনি যখন কথা বলা একটা ট্যাবলেট পায়, খেলনাগুলোকে মন জয়ের লড়াইয়ে নামতে হয় এমন এক যন্ত্রের সঙ্গে, যার আইডিয়া কখনও ফুরোয় না। একসঙ্গে থাকার চেয়েও কঠিন হয়ে দাঁড়ায় ভালোবাসা ধরে রাখা।',
     tagline: 'The toys meet something that does not need batteries either.',
     synopsis:
       'When Bonnie receives a Lilypad tablet as a gift and becomes obsessed, Buzz, Woody, Jessie and the rest of the gang\'s jobs become exponentially harder when they have to go head to head with the all-new threat to playtime.',
@@ -118,6 +163,21 @@ export const movies: Movie[] = [
     id: 'mov-project-hail-mary',
     slug: 'project-hail-mary',
     title: 'Project Hail Mary',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'm08TxIsFTRI',
+    title: 'Project Hail Mary - Official Trailer',
+    type: 'official-trailer',
+    officialChannel: 'Amazon MGM Studios',
+    sourceUrl: 'https://www.youtube.com/watch?v=m08TxIsFTRI',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Ryland Grace wakes on a spacecraft with no memory of boarding it and two dead crewmates for company. As his past comes back in pieces, so does the reason he is out here: the sun is dimming, Earth has one attempt at a fix, and he is it. Then he finds he is not alone.',
+  shortStoryBn:
+    'রাইল্যান্ড গ্রেস একটি মহাকাশযানে জেগে ওঠে — কীভাবে উঠেছিল মনে নেই, সঙ্গী বলতে দুজন মৃত সহযাত্রী। স্মৃতি টুকরো টুকরো করে ফিরে আসার সঙ্গে সঙ্গে ফিরে আসে কারণটাও: সূর্য নিভে আসছে, পৃথিবীর হাতে একটাই চেষ্টা, আর সেই চেষ্টাটা সে নিজেই। তারপর সে টের পায়, সে একা নয়।',
     tagline: 'One man, one ship, and a problem the sun is not going to wait on.',
     synopsis:
       'Science teacher Ryland Grace wakes up on a spaceship light years from home with no recollection of who he is or how he got there. As his memory returns, he begins to uncover his mission: solve the riddle of the mysterious substance causing the sun to die out. He must call on his scientific knowledge and unorthodox ideas to save everything on Earth from extinction.',
@@ -150,6 +210,21 @@ export const movies: Movie[] = [
     id: 'mov-supergirl',
     slug: 'supergirl',
     title: 'Supergirl',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'YqdAEdkHrwo',
+    title: 'Supergirl | Official Teaser Trailer',
+    type: 'official-teaser',
+    officialChannel: 'DC',
+    sourceUrl: 'https://www.youtube.com/watch?v=YqdAEdkHrwo',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Kara Zor-El remembers Krypton dying — she was old enough to watch it happen. Drifting between worlds with little use for Earth, she is pulled into a revenge mission by a girl with nothing left to lose. What follows is less a rescue than a long, hard journey across the galaxy.',
+  shortStoryBn:
+    'কারা জোর-এল ক্রিপ্টনের ধ্বংস দেখেছিল — সেটা মনে রাখার মতো বয়স তার হয়েছিল। পৃথিবীর প্রতি বিশেষ টান নেই, নানা গ্রহে ঘুরে বেড়ায় সে; তারপর সব হারানো এক মেয়ের প্রতিশোধের অভিযানে তাকে জড়িয়ে পড়তে হয়। যা ঘটে তা উদ্ধারকাজের চেয়ে বেশি — ছায়াপথজুড়ে এক দীর্ঘ, কঠিন যাত্রা।',
     tagline: 'She was told to be careful. She has stopped listening.',
     synopsis:
       'When an unexpected and ruthless adversary strikes too close to home, Kara Zor-El, aka Supergirl, reluctantly joins forces with an unlikely companion on an epic, interstellar journey of vengeance and justice.',
@@ -179,6 +254,21 @@ export const movies: Movie[] = [
     id: 'mov-backrooms',
     slug: 'backrooms',
     title: 'Backrooms',
+  trailer: {
+    provider: 'youtube',
+    videoId: '0HjdiohVOik',
+    title: 'Backrooms | Official Trailer HD | A24',
+    type: 'official-trailer',
+    officialChannel: 'A24',
+    sourceUrl: 'https://www.youtube.com/watch?v=0HjdiohVOik',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'A boy falls out of the world in 1996 and lands somewhere that should not exist: an office corridor with no end, buzzing lights and damp carpet, repeating forever. Years of found footage suggest others have fallen through too, and that whatever is down there has learned to wait.',
+  shortStoryBn:
+    '১৯৯৬ সালে এক কিশোর পৃথিবী থেকে ছিটকে গিয়ে পড়ে এমন এক জায়গায়, যার থাকারই কথা নয় — শেষহীন অফিস করিডোর, ভনভন করা আলো আর স্যাঁতসেঁতে কার্পেট, অনন্তকাল ধরে একই রকম। বছরের পর বছরের ফুটেজ বলে, আরও অনেকে এভাবেই হারিয়ে গেছে — আর নিচে যা-ই থাকুক, সে অপেক্ষা করতে শিখে গেছে।',
     tagline: 'The room you walk into is the same room. That is the problem.',
     synopsis:
       'A strange doorway appears in the basement of a furniture showroom.',
@@ -208,6 +298,21 @@ export const movies: Movie[] = [
     id: 'mov-moana',
     slug: 'moana',
     title: 'Moana',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'EEz5xbzYPKI',
+    title: 'Moana | Final Trailer | In Theaters July 10',
+    type: 'official-trailer',
+    officialChannel: 'Disney',
+    sourceUrl: 'https://www.youtube.com/watch?v=EEz5xbzYPKI',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Motunui is failing: the fish are gone and the coconuts are spoiling. Moana, who has been told her whole life not to cross the reef, takes a boat past it anyway to find the demigod who caused it. Maui is not especially interested in helping.',
+  shortStoryBn:
+    'মোতুনুই ভালো নেই — মাছ উধাও, নারকেল নষ্ট হয়ে যাচ্ছে। সারা জীবন যাকে বলা হয়েছে প্রবাল-প্রাচীর পেরোতে নেই, সেই মোয়ানা নৌকা নিয়ে ঠিকই পেরিয়ে যায়, খুঁজতে যায় সেই দেবতুল্যকে, যার জন্য এই দশা। মাউয়ির অবশ্য সাহায্য করায় বিশেষ আগ্রহ নেই।',
     tagline: 'The ocean chose her once. It is asking again.',
     synopsis:
       'Teenage Moana answers the Ocean\'s call and, for the first time, voyages beyond the reef of her island of Motunui with infamous demigod Maui on an unforgettable journey to restore prosperity to her people.',
@@ -237,6 +342,21 @@ export const movies: Movie[] = [
     id: 'mov-masters-of-the-universe',
     slug: 'masters-of-the-universe',
     title: 'Masters of the Universe',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'X21JsHLHnY8',
+    title: 'Masters of The Universe – Official Trailer',
+    type: 'official-trailer',
+    officialChannel: 'Amazon MGM Studios',
+    sourceUrl: 'https://www.youtube.com/watch?v=X21JsHLHnY8',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Adam was sent away from Eternia as a baby and raised on Earth knowing none of it. When the sword that belongs to him finally arrives, so does Skeletor\'s army — and a throne he never asked for. Becoming He-Man is the easy part; being worth the title is not.',
+  shortStoryBn:
+    'শিশু বয়সেই অ্যাডামকে ইটার্নিয়া থেকে সরিয়ে দেওয়া হয়েছিল; পৃথিবীতে সে বড় হয়েছে কিছুই না জেনে। যে তরবারি তার, সেটি যখন অবশেষে পৌঁছয়, সঙ্গে পৌঁছয় স্কেলেটরের বাহিনী — আর এমন এক সিংহাসন, যা সে কখনও চায়নি। হি-ম্যান হওয়াটা সহজ; নামের যোগ্য হয়ে ওঠাটা নয়।',
     tagline: 'Eternia has waited a long time for someone to lift the sword.',
     synopsis:
       'After being separated for 15 years, the Sword of Power leads Prince Adam back to Eternia, where he discovers his home shattered under the fiendish rule of Skeletor. To save his family and his world, Adam must join forces with his closest allies, Teela and Duncan/Man-At-Arms, and embrace his true destiny as He-Man — the most powerful man in the universe.',
@@ -266,6 +386,21 @@ export const movies: Movie[] = [
     id: 'mov-avengers-doomsday',
     slug: 'avengers-doomsday',
     title: 'Avengers: Doomsday',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'irVNGjRFZGk',
+    title: 'Avengers: Doomsday | Official Trailer | In Theaters December 18',
+    type: 'official-trailer',
+    officialChannel: 'Marvel Entertainment',
+    sourceUrl: 'https://www.youtube.com/watch?v=irVNGjRFZGk',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Heroes from three separate universes are pulled onto the same collision course by a threat none of them can meet alone. Victor Von Doom is not hiding, not bargaining and not obviously wrong — and the teams sent to stop him have never worked together, or in some cases even met.',
+  shortStoryBn:
+    'তিনটি আলাদা মহাবিশ্বের নায়কদের এক সংঘর্ষের পথে টেনে আনে এমন এক বিপদ, যার সামনে কেউ একা দাঁড়াতে পারে না। ভিক্টর ভন ডুম লুকোচ্ছে না, দরকষাকষিও করছে না, আর তাকে স্পষ্ট ভুলও বলা যাচ্ছে না — অথচ তাকে থামাতে পাঠানো দলগুলো কখনও একসঙ্গে কাজ করেনি, কেউ কেউ তো একে অন্যকে চেনেই না।',
     tagline: 'Everything they have built, against one man who has read the plan.',
     synopsis:
       'Beloved heroes from three distinct universes are set on a deadly collision course and face an existential threat unlike anything they\'ve ever encountered.',
@@ -295,6 +430,21 @@ export const movies: Movie[] = [
     id: 'mov-dune-part-three',
     slug: 'dune-part-three',
     title: 'Dune: Part Three',
+  trailer: {
+    provider: 'youtube',
+    videoId: '3_9vCamtuPY',
+    title: 'Dune: Part Three | Official Teaser Trailer',
+    type: 'official-teaser',
+    officialChannel: 'Warner Bros.',
+    sourceUrl: 'https://www.youtube.com/watch?v=3_9vCamtuPY',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Paul Atreides got everything he set out for: the throne, the desert, the faithful. Twelve years on, the holy war carried out in his name has crossed the known universe, and the people closest to him are quietly deciding what to do about the emperor they made.',
+  shortStoryBn:
+    'পল আত্রেইদিস যা যা চেয়েছিল, সবই পেয়েছে — সিংহাসন, মরুভূমি, অনুগত মানুষ। বারো বছর পরে তার নামে চালানো পবিত্র যুদ্ধ ছড়িয়ে পড়েছে গোটা পরিচিত মহাবিশ্বে, আর তার সবচেয়ে কাছের মানুষগুলো চুপচাপ ঠিক করছে — নিজেদের বানানো এই সম্রাটকে নিয়ে এখন কী করা যায়।',
     tagline: 'The desert finishes what it started.',
     synopsis:
       'Emperor Paul Atreides faces the fallout from his ascent to power as political plots and a galaxy-wide holy war endanger the future only he can see.',
@@ -324,6 +474,21 @@ export const movies: Movie[] = [
     id: 'mov-the-hunger-games-sunrise-on-the-reaping',
     slug: 'the-hunger-games-sunrise-on-the-reaping',
     title: 'The Hunger Games: Sunrise on the Reaping',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'k3khlqKZOJk',
+    title: 'The Hunger Games: Sunrise on the Reaping - Official Trailer',
+    type: 'official-trailer',
+    officialChannel: 'LionsgateFilmsUK',
+    sourceUrl: 'https://www.youtube.com/watch?v=k3khlqKZOJk',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Twenty-four years before Katniss, the Capitol marks the fiftieth Games by doubling the tributes. Sixteen-year-old Haymitch Abernathy is reaped from District Twelve into an arena built for forty-eight children, and works out early that surviving it and beating it are not the same thing.',
+  shortStoryBn:
+    'ক্যাটনিসের চব্বিশ বছর আগে, পঞ্চাশতম গেমস উপলক্ষে ক্যাপিটল দ্বিগুণ প্রতিযোগী তুলে নেয়। বারো নম্বর ডিস্ট্রিক্ট থেকে ষোলো বছরের হেইমিচ অ্যাবারনাথিকে পাঠানো হয় আটচল্লিশটি কিশোর-কিশোরীর জন্য বানানো এক আখড়ায় — আর সে খুব তাড়াতাড়ি বুঝে যায়, বেঁচে ফেরা আর জিতে ফেরা এক জিনিস নয়।',
     tagline: 'Twenty-four years before Katniss, another name came out of the bowl.',
     synopsis:
       'Return to the world of Panem 24 years before the events of The Hunger Games, starting on the morning of the reaping of the 50th Hunger Games, also known as the Second Quarter Quell.',
@@ -353,6 +518,21 @@ export const movies: Movie[] = [
     id: 'mov-jumanji-open-world',
     slug: 'jumanji-open-world',
     title: 'Jumanji: Open World',
+  trailer: {
+    provider: 'youtube',
+    videoId: '-citDl5XHLE',
+    title: 'JUMANJI: OPEN WORLD - Official Trailer (HD)',
+    type: 'official-trailer',
+    officialChannel: 'Sony Pictures Malaysia',
+    sourceUrl: 'https://www.youtube.com/watch?v=-citDl5XHLE',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'The game is back, and it has stopped waiting to be played. Where Jumanji once pulled people in, this version has learned to spill out — and the avatars who survived it before are the only ones who understand the rules well enough to be frightened.',
+  shortStoryBn:
+    'খেলাটা ফিরে এসেছে, আর এবার সে খেলার অপেক্ষায় বসে নেই। জুমানজি আগে মানুষকে ভেতরে টেনে নিত; এবারের সংস্করণ বাইরে বেরিয়ে আসতে শিখেছে — আর আগে যারা বেঁচে ফিরেছিল, নিয়মগুলো এতটা ভালো জানে বলেই কেবল তারাই ভয় পাচ্ছে।',
     tagline: 'The game has stopped waiting to be played.',
     synopsis:
       'Our heroes have escaped the ever-changing jungles of Jumanji before, but this time the game comes to us - as Jumanji breaks free of its console, unleashing its chaos into our world.',
@@ -382,6 +562,21 @@ export const movies: Movie[] = [
     id: 'mov-clayface',
     slug: 'clayface',
     title: 'Clayface',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'qwacKDJOESw',
+    title: 'Clayface - Official Trailer - Warner Bros. UK and Ireland',
+    type: 'official-trailer',
+    officialChannel: 'Warner Bros. UK & Ireland',
+    sourceUrl: 'https://www.youtube.com/watch?v=qwacKDJOESw',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'A failing actor takes a treatment that promises him any face he wants. It works — and then it keeps working, past the point where he can stop it or find his own face underneath. A body-horror picture set at the edges of Gotham rather than in its skyline.',
+  shortStoryBn:
+    'কেরিয়ার-ডোবা এক অভিনেতা এমন এক চিকিৎসা নেয়, যা তাকে যেকোনো চেহারা এনে দেবে বলে কথা দেয়। কাজ হয় — এবং হতেই থাকে, এমন জায়গা পেরিয়ে যায় যেখান থেকে সে আর থামাতে পারে না, নিজের চেহারাটাও খুঁজে পায় না। গথামের আকাশরেখা নয়, এই বডি-হরর ছবিটি শহরের প্রান্তের গল্প।',
     tagline: 'He wanted a face people would remember.',
     synopsis:
       'Follow the terrifying descent into hell of a promising Hollywood actor who has become a monster driven by revenge, exploring the loss of identity and humanity, the ravages of toxic love and the dark side of scientific ambition.',
@@ -411,6 +606,21 @@ export const movies: Movie[] = [
     id: 'mov-klara-and-the-sun',
     slug: 'klara-and-the-sun',
     title: 'Klara and the Sun',
+  trailer: {
+    provider: 'youtube',
+    videoId: 'wixzainceAE',
+    title: 'KLARA AND THE SUN – Official Trailer (4K)',
+    type: 'official-trailer',
+    officialChannel: 'Sony Pictures Entertainment',
+    sourceUrl: 'https://www.youtube.com/watch?v=wixzainceAE',
+    verifiedAt: '2026-08-03',
+    language: 'en',
+    captionsAvailable: true,
+  },
+  shortStory:
+    'Klara is an Artificial Friend, built to be bought and watching the street through a shop window until she is. Chosen by a girl who is often ill, she learns a household from the outside in — and forms her own quiet theory about what is wrong and what might fix it.',
+  shortStoryBn:
+    'ক্লারা একজন আর্টিফিশিয়াল ফ্রেন্ড — বিক্রি হওয়ার জন্য তৈরি, আর সেই অপেক্ষায় দোকানের কাচ দিয়ে রাস্তা দেখে। প্রায়ই অসুস্থ থাকে এমন এক কিশোরী তাকে বেছে নেয়, আর বাইরে থেকে ভেতরে ঢুকে ক্লারা একটি পরিবারকে চিনতে শেখে — নিজের মতো করে একটা নিঃশব্দ ধারণাও তৈরি করে ফেলে, কী গোলমাল হয়েছে আর কীসে তা সারতে পারে।',
     tagline: 'She was built to watch, and she has been watching carefully.',
     synopsis:
       'When Klara, an Artificial Friend who wants nothing more than to find the perfect home, meets Josie, each immediately senses a kindred spirit in the other. Josie has a fraught relationship with her mother and they\'ve suffered great loss, but Klara\'s innocent wonder and unwavering loyalty begin to heal the family and bring light to Josie\'s complicated world.',

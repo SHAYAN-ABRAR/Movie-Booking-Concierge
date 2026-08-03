@@ -77,7 +77,7 @@ export function Contact() {
       `Subject area: ${topic.label}`,
       cinema ? `Cinema: ${cinema.name}` : null,
       '',
-      'Sent from the Nokshi Cinemas demonstration site.',
+      'Sent from the GrandPlex demonstration site.',
     ]
       .filter((line): line is string => line !== null)
       .join('\n');

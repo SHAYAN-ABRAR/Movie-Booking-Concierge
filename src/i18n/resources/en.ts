@@ -60,7 +60,7 @@ export const en = {
     counter: 'Counter',
     offers: 'Offers',
     skipToContent: 'Skip to content',
-    home: 'Nokshi Cinemas — home',
+    home: 'GrandPlex — home',
     ticketPrices: 'Ticket prices',
     myBookings: 'My bookings',
     about: 'About',
@@ -93,15 +93,15 @@ export const en = {
       ticketPrices: 'Ticket prices',
       contactSupport: 'Contact & support',
       myBookings: 'My bookings',
-      aboutNokshi: 'About Nokshi',
+      aboutGrandPlex: 'About GrandPlex',
       accessibility: 'Accessibility',
       lostProperty: 'Lost property',
     },
     houses: 'Our houses',
     demonstrationTitle: 'A demonstration build.',
     demonstrationBody:
-      "Nokshi Cinemas is not a real cinema chain. Every film, venue, schedule, seat, price, offer and policy on this site is sample data written for this project. No payment is taken and no information leaves your browser — bookings are stored in this browser's local storage only.",
-    copyright: '© {{year}} Nokshi Cinemas',
+      "GrandPlex is not a real cinema chain. Every film, venue, schedule, seat, price, offer and policy on this site is sample data written for this project. No payment is taken and no information leaves your browser — bookings are stored in this browser's local storage only.",
+    copyright: '© {{year}} GrandPlex',
   },
 
   location: {
@@ -286,7 +286,7 @@ export const en = {
 
   featured: {
     demoNote:
-      'Nokshi Cinemas is a demonstration build — the films, schedules and prices are sample data. You can complete a booking as a guest; no payment is taken.',
+      'GrandPlex is a demonstration build — the films, schedules and prices are sample data. You can complete a booking as a guest; no payment is taken.',
   },
 
   bookings: {
@@ -428,6 +428,29 @@ export const en = {
     bookLabel: 'Book {{time}}, {{format}}, {{seats}}',
   },
 
+  trailer: {
+    watch: 'Watch trailer',
+    watchOfficial: 'Watch official trailer',
+    watchFor: 'Watch the trailer for {{movie}}',
+    playerTitle: '{{movie}} — official trailer',
+    loading: 'Loading the player…',
+    watchOnYouTube: 'Watch on YouTube',
+    officialTrailerBy: 'Official trailer · {{channel}}',
+    officialTeaserBy: 'Official teaser · {{channel}}',
+    notReleasedTitle: 'Trailer not released yet',
+    notReleasedBody:
+      'The studio has not published a trailer or teaser for this film. Rather than link you to an unofficial upload, there is nothing here yet.',
+  },
+
+  story: {
+    heading: 'Story',
+    fullSynopsis: 'Full synopsis',
+    readMore: 'Read more',
+    showLess: 'Show less',
+    viewDetails: 'View details',
+    selected: 'Selected: {{title}}.',
+  },
+
   filters: {
     heading: 'Filters',
     search: 'Search',
@@ -490,7 +513,7 @@ export const en = {
     share: 'Share',
     linkCopied: 'Link copied',
     copyPrompt: 'Copy this link',
-    shareTitle: '{{title}} — Nokshi Cinemas',
+    shareTitle: '{{title}} — GrandPlex',
     restrictionNote:
       'The booking flow will check the ticket categories you choose against this. This site does not verify anyone’s age — the door does.',
     credits: {
@@ -518,7 +541,7 @@ export const en = {
     noScreeningsBody:
       '{{title}} is not scheduled at {{cinema}} on the date you picked. Try another day, or clear the cinema filter.',
     showAllCinemas: 'Show all cinemas',
-    notRealListings: 'These are not real Nokshi Cinemas listings and nothing here reflects live inventory.',
+    notRealListings: 'These are not real GrandPlex listings and nothing here reflects live inventory.',
     pricingHeading: 'What a ticket costs',
     fullPrice: 'Full price',
     ageFrom: '{{from}}+',
@@ -699,15 +722,15 @@ export const en = {
   },
 
   metadata: {
-    /** `{{page}} — Nokshi Cinemas` */
-    titleTemplate: '{{page}} — Nokshi Cinemas',
+    /** `{{page}} — GrandPlex` */
+    titleTemplate: '{{page}} — GrandPlex',
     booking: 'Booking',
     confirmation: 'Your ticket',
     notFound: 'Page not found',
-    siteName: 'Nokshi Cinemas',
+    siteName: 'GrandPlex',
     home: 'The Programme',
     description:
-      'Nokshi Cinemas — browse the programme, compare showtimes and book seats. A local, frontend-only demonstration build.',
+      'GrandPlex — browse the programme, compare showtimes and book seats. A local, frontend-only demonstration build.',
   },
 } as const;
 

@@ -5,6 +5,7 @@ import { Check, Clapperboard, Share2, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge, DemoNote, RuleHeading } from '@/components/ui/misc';
 import { AccessibilityChips, AccessibilityLegend, CertificateChip } from '@/components/movie/Chips';
+import { TrailerButton, TrailerPreview } from '@/components/movie/TrailerDialog';
 import { ShowtimePill } from '@/components/showtime/ShowtimeButton';
 import { MovieImage } from '@/components/visual/MovieImage';
 import { DateStrip } from '@/components/showtime/DateStrip';
@@ -40,7 +41,7 @@ import { usePreferences } from '@/store/preferences';
 import { cn } from '@/lib/utils';
 
 export function MovieDetails() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const f = useFormatters();
   const { slug } = useParams<{ slug: string }>();
   const movie = slug ? getMovie(slug) : null;
@@ -171,6 +172,13 @@ export function MovieDetails() {
                 ) : null}
               </div>
 
+              {/* The premise, before the actions. Someone deciding whether to
+                  press "Choose a showtime" wants three sentences, not the
+                  paragraph further down the page. */}
+              <p className="mt-6 max-w-prose text-[1rem] leading-7 text-content-muted">
+                {i18n.language === 'bn' ? movie.shortStoryBn : movie.shortStory}
+              </p>
+
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 {movie.status === 'now-showing' ? (
                   <Button asChild size="lg">
@@ -181,6 +189,7 @@ export function MovieDetails() {
                     {t('movieDetails.opens', { date: releaseLabel(movie) })}
                   </Badge>
                 )}
+                <TrailerButton movie={movie} variant="outline" size="lg" />
                 <Button variant="outline" size="lg" onClick={share}>
                   {shared === 'copied' ? (
                     <>
@@ -265,7 +274,7 @@ export function MovieDetails() {
         <div className="min-w-0">
           <section aria-labelledby="synopsis-heading">
             <RuleHeading id="synopsis-heading" className="mb-5">
-              {t('movieDetails.theFilm')}
+              {t('story.fullSynopsis')}
             </RuleHeading>
             <p className="max-w-prose text-[1.0625rem] leading-8">{movie.synopsis}</p>
 
@@ -280,15 +289,8 @@ export function MovieDetails() {
             <RuleHeading id="trailer-heading" className="mb-5">
               {t('movieDetails.trailer')}
             </RuleHeading>
-            {movie.trailerSrc ? (
-              <video
-                controls
-                preload="none"
-                className="w-full border border-hairline-strong bg-content"
-                src={movie.trailerSrc}
-              >
-                <track kind="captions" />
-              </video>
+            {movie.trailer ? (
+              <TrailerPreview movie={movie} />
             ) : (
               /* A screen with nothing running on it, rather than an error box.
                  The frame is real, the leader marks are real, and the copy is

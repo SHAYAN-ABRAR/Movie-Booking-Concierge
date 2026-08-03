@@ -16,7 +16,7 @@ export function About() {
     <div className="shell">
       <PageHeader
         eyebrow="About"
-        title="Nokshi Cinemas"
+        title="GrandPlex"
         lede="Five houses, nineteen screens, one programme that changes every Thursday. And a note about how this site was built, because it matters to how it looks."
       />
 
@@ -27,8 +27,8 @@ export function About() {
               The name
             </RuleHeading>
             <p className="text-[1.0625rem] leading-8">
-              <em>Nokshi</em> — নকশী — is the running stitch of Bengal, the line of small marks that
-              makes a nokshi kantha out of worn cloth. A strip of 35mm film carries the same
+              <em>GrandPlex</em> — নকশী — is the running stitch of Bengal, the line of small marks that
+              makes a nakshi kantha out of worn cloth. A strip of 35mm film carries the same
               interrupted line down both its edges: sprocket holes, evenly spaced, pulling the
               picture past the lamp.
             </p>
@@ -71,7 +71,7 @@ export function About() {
               About this build
             </RuleHeading>
             <p className="text-[1.0625rem] leading-8">
-              Nokshi Cinemas is not a real cinema chain. It is a demonstration of a complete booking
+              GrandPlex is not a real cinema chain. It is a demonstration of a complete booking
               product, built as a frontend-only application: there is no server, no database, no
               account system and no payment processor anywhere in it. The films, venues, schedules,
               seat availability, prices, offers and policies are all sample data written for this

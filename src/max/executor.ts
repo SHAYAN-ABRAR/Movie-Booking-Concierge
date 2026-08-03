@@ -221,7 +221,7 @@ export function useMaxExecutor() {
           const url = buildIcs({
             uid: record.reference,
             title: `${record.movieTitle} — ${record.cinemaName}`,
-            description: `Booking ${record.reference}. Seats ${seatRanges(record.seats.map((s) => s.seatId))} in ${record.screenName}. Nokshi Cinemas demonstration booking — not a valid ticket.`,
+            description: `Booking ${record.reference}. Seats ${seatRanges(record.seats.map((s) => s.seatId))} in ${record.screenName}. GrandPlex demonstration booking — not a valid ticket.`,
             location: cinema ? cinema.addressLines.join(', ') : record.cinemaName,
             start: screeningStart(record.date, record.time),
             durationMinutes: Math.max(60, duration),

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { AnimatedNumber, useMotionPreferences } from '@/motion';
+import { SelectedMovieStory } from '@/components/movie/SelectedMovieStory';
 import { ease } from '@/motion/tokens';
 import { Button } from '@/components/ui/button';
 import {
@@ -235,6 +236,10 @@ export function QuickBook() {
           </Button>
         </m.div>
       </div>
+
+      {/* The story arrives once a film is chosen, and only then — an empty
+          panel above the fold on every visit would be worse than no panel. */}
+      <SelectedMovieStory movie={chosenMovie} className="mt-5" />
     </section>
   );
 }

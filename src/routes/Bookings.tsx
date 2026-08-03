@@ -50,7 +50,7 @@ function BookingRow({
         `Booking ${booking.reference}`,
         `Seats ${seatRanges(booking.seats.map((s) => s.seatId))} in ${booking.screenName}`,
         '',
-        'Nokshi Cinemas demonstration booking — not a real ticket.',
+        'GrandPlex demonstration booking — not a real ticket.',
       ].join('\n'),
       location: cinema ? cinema.addressLines.join(', ') : booking.cinemaName,
       start,

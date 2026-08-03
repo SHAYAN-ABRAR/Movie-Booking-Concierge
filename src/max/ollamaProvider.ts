@@ -47,7 +47,7 @@ export async function detectOllama(timeoutMs = 1200): Promise<{ available: boole
 }
 
 const SYSTEM_PROMPT = [
-  'You are Max, a cinema booking concierge for Nokshi Cinemas.',
+  'You are Max, a cinema booking concierge for GrandPlex.',
   'You will be given a DRAFT reply that has already been computed from local data.',
   'Rewrite the DRAFT so it reads naturally. Obey these rules exactly:',
   '- Keep every number, price, time, date, seat identifier and proper noun byte-for-byte identical.',

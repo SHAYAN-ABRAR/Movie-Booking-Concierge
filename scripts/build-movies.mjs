@@ -231,7 +231,7 @@ const file = `import type { Movie } from './types';
  * film's public TMDB record, verified on ${TODAY}, and every one carries a
  * \`metadataSource\` pointing at the record it came from.
  *
- * Everything Nokshi-specific around them is simulated for this demonstration:
+ * Everything GrandPlex-specific around them is simulated for this demonstration:
  * showtimes, screens, seat availability, prices, offers and the intermission
  * guidance. \`tagline\` and \`programmeNote\` are this programme's own editorial
  * voice — opinions about real films, not claims of fact about them.

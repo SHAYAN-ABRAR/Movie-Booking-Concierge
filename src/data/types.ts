@@ -1,5 +1,5 @@
 /**
- * Domain types for the Nokshi Cinemas demonstration catalogue.
+ * Domain types for the GrandPlex demonstration catalogue.
  *
  * Every value in this application originates from typed seed data in `src/data`.
  * There is no backend, no database and no network call to any ticketing service.
@@ -76,6 +76,38 @@ export interface BreakWindow {
   note: string;
 }
 
+/**
+ * A verified official trailer.
+ *
+ * Stored as typed fields rather than a URL or — worse — an embed string, so the
+ * player builds its own iframe from the id and nothing in the data layer can
+ * inject markup. The provenance fields are not decoration: `officialChannel`
+ * and `verifiedAt` are what make the claim "official" checkable, and
+ * `scripts/verify-trailers.mjs` re-checks every one against YouTube's oEmbed
+ * endpoint on demand.
+ *
+ * A YouTube video *title* is written by whoever uploaded it, so a title reading
+ * "Sony Pictures Entertainment" proves nothing. The channel is the evidence.
+ */
+export interface MovieTrailer {
+  provider: 'youtube';
+  /** The 11-character id. Never a full URL, never an embed string. */
+  videoId: string;
+  /** The video's own title, as published. */
+  title: string;
+  type: 'official-trailer' | 'official-teaser';
+  /** The uploading channel, verbatim, exactly as YouTube reports it. */
+  officialChannel: string;
+  sourceUrl: string;
+  /** ISO date the channel attribution was last confirmed. */
+  verifiedAt: string;
+  /** BCP-47 tag for the trailer's spoken language. */
+  language: string;
+  captionsAvailable?: boolean;
+  /** Noted where a studio geo-restricts a regional upload. */
+  regionalNote?: string;
+}
+
 export interface Movie {
   id: string;
   slug: string;
@@ -100,8 +132,33 @@ export interface Movie {
   formats: Format[];
   /** Explicitly authored break guidance. Absent = Max must say it has none. */
   breakWindows?: BreakWindow[];
-  /** Local trailer file in /public, when one exists. None are supplied. */
-  trailerSrc?: string;
+  /**
+   * The film's official trailer.
+   *
+   * Optional in the type because a film can be announced long before its studio
+   * publishes anything — and an honest "not released yet" state is better than
+   * a fan upload. `validate:content` requires either this or an explicit
+   * `trailerStatus`, so a film cannot silently end up with neither.
+   */
+  trailer?: MovieTrailer;
+
+  /**
+   * Why there is no trailer, when there is none. Absent when `trailer` is set.
+   */
+  trailerStatus?: 'not-yet-released';
+
+  /**
+   * A short, spoiler-free account of the premise — two or three sentences,
+   * roughly 45–80 words in English.
+   *
+   * Deliberately not `synopsis`. The synopsis is a full paragraph for someone
+   * deciding what a film *is*; this is for someone who has already half-chosen
+   * it and wants to know what they are sitting down to. It appears under the
+   * selected film in every booking surface, where a paragraph would not fit and
+   * would not be read.
+   */
+  shortStory: string;
+  shortStoryBn: string;
   /** Deterministic accent index (0–5) used for the typographic plate. */
   plate: number;
   /** Editorial pull-quote from the programme's own notes. */

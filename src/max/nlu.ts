@@ -497,7 +497,10 @@ export function extractEntities(text: string, now: Date = new Date()): MaxEntiti
   if (/\bpremium|recliner|luxury|best seats?|ভালো সিট\b/.test(text)) entities.premium = true;
   if (/\bcheapest|cheap|lowest price|best price|সস্তা|কম দামে\b/.test(text)) entities.cheapest = true;
 
-  const reference = /\b(nk-[23456789abcdefghjklmnpqrstuvwxyz]{6})\b/i.exec(text);
+  // Both prefixes: `GP-` is what this build issues, `NK-` is what customers who
+  // booked before the rebrand still have printed on their tickets. Max has to
+  // recognise a reference someone reads out, whenever it was issued.
+  const reference = /\b((?:gp|nk)-[23456789abcdefghjklmnpqrstuvwxyz]{6})\b/i.exec(text);
   if (reference) entities.bookingReference = reference[1]!.toUpperCase();
 
   for (const { match, value } of lostItemPatterns) {

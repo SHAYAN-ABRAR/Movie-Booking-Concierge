@@ -1,9 +1,9 @@
-# Nokshi Cinemas
+# GrandPlex
 
 A frontend-only movie discovery and ticket-booking product, with **Max**, an on-device booking
 concierge.
 
-> **This is a demonstration build.** Nokshi Cinemas is not a real cinema chain. Every film, venue,
+> **This is a demonstration build.** GrandPlex is not a real cinema chain. Every film, venue,
 > schedule, seat, price, offer and policy here is sample data written for this project. No payment is
 > taken, nothing is sent anywhere, and bookings are stored only in your own browser.
 > See [`docs/limitations.md`](docs/limitations.md).

@@ -98,7 +98,7 @@ export function BookingConfirmation() {
         `Seats ${seatRanges(booking.seats.map((s) => s.seatId))} in ${booking.screenName}`,
         `Doors: aim to arrive by ${displayTime(arriveBy)}.`,
         '',
-        'Nokshi Cinemas demonstration booking — not a valid ticket.',
+        'GrandPlex demonstration booking — not a valid ticket.',
       ].join('\n'),
       location: venueAddress,
       start,
@@ -154,7 +154,7 @@ export function BookingConfirmation() {
 
           <div className="grid gap-0 sm:grid-cols-[1fr_auto]">
             <div className="p-6 sm:p-8">
-              <p className="eyebrow mb-3 text-house-muted">Nokshi Cinemas · admit {booking.seats.length}</p>
+              <p className="eyebrow mb-3 text-house-muted">GrandPlex · admit {booking.seats.length}</p>
 
               <h2 className="font-display text-[2rem] leading-[1.02] tracking-[-0.03em] text-house-ink">
                 {booking.movieTitle}

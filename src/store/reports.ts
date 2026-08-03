@@ -182,7 +182,7 @@ export function lostItemSummary(
     `Email:       ${report.contactEmail}`,
     report.contactPhone ? `Phone:       ${report.contactPhone}` : null,
     '',
-    'This report was prepared in the Nokshi Cinemas demonstration site and has',
+    'This report was prepared in the GrandPlex demonstration site and has',
     'not been submitted to anyone. Please treat this message as the report.',
   ]
     .filter((line): line is string => line !== null)

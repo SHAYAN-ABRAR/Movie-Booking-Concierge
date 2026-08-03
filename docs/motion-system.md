@@ -1,6 +1,6 @@
 # Motion system
 
-Everything that moves in Nokshi Cinemas is defined in [`src/motion/`](../src/motion/). No component
+Everything that moves in GrandPlex is defined in [`src/motion/`](../src/motion/). No component
 writes a raw duration or a raw cubic-bezier; it names an intent and the system decides.
 
 ---
