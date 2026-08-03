@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge, DemoNote, RuleHeading } from '@/components/ui/misc';
 import { AccessibilityChips, AccessibilityLegend, CertificateChip } from '@/components/movie/Chips';
 import { ShowtimePill } from '@/components/showtime/ShowtimeButton';
-import { CinematicArtwork } from '@/components/visual/CinematicArtwork';
+import { MovieImage } from '@/components/visual/MovieImage';
 import { DateStrip } from '@/components/showtime/DateStrip';
 import { EmptyState } from '@/components/common';
 import { NotFound } from './NotFound';
@@ -23,6 +23,7 @@ import {
 import { certificates, ticketCategories } from '@/data/pricing';
 import { adultPriceRange } from '@/lib/bookingMath';
 import { dateWindow, formatRuntime, timeOfDayLabels } from '@/lib/datetime';
+import { CATALOGUE_DISCLOSURE, releaseLabel, runtimeLabel } from '@/lib/movieMeta';
 import { money, moneyRange } from '@/lib/format';
 import { usePreferences } from '@/store/preferences';
 import { cn } from '@/lib/utils';
@@ -86,20 +87,18 @@ export function MovieDetails() {
 
   return (
     <>
-      {/* ── Masthead ──────────────────────────────────────────────────
-          Deliberately no plate here. The catalogue card already carries the
-          film's plate; repeating it would be the same visual twice. The
-          details page is set as an editorial title page instead. */}
+      {/* ── Masthead ────────────────────────────────────────────────── */}
       <header className="relative overflow-hidden border-b-2 border-ink">
-        {/* The same art direction as the catalogue card, expanded wide. The
-            card is a condensed vertical crop of this composition — one
-            identity, two framings, never the same rectangle twice. */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-full lg:w-[52%]">
-          <CinematicArtwork
+        {/* The film's real landscape backdrop, not a poster stretched wide.
+            `aria-hidden` because the title, credits and synopsis beside it are
+            the content; the picture is atmosphere. */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 -z-10 w-full lg:w-[56%]">
+          <MovieImage
             movie={movie}
-            variant="hero"
-            animated
-            className="size-full [&>svg]:size-full"
+            role="backdrop"
+            priority
+            sizes="(max-width: 1024px) 100vw, 56vw"
+            className="size-full aspect-auto!"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-paper from-8% via-paper/45 via-40% to-transparent to-78% lg:via-paper/20 lg:via-28%" />
           <div className="absolute inset-0 bg-paper/68 lg:hidden" />
@@ -129,8 +128,14 @@ export function MovieDetails() {
               </p>
 
               <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
-                <CertificateChip code={movie.certificate} />
-                <span className="numeral">{formatRuntime(movie.runtimeMinutes)}</span>
+                {movie.certificateConfirmed ? (
+                  <CertificateChip code={movie.certificate} />
+                ) : (
+                  <span className="border border-hairline-strong px-2 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em]">
+                    Not yet rated
+                  </span>
+                )}
+                <span className="numeral">{runtimeLabel(movie)}</span>
                 <span aria-hidden="true">·</span>
                 <span>{languageLabels[movie.language]}</span>
                 {movie.subtitles.length ? (
@@ -156,12 +161,7 @@ export function MovieDetails() {
                   </Button>
                 ) : (
                   <Badge tone="marigold" className="px-3 py-1.5 text-xs">
-                    Opens{' '}
-                    {new Date(movie.releaseDate).toLocaleDateString('en-GB', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
+                    Opens {releaseLabel(movie)}
                   </Badge>
                 )}
                 <Button variant="outline" size="lg" onClick={share}>
@@ -193,9 +193,13 @@ export function MovieDetails() {
               ) : null}
             </div>
 
-            {/* Credits — set as a printed colophon */}
+            {/* Credits — set as a printed colophon.
+                The backdrop sits behind this column on `lg`, so the colophon
+                carries its own paper ground. Without it the credits are set on
+                whatever the film's artwork happens to be doing and become
+                unreadable — which is exactly what the backdrop must never cost. */}
             <div className="lg:pt-3">
-              <dl className="border-t-2 border-ink text-sm">
+              <dl className="border-t-2 border-ink bg-paper/92 px-4 py-1 text-sm backdrop-blur-[2px] lg:px-5">
                 <div className="border-b border-hairline py-3">
                   <dt className="eyebrow mb-1">Director</dt>
                   <dd>{movie.director}</dd>
@@ -208,13 +212,7 @@ export function MovieDetails() {
                 ) : null}
                 <div className="border-b border-hairline py-3">
                   <dt className="eyebrow mb-1">Released</dt>
-                  <dd className="numeral">
-                    {new Date(movie.releaseDate).toLocaleDateString('en-GB', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                  </dd>
+                  <dd className="numeral">{releaseLabel(movie)}</dd>
                 </div>
                 <div className="border-b border-hairline py-3">
                   <dt className="eyebrow mb-1">Available in</dt>
@@ -327,6 +325,7 @@ export function MovieDetails() {
 
             {movie.status === 'coming-soon' ? (
               <EmptyState
+                variant="schedule"
                 title="Not yet on sale"
                 body={`${movie.title} opens on ${new Date(movie.releaseDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}. Advance booking opens four weeks before release, and this page will show times as soon as it does.`}
                 action={
@@ -371,6 +370,7 @@ export function MovieDetails() {
 
                 {byCinema.length === 0 ? (
                   <EmptyState
+                    variant="schedule"
                     title="No screenings that day"
                     body={`${movie.title} is not scheduled at ${cinemaId ? cinemas.find((c) => c.id === cinemaId)?.shortName : 'any house'} on the date you picked. Try another day, or clear the cinema filter.`}
                     action={
@@ -417,8 +417,8 @@ export function MovieDetails() {
                 )}
 
                 <DemoNote className="mt-6" tone="loud">
-                  Sample schedule and seat availability, generated locally for this demonstration.
-                  These are not real Nokshi Cinemas listings and nothing here reflects live inventory.
+                  {CATALOGUE_DISCLOSURE} These are not real Nokshi Cinemas listings and nothing here
+                  reflects live inventory.
                 </DemoNote>
 
                 <div className="mt-8 border-t border-hairline pt-6">

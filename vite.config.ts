@@ -11,31 +11,19 @@ export default defineConfig({
   build: {
     target: 'es2022',
     cssTarget: 'chrome111',
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (!id.includes('node_modules')) return undefined;
-          // framer-motion is deliberately handed back to Rollup rather than
-          // named here. `LazyMotion` dynamically imports its feature bundle,
-          // and claiming framer-motion for any manual chunk — including the
-          // catch-all `vendor` below — merges that import back into the eager
-          // graph and undoes the split. Returning undefined lets Rollup put
-          // the ~30 KB feature bundle in its own async chunk.
-          if (id.includes('framer-motion')) return undefined;
-          if (id.includes('qrcode')) return 'qrcode';
-          if (id.includes('@fontsource')) return 'fonts';
-          if (id.includes('@radix-ui')) return 'radix';
-          if (id.includes('react-hook-form') || id.includes('/zod/') || id.includes('@hookform')) {
-            return 'forms';
-          }
-          if (id.includes('date-fns')) return 'dates';
-          if (id.includes('react-router') || id.includes('react-dom') || id.includes('/react/')) {
-            return 'react-vendor';
-          }
-          return 'vendor';
-        },
-      },
-    },
+    // `manualChunks` is deliberately NOT configured.
+    //
+    // The previous hand-rolled splitter produced a circular chunk graph —
+    // `react-vendor` imported `vendor` (via scheduler) while `vendor` imported
+    // `react-vendor` (via react). Rollup cannot order a cycle, so on load one
+    // side evaluated with the other still undefined and the app died at
+    // `Cannot read properties of undefined (reading 'useLayoutEffect')` with an
+    // empty #root. The production bundle never booted.
+    //
+    // Rollup's default chunking is cycle-free by construction and still splits
+    // every dynamic import — the lazy routes and LazyMotion's feature bundle
+    // are unaffected. A hand-tuned splitter is not worth a bundle that does not
+    // start; see docs/booking-confirmation-root-cause.md.
   },
   test: {
     environment: 'jsdom',

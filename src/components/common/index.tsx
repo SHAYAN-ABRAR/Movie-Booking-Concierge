@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { EmptyDrawing } from '@/components/visual/EmptyStates';
+import type { EmptyVariant } from '@/components/visual/EmptyStates';
 
 export function PageHeader({
   eyebrow,
@@ -34,28 +36,47 @@ export function PageHeader({
   );
 }
 
+/**
+ * An empty state.
+ *
+ * `variant` selects a drawn composition for the thing that is actually empty —
+ * a schedule with no screenings, an index cut short, a till roll with no lines.
+ * Without one it falls back to the original stitched panel, so any call site
+ * that has not been given a drawing still renders correctly.
+ */
 export function EmptyState({
   title,
   body,
   action,
+  variant,
   className,
 }: {
   title: string;
   body: React.ReactNode;
   action?: React.ReactNode;
+  variant?: EmptyVariant;
   className?: string;
 }) {
   return (
     <div
       className={cn(
-        'flex flex-col items-start gap-3 border border-dashed border-hairline-strong bg-surface-sunken/50 px-6 py-10',
+        'border border-hairline-strong bg-surface-sunken/50 px-6 py-8',
+        variant ? 'sm:flex sm:items-center sm:gap-8' : 'border-dashed py-10',
         className,
       )}
     >
-      <span aria-hidden="true" className="stitch-x h-[1.5px] w-16" />
-      <h3 className="font-display text-xl leading-tight">{title}</h3>
-      <div className="max-w-prose text-[0.9375rem] leading-6 text-content-muted">{body}</div>
-      {action ? <div className="pt-2">{action}</div> : null}
+      {variant ? (
+        <div className="mb-6 w-full max-w-52 shrink-0 sm:mb-0 sm:w-52">
+          <EmptyDrawing variant={variant} />
+        </div>
+      ) : null}
+
+      <div className="flex flex-col items-start gap-3">
+        {variant ? null : <span aria-hidden="true" className="stitch-x h-[1.5px] w-16" />}
+        <h3 className="font-display text-xl leading-tight">{title}</h3>
+        <div className="max-w-prose text-[0.9375rem] leading-6 text-content-muted">{body}</div>
+        {action ? <div className="pt-2">{action}</div> : null}
+      </div>
     </div>
   );
 }

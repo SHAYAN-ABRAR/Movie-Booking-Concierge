@@ -19,3 +19,12 @@ skills-lock.json
 # to redistribute — see docs/asset-inventory.md. `npm run check:assets` runs
 # fine without it.
 reference-assets/
+
+# Playwright artefacts — generated, never committed
+test-results/
+playwright-report/
+
+# One-off research output from scripts/fetch-*.mjs
+movie-research.json
+movie-images.json
+concession-photos.json

@@ -7,6 +7,7 @@ import { Footer } from './Footer';
 import { MaxDock } from '@/components/max/MaxDock';
 import { DemoAlertRunner } from '@/components/max/DemoAlertRunner';
 import { MotionProvider, PageTransition, RouteProgress } from '@/motion';
+import { AppErrorBoundary } from '@/components/common/AppErrorBoundary';
 
 /** Returns to the top on navigation, unless the browser is restoring a position. */
 function ScrollRestoration() {
@@ -79,7 +80,9 @@ export function Layout() {
         <div className="relative z-10 flex min-h-dvh flex-col">
           <Header />
           <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
-            <PageTransition routeKey={routeKey}>{outlet}</PageTransition>
+            <AppErrorBoundary resetKey={routeKey}>
+              <PageTransition routeKey={routeKey}>{outlet}</PageTransition>
+            </AppErrorBoundary>
           </main>
           <Footer />
         </div>

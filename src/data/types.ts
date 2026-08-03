@@ -106,6 +106,31 @@ export interface Movie {
   plate: number;
   /** Editorial pull-quote from the programme's own notes. */
   programmeNote: string;
+
+  /* ── Real-catalogue fields ──────────────────────────────────────────
+   * These films are real, so the record has to be honest about what is
+   * actually known. A studio often announces a title long before it
+   * publishes a runtime or submits it for classification.
+   * ────────────────────────────────────────────────────────────────── */
+
+  /** False when no official runtime is published yet; the UI then says so. */
+  runtimeConfirmed: boolean;
+  /** False when the film is not yet classified; the UI prints "Not yet rated". */
+  certificateConfirmed: boolean;
+  /**
+   * Local poster path **without** width or extension, e.g.
+   * `/media/movies/posters/the-odyssey`. `<Poster>` appends `-400.avif` and
+   * friends. Portrait, 2:3.
+   */
+  poster: string;
+  /** Local backdrop path, same convention. Landscape, 16:9. */
+  backdrop: string;
+  /** TMDB record id, so the source of every fact can be checked. */
+  tmdbId: number;
+  /** The page each fact above was transcribed from. */
+  metadataSource: string;
+  /** ISO date the metadata was verified against the source. */
+  verifiedAt: string;
 }
 
 export interface ScreenSeatRule {

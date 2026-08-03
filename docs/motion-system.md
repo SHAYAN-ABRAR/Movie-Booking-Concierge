@@ -136,7 +136,11 @@ Three tests assert the reduced-motion paths render real content rather than an e
 | Seat map | Lights down, rows arrive, seats settle | Arriving in an auditorium |
 | Totals | Counted | A price that changes silently loses trust |
 | Confirmation | Ticket settles, light passes once, QR fades after | The one moment worth a reveal |
+| Offer leader | Sweep arm makes one revolution on reveal | A countdown that has finished, not a decoration that spins |
 | Max launcher | Lift, press, one sweep on genuinely new events | Physical, never attention-seeking |
+
+Four of the five offer compositions are deliberately **still**. Five moving objects on one page is a
+performance; one is a focal point.
 
 ## What is still forbidden
 

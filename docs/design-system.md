@@ -229,10 +229,55 @@ same picture.
 
 *Superseded:* the original six-plate system (three colour pairs × two structures) is replaced. It
 varied colour and title position but not structure, so a grid of it read as one design recoloured.
+`src/components/brand/Plate.tsx` was kept during the transition and has now been removed — both its
+consumers (the catalogue and the offers page) draw from the systems below instead.
 
 **Cinemas** get the same treatment differently — a true diagram of their own screens, one bar per
 house sized by seat count and coloured by format. It carries information a lobby photograph would
 not.
+
+### Offers — cinema stationery
+
+Offers are not films, so they do not use the film families. They use the printed things a box office
+hands you, in `src/components/visual/OfferComposition.tsx`, directed from `src/data/offerArt.ts`.
+
+| Composition | Offer | Why |
+|---|---|---|
+| **Stub** | Before Three | A matinee ticket, torn from the book and punched |
+| **Pass** | Family of Four | Four admissions on one perforated strip |
+| **Leader** | The Late Repertory | Academy leader running down to a late feature |
+| **Insert** | Sensory-Friendly Matinee | A folded programme insert — the quietest of the five |
+| **Card** | Student Weeknights | The door checks a student ID, so the offer is a card |
+
+Each prints one **figure** — the value the offer is actually about. A test asserts that figure is
+traceable to the offer's own `mechanic`, `detail` or `summary` copy: **the artwork may not invent a
+number.** Two variants, `full` (8:5) and `tile` (16:9), drawn to their own viewBoxes.
+
+Only the leader moves, and it makes exactly **one** revolution when it first enters view, then
+rests. A countdown that has finished — not a decoration that spins forever.
+
+### The counter — real photography
+
+*Superseded.* `CounterIllustration.tsx` drew each item as authored vector
+line-work. It has been **removed**. Every item on the counter now carries its own
+real photograph, downloaded once from a commercially-licensed source into
+`public/media/concessions/` and rendered by
+`src/components/visual/ConcessionPhoto.tsx` as AVIF / WebP / JPEG at three
+widths.
+
+No item shares a photograph with another, every file has a recorded creator,
+licence and source page in `docs/concession-image-sources.md`, and nothing is
+fetched at runtime. `npm run validate:content` fails if an illustration
+component is ever mounted on a card again.
+
+
+### Empty states
+
+`src/components/visual/EmptyStates.tsx`. One dashed box repeated across seven contexts told the
+customer nothing about *which* thing was empty. Five drawings replace it: an unfilled projection
+schedule, a programme index cut short on the diagonal, a till roll with no lines, a ticket book with
+nothing torn out, a notification strip lying flat. `EmptyState` still renders the original stitched
+panel when no `variant` is given.
 
 ## Image treatment rules
 

@@ -137,6 +137,44 @@ describe('the seat map', () => {
     expect(onToggle).toHaveBeenCalledTimes(1);
   });
 
+  it('draws the sold mark as a cross, with both arms through the centre', () => {
+    renderMap();
+    const sold = screen
+      .getAllByRole('option')
+      .find((node) => /sold/.test(node.getAttribute('aria-label') ?? ''))!;
+    expect(sold).toBeDefined();
+
+    const mark = sold.querySelector('span[aria-hidden="true"]')!;
+    expect(mark).not.toBeNull();
+
+    // Regression guard. Both arms were originally pinned to the box's *top*
+    // edge (`inset-0` + `border-t`), so rotating them ±45° about the box centre
+    // swung them into a caret rather than a cross. They must be centred first.
+    const cls = mark.className;
+    expect(cls).toContain('before:top-1/2');
+    expect(cls).toContain('after:top-1/2');
+    expect(cls).toContain('before:rotate-45');
+    expect(cls).toContain('after:-rotate-45');
+  });
+
+  it('distinguishes seat classes by silhouette, not only by colour', () => {
+    renderMap();
+    const options = screen.getAllByRole('option');
+    const classOf = (name: RegExp) =>
+      options.find((node) => name.test(node.getAttribute('aria-label') ?? ''))?.className ?? '';
+
+    const regular = classOf(/Regular/);
+    const premium = classOf(/Premium/);
+    expect(regular).toBeTruthy();
+    expect(premium).toBeTruthy();
+
+    // A premium seat has a rounder back and a deeper cushion, so the map still
+    // reads in greyscale.
+    expect(premium).toContain('rounded-t-[8px]');
+    expect(premium).toContain('border-b-[3px]');
+    expect(regular).not.toContain('rounded-t-[8px]');
+  });
+
   it('shows a legend that names every state in words', () => {
     renderMap();
     const legend = screen.getByRole('heading', { name: /legend/i }).parentElement!;

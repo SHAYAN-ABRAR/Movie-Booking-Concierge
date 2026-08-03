@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Announcer, DataRow, EmptyState, PageHeader } from '@/components/common';
+import { EmptyDrawing } from '@/components/visual/EmptyStates';
 import { Button } from '@/components/ui/button';
 import { DemoNote } from '@/components/ui/misc';
 import { FilterChip } from '@/components/ui/toggle';
@@ -123,6 +124,7 @@ export function Concessions() {
           {items.length === 0 ? (
             <EmptyState
               title="Nothing matches that"
+            variant="index"
               body="No item on the counter fits every filter. Clearing the dietary filters usually brings the list back."
               action={
                 <Button
@@ -170,10 +172,14 @@ export function Concessions() {
               </h2>
 
               {lines.length === 0 ? (
-                <p className="mt-4 text-[0.9375rem] leading-7 text-ink-muted">
-                  Nothing added yet. Anything you pick here waits for you at the add-ons step of your
-                  booking — you do not have to decide now.
-                </p>
+                <>
+                  {/* A till roll with nothing printed on it yet. */}
+                  <EmptyDrawing variant="receipt" className="mx-auto mt-4 max-w-36" />
+                  <p className="mt-3 text-[0.9375rem] leading-7 text-ink-muted">
+                    Nothing added yet. Anything you pick here waits for you at the add-ons step of
+                    your booking — you do not have to decide now.
+                  </p>
+                </>
               ) : (
                 <>
                   <dl className="mt-4">

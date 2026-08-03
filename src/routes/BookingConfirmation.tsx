@@ -8,7 +8,6 @@ import { ease } from '@/motion/tokens';
 import { Button } from '@/components/ui/button';
 import { Badge, DemoNote } from '@/components/ui/misc';
 import { DataRow } from '@/components/common';
-import { NotFound } from './NotFound';
 import { useBookings } from '@/store/bookings';
 import { cinemaById, formatLabels, movieById } from '@/data';
 import { insurancePolicy } from '@/data/policies';
@@ -66,7 +65,11 @@ export function BookingConfirmation() {
     );
   }
 
-  if (!movie || !cinema) return <NotFound />;
+  // The ticket renders from the booking's own snapshot. The live catalogue only
+  // *enhances* it — a Bengali title, the venue's trailer policy, a map link.
+  // A completed booking must survive the programme changing underneath it, so
+  // a missing movie or cinema record degrades the extras rather than the page.
+  // This used to `return <NotFound />` here, which threw away a real ticket.
 
   const categoryTally = booking.seats.reduce<Record<string, number>>((acc, seat) => {
     acc[seat.category] = (acc[seat.category] ?? 0) + 1;
@@ -76,15 +79,20 @@ export function BookingConfirmation() {
   const arriveBy = timeFromMinutes(minutesFromTime(booking.time) - 20);
 
   function addToCalendar() {
-    if (!booking || !cinema) return;
+    if (!booking) return;
     const start = screeningStart(booking.date, booking.time);
     const duration = endTime
       ? minutesFromTime(endTime) - minutesFromTime(booking.time)
       : 150;
 
+    // Snapshot first, catalogue second — the calendar file must still be
+    // correct for a venue that has since left the programme.
+    const venueName = cinema?.shortName ?? booking.cinemaName;
+    const venueAddress = cinema?.addressLines.join(', ') ?? booking.cinemaAddress ?? booking.cinemaName;
+
     const url = buildIcs({
       uid: booking.reference,
-      title: `${booking.movieTitle} — ${cinema.shortName}`,
+      title: `${booking.movieTitle} — ${venueName}`,
       description: [
         `Booking ${booking.reference}`,
         `Seats ${seatRanges(booking.seats.map((s) => s.seatId))} in ${booking.screenName}`,
@@ -92,7 +100,7 @@ export function BookingConfirmation() {
         '',
         'Nokshi Cinemas demonstration booking — not a valid ticket.',
       ].join('\n'),
-      location: cinema.addressLines.join(', '),
+      location: venueAddress,
       start,
       durationMinutes: Math.max(60, duration),
     });
@@ -151,7 +159,7 @@ export function BookingConfirmation() {
               <h2 className="font-display text-[2rem] leading-[1.02] tracking-[-0.03em] text-house-ink">
                 {booking.movieTitle}
               </h2>
-              {movie.titleBn ? (
+              {movie?.titleBn ? (
                 <p lang="bn" className="mt-1 text-lg text-house-muted">
                   {movie.titleBn}
                 </p>
@@ -217,7 +225,7 @@ export function BookingConfirmation() {
               <p className="mt-6 text-[0.8125rem] leading-6 text-house-muted">
                 Aim to be at the door by{' '}
                 <span className="numeral font-semibold text-house-ink">{displayTime(arriveBy)}</span>.
-                Trailers run {cinema.trailerMinutes} minutes before the feature.
+                {cinema ? ` Trailers run ${cinema.trailerMinutes} minutes before the feature.` : ''}
               </p>
             </div>
 
@@ -292,24 +300,35 @@ export function BookingConfirmation() {
                 for tickets, the counter and finding your seat.
               </span>
             </li>
+            {cinema ? (
+              <li className="flex gap-2.5">
+                <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-marigold" />
+                <span>{cinema.lateArrivalPolicy}</span>
+              </li>
+            ) : null}
             <li className="flex gap-2.5">
               <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-marigold" />
               <span>
-                {cinema.lateArrivalPolicy}
-              </span>
-            </li>
-            <li className="flex gap-2.5">
-              <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-marigold" />
-              <span>
-                <a
-                  href={mapUrl(cinema.mapQuery)}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="font-semibold text-ink underline underline-offset-4"
-                >
-                  Directions to {cinema.shortName}
-                </a>{' '}
-                — {cinema.addressLines.join(', ')}.
+                {cinema ? (
+                  <>
+                    <a
+                      href={mapUrl(cinema.mapQuery)}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="font-semibold text-ink underline underline-offset-4"
+                    >
+                      Directions to {cinema.shortName}
+                    </a>{' '}
+                    — {cinema.addressLines.join(', ')}.
+                  </>
+                ) : (
+                  // The venue is no longer in the programme; the ticket still
+                  // knows where it was, so print that rather than nothing.
+                  <>
+                    <span className="font-semibold text-ink">{booking.cinemaName}</span>
+                    {booking.cinemaAddress ? ` — ${booking.cinemaAddress}.` : '.'}
+                  </>
+                )}
               </span>
             </li>
           </ul>

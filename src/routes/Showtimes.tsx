@@ -175,6 +175,7 @@ export function Showtimes() {
           {byMovie.length === 0 ? (
             <EmptyState
               title="Nothing scheduled for that combination"
+            variant="schedule"
               body={
                 <p>
                   No screening on this date matches your filters. Try a different day on the strip

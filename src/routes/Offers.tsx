@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Badge, DemoNote } from '@/components/ui/misc';
-import { OfferPlate } from '@/components/brand/Plate';
+import { OfferComposition } from '@/components/visual/OfferComposition';
+import { Reveal } from '@/motion';
 import { cinemaById, offers } from '@/data';
 
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -20,7 +21,9 @@ export function Offers() {
         {offers.map((offer, index) => (
           <li key={offer.id}>
             <article className="grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:gap-14">
-              <div className="lg:order-2">
+              {/* The composition leads at every width — on desktop it is the
+                  left column, on mobile it is the first thing in the flow. */}
+              <div className="order-2">
                 <div className="flex items-baseline gap-4">
                   <span
                     aria-hidden="true"
@@ -102,12 +105,15 @@ export function Offers() {
                 </div>
               </div>
 
-              <div className="lg:order-1">
-                <OfferPlate
-                  title={offer.title}
-                  kicker={offer.days.length === 0 ? 'Every day' : dayNames[offer.days[0]!] ?? 'Offer'}
-                  plate={offer.plate}
-                />
+              <div className="order-1">
+                <Reveal>
+                  {/* Depth level 2 — a printed insert lying on the programme
+                      page, not a card floating above the interface. */}
+                  <OfferComposition
+                    offer={offer}
+                    className="shadow-[0_10px_28px_-18px_rgb(20_22_31_/_0.45)]"
+                  />
+                </Reveal>
               </div>
             </article>
           </li>

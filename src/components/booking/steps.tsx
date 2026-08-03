@@ -121,6 +121,7 @@ export function SessionStep({ movie, showtime }: { movie: Movie; showtime: Showt
         ) : options.length === 0 ? (
           <EmptyState
             title="Nothing scheduled that day"
+            variant="schedule"
             body={`${movie.title} is not on at ${cinemaById.get(cinemaId)?.name ?? 'this cinema'} on the day you picked. Try another date above, or another house.`}
           />
         ) : (

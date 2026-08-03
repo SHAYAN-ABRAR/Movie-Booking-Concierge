@@ -6,6 +6,7 @@ import { usePreferences } from '@/store/preferences';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DemoNote } from '@/components/ui/misc';
+import { EmptyDrawing } from '@/components/visual/EmptyStates';
 import { useWatches, unreadAlertCount, watchKindLabels } from '@/store/watches';
 import { movieById } from '@/data/movies';
 import { cinemaById } from '@/data/cinemas';
@@ -77,11 +78,15 @@ export function AlertBell() {
 
         <div className="max-h-[24rem] overflow-y-auto">
           {alerts.length === 0 ? (
-            <p className="px-4 py-6 text-sm leading-6 text-content-muted">
-              {watches.length > 0
-                ? `You have ${watches.length} demo alert${watches.length === 1 ? '' : 's'} saved. Nothing has fired yet.`
-                : 'No alerts. Max can save a demo alert for a screening you are watching.'}
-            </p>
+            <div className="px-4 pb-6 pt-4">
+              {/* The strip, lying flat — nothing has come through. */}
+              <EmptyDrawing variant="alerts" className="mx-auto max-w-36" />
+              <p className="mt-2 text-sm leading-6 text-content-muted">
+                {watches.length > 0
+                  ? `You have ${watches.length} demo alert${watches.length === 1 ? '' : 's'} saved. Nothing has fired yet.`
+                  : 'No alerts. Max can save a demo alert for a screening you are watching.'}
+              </p>
+            </div>
           ) : (
             <ul className="divide-y divide-hairline">
               {alerts.map((alert) => {

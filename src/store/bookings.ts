@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { z } from 'zod';
 import { hashString } from '@/lib/deterministic';
 import type { Format, SeatClass, TicketCategory } from '@/data/types';
 import type { PaymentMethodId } from './booking';
@@ -26,6 +27,14 @@ export interface CompletedBooking {
   movieTitle: string;
   cinemaId: string;
   cinemaName: string;
+  /**
+   * Snapshotted so the ticket can print an address even if the venue is later
+   * renamed, moved or removed from the catalogue. Optional because bookings
+   * saved before this field existed are still valid history.
+   */
+  cinemaAddress?: string;
+  /** Local poster path, snapshotted so the ticket survives a catalogue change. */
+  moviePoster?: string;
   screenId: string;
   screenName: string;
   showtimeId: string;
@@ -46,6 +55,79 @@ export interface CompletedBooking {
   guestEmail: string;
   guestPhone: string;
   guestNote: string;
+}
+
+/**
+ * Shape validation for records read back from localStorage.
+ *
+ * A completed booking is the only thing in this product a customer cannot
+ * recreate, and it lives in storage that a browser extension, an older build or
+ * a half-finished write can corrupt. Without validation one bad record throws
+ * during render and takes the whole page down — a blank screen where a ticket
+ * should be. Invalid records are dropped; every valid one is preserved.
+ *
+ * Deliberately permissive about unknown extra keys, so a record written by a
+ * newer build still loads in an older one.
+ */
+const bookedSeatSchema = z.object({
+  seatId: z.string().min(1),
+  seatClass: z.string().min(1),
+  category: z.string().min(1),
+  price: z.number().finite(),
+});
+
+const bookedConcessionSchema = z.object({
+  itemId: z.string().min(1),
+  name: z.string().min(1),
+  quantity: z.number().int().nonnegative(),
+  unitPrice: z.number().finite(),
+  total: z.number().finite(),
+});
+
+export const completedBookingSchema = z.object({
+  reference: z.string().min(1),
+  createdAt: z.string().min(1),
+  movieId: z.string().min(1),
+  movieTitle: z.string().min(1),
+  moviePoster: z.string().optional(),
+  cinemaId: z.string().min(1),
+  cinemaName: z.string().min(1),
+  cinemaAddress: z.string().optional(),
+  screenId: z.string().min(1),
+  screenName: z.string().min(1),
+  showtimeId: z.string().min(1),
+  date: z.string().min(1),
+  time: z.string().min(1),
+  format: z.string().min(1),
+  seats: z.array(bookedSeatSchema).min(1),
+  concessions: z.array(bookedConcessionSchema),
+  ticketSubtotal: z.number().finite(),
+  concessionSubtotal: z.number().finite(),
+  bookingFee: z.number().finite(),
+  insuranceFee: z.number().finite(),
+  total: z.number().finite(),
+  insurance: z.boolean(),
+  paymentMethod: z.string().min(1),
+  guestName: z.string().min(1),
+  guestEmail: z.string(),
+  guestPhone: z.string(),
+  guestNote: z.string(),
+});
+
+/** Keeps every record that parses; reports how many were discarded. */
+export function parseStoredBookings(value: unknown): {
+  bookings: CompletedBooking[];
+  discarded: number;
+} {
+  if (!Array.isArray(value)) return { bookings: [], discarded: 0 };
+  const bookings: CompletedBooking[] = [];
+  let discarded = 0;
+  for (const entry of value) {
+    const parsed = completedBookingSchema.safeParse(entry);
+    if (parsed.success) bookings.push(entry as CompletedBooking);
+    else discarded += 1;
+  }
+  return { bookings, discarded };
 }
 
 /**
@@ -102,6 +184,20 @@ export const useBookings = create<BookingsState>()(
       name: 'nokshi.bookings.v1',
       version: 1,
       storage: createJSONStorage(() => localStorage),
+      // Validate on the way in. A malformed record is dropped rather than
+      // allowed to throw during render — losing one corrupt entry is a far
+      // better outcome than a blank page where the ticket should be.
+      merge: (persisted, current) => {
+        const raw = (persisted as { bookings?: unknown } | undefined)?.bookings;
+        const { bookings, discarded } = parseStoredBookings(raw);
+        if (discarded > 0) {
+          console.warn(
+            `Nokshi: ignored ${discarded} unreadable booking record(s) in local storage. ` +
+              `${bookings.length} valid booking(s) kept.`,
+          );
+        }
+        return { ...current, bookings };
+      },
     },
   ),
 );

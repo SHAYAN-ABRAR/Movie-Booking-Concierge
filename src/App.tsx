@@ -4,6 +4,11 @@ import { Layout } from '@/components/layout/Layout';
 import { Home } from '@/routes/Home';
 import { NotFound, RouteErrorBoundary } from '@/routes/NotFound';
 import { RouteFallback } from '@/routes/RouteFallback';
+// Eagerly imported, unlike every other non-home route. The confirmation is the
+// one screen a customer reaches exactly once, immediately after paying, with no
+// obvious way to retry — so it must not depend on a chunk fetch succeeding at
+// that moment. Reliability beats the ~10 KB.
+import { BookingConfirmation } from '@/routes/BookingConfirmation';
 
 /**
  * Routing.
@@ -30,9 +35,6 @@ const TicketPrices = lazy(() =>
 );
 const Booking = lazy(() => import('@/routes/Booking').then((m) => ({ default: m.Booking })));
 const Bookings = lazy(() => import('@/routes/Bookings').then((m) => ({ default: m.Bookings })));
-const BookingConfirmation = lazy(() =>
-  import('@/routes/BookingConfirmation').then((m) => ({ default: m.BookingConfirmation })),
-);
 const About = lazy(() => import('@/routes/About').then((m) => ({ default: m.About })));
 const Contact = lazy(() => import('@/routes/Contact').then((m) => ({ default: m.Contact })));
 
@@ -57,7 +59,8 @@ const router = createBrowserRouter([
       { path: 'ticket-prices', element: split(<TicketPrices />) },
       { path: 'booking/:movieSlug', element: split(<Booking />) },
       { path: 'bookings', element: split(<Bookings />) },
-      { path: 'booking-confirmation/:bookingId', element: split(<BookingConfirmation />) },
+      // Not wrapped in `split()` — imported eagerly, see the import above.
+      { path: 'booking-confirmation/:bookingId', element: <BookingConfirmation /> },
       { path: 'about', element: split(<About />) },
       { path: 'contact', element: split(<Contact />) },
       { path: '*', element: <NotFound /> },

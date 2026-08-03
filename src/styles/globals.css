@@ -36,7 +36,11 @@
   --house-sunken: #080a13;
   --house-ink: #f0ece3;
   --house-muted: #a0a4b2;
-  --house-faint: #6f7484;
+  /* Lifted from the originally authored #6f7484, which measured 3.96:1 on the
+     auditorium ground — under AA for the small print it carries (row letters,
+     the per-seat pricing note, the ticket's field labels). This is 4.71:1 and
+     still sits clearly below --house-muted in the hierarchy. */
+  --house-faint: #7c8092;
   --house-rule: #2a2f40;
 
   /* Projector blue — sampled periwinkle #93B2F3 / #7F9CD8, deepened for ink-on-paper contrast */
@@ -124,7 +128,15 @@
   --color-ink-muted: var(--ink-muted);
   --color-house: var(--house);
   --color-house-raised: var(--house-raised);
+  --color-house-sunken: var(--house-sunken);
   --color-house-ink: var(--house-ink);
+  /* These three were used in the auditorium from the start but never registered
+     here, so `text-house-muted`, `text-house-faint` and `border-house-rule`
+     emitted no CSS and silently fell back to currentColor — which is why the
+     seat map and the ticket read flat and over-bright. */
+  --color-house-muted: var(--house-muted);
+  --color-house-faint: var(--house-faint);
+  --color-house-rule: var(--house-rule);
 
   --color-projector: var(--projector);
   --color-projector-deep: var(--projector-deep);

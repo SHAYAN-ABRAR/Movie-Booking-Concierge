@@ -4,8 +4,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CertificateChip } from '@/components/movie/Chips';
-import { CinematicArtwork } from '@/components/visual/CinematicArtwork';
-import { artworkFor } from '@/data/artwork';
+import { MovieImage } from '@/components/visual/MovieImage';
 import { genreLabels, languageLabels, nowShowing } from '@/data';
 import { formatRuntime, todayIso } from '@/lib/datetime';
 import { rngFor, seededShuffle } from '@/lib/deterministic';
@@ -45,7 +44,6 @@ export function FeaturedStage() {
   const stageRef = useRef<HTMLDivElement>(null);
 
   const movie = featured[index] ?? nowShowing[0]!;
-  const direction = artworkFor(movie);
 
   /* ── Only advance while the stage is actually on screen ─────────────── */
   useEffect(() => {
@@ -101,11 +99,12 @@ export function FeaturedStage() {
             exit="exit"
             className="size-full"
           >
-            <CinematicArtwork
+            <MovieImage
               movie={movie}
-              variant="hero"
-              animated
-              className="size-full [&>svg]:size-full"
+              role="backdrop"
+              priority
+              sizes="(max-width: 1024px) 100vw, 55vw"
+              className="size-full aspect-auto!"
             />
           </m.div>
         </AnimatePresence>
@@ -156,7 +155,7 @@ export function FeaturedStage() {
 
               <blockquote
                 className="mt-7 max-w-xl border-l-2 pl-5"
-                style={{ borderColor: direction.accent }}
+                style={{ borderColor: 'var(--marigold)' }}
               >
                 <p className="font-display text-[1.25rem] leading-[1.45] tracking-[-0.01em] sm:text-[1.4rem]">
                   {movie.programmeNote}

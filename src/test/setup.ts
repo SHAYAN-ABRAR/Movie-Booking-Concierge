@@ -68,3 +68,62 @@ if (!window.ResizeObserver) {
     disconnect() {}
   };
 }
+
+/**
+ * jsdom has no IntersectionObserver, and framer-motion's `whileInView` needs
+ * one the moment its features are loaded.
+ *
+ * This only started mattering when `MotionProvider` moved to eager features:
+ * with the old async loader the features never resolved inside a test, so every
+ * `whileInView` was silently inert and the tests were not exercising the code
+ * that actually ships. They are now.
+ *
+ * Entries report as intersecting straight away, which is the state a reveal
+ * assertion cares about — content must be present, not hidden behind a scroll.
+ */
+if (!('IntersectionObserver' in window)) {
+  class TestIntersectionObserver implements IntersectionObserver {
+    readonly root: Element | Document | null = null;
+    readonly rootMargin: string = '0px';
+    readonly thresholds: readonly number[] = [0];
+    private readonly callback: IntersectionObserverCallback;
+
+    constructor(callback: IntersectionObserverCallback) {
+      this.callback = callback;
+    }
+
+    observe(target: Element) {
+      this.callback(
+        [
+          {
+            target,
+            isIntersecting: true,
+            intersectionRatio: 1,
+            time: 0,
+            boundingClientRect: target.getBoundingClientRect(),
+            intersectionRect: target.getBoundingClientRect(),
+            rootBounds: null,
+          } as IntersectionObserverEntry,
+        ],
+        this,
+      );
+    }
+
+    unobserve() {}
+    disconnect() {}
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
+  }
+
+  Object.defineProperty(window, 'IntersectionObserver', {
+    configurable: true,
+    writable: true,
+    value: TestIntersectionObserver,
+  });
+  Object.defineProperty(globalThis, 'IntersectionObserver', {
+    configurable: true,
+    writable: true,
+    value: TestIntersectionObserver,
+  });
+}

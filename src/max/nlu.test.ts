@@ -154,8 +154,8 @@ describe('entity extraction', () => {
   });
 
   it('recognises a film by a distinctive word in its title', () => {
-    expect(extractEntities(normalise('how long is cholonto chhaya'), NOW).movieIds).toContain(
-      'mov-cholonto-chhaya',
+    expect(extractEntities(normalise('how long is the odyssey'), NOW).movieIds).toContain(
+      'mov-the-odyssey',
     );
   });
 });
@@ -166,7 +166,7 @@ describe('intent detection', () => {
     ['What can I watch tonight?', 'find_showtimes'],
     ['Find me three seats together', 'seat_recommend'],
     ['I want two seats near the aisle', 'seat_recommend'],
-    ['How long is Kaanch?', 'runtime_info'],
+    ['How long is Supergirl?', 'runtime_info'],
     ['When does it end?', 'runtime_info'],
     ['How is a ticket price worked out?', 'price_explain'],
     ['What is the cheapest showtime?', 'budget_optimise'],

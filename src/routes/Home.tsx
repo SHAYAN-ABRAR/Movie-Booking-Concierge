@@ -6,7 +6,7 @@ import { Stagger, StaggerItem } from '@/motion';
 import { MovieCard } from '@/components/movie/MovieCard';
 import { CertificateChip } from '@/components/movie/Chips';
 import { ShowtimePill } from '@/components/showtime/ShowtimeButton';
-import { OfferPlate } from '@/components/brand/Plate';
+import { OfferComposition } from '@/components/visual/OfferComposition';
 import { QuickBook } from '@/components/home/QuickBook';
 import { FeaturedStage } from '@/components/home/FeaturedStage';
 import {
@@ -242,11 +242,21 @@ export function Home() {
             <li key={offer.id}>
               <Link
                 to="/offers"
-                className="group block border border-hairline-strong transition-colors hover:border-ink"
+                className="group block border border-hairline-strong transition-colors hover:border-ink focus-visible:border-ink"
               >
-                <OfferPlate title={offer.title} kicker="Offer" plate={offer.plate} />
+                <div className="overflow-hidden">
+                  <div className="transition-transform duration-500 ease-out group-hover:scale-[1.02] group-focus-visible:scale-[1.02] motion-reduce:transform-none">
+                    <OfferComposition offer={offer} variant="tile" />
+                  </div>
+                </div>
                 <div className="p-5">
-                  <p className="text-[0.9375rem] leading-7 text-ink-muted">{offer.summary}</p>
+                  {/* The title is real text rather than something drawn into the
+                      composition, so it is readable, selectable and announced. */}
+                  <h3 className="font-display text-xl leading-tight">{offer.title}</h3>
+                  <p lang="bn" className="mt-0.5 text-[0.875rem] text-ink-muted">
+                    {offer.titleBn}
+                  </p>
+                  <p className="mt-2.5 text-[0.9375rem] leading-7 text-ink-muted">{offer.summary}</p>
                   <p className="eyebrow mt-3 group-hover:text-ink">Read the terms</p>
                 </div>
               </Link>

@@ -35,11 +35,37 @@ const statusLabels: Record<Seat['status'], string> = {
   unavailable: 'not a seat',
 };
 
+/**
+ * Seat silhouette.
+ *
+ * Class is carried by *shape* as well as tone, so the map still reads in
+ * greyscale and at a glance: a rounder back and a deeper cushion mean a better
+ * seat. Every silhouette is 24px on the outside (28px for a recliner) — the
+ * bottom border thickens inside the box, so nothing shifts when state changes.
+ */
+function seatShape(seatClass: SeatClass): string {
+  switch (seatClass) {
+    case 'recliner':
+      return 'h-7 w-7 rounded-t-[9px] rounded-b-[2px] border-b-[4px]';
+    case 'premium':
+      return 'h-6 w-6 rounded-t-[8px] rounded-b-[1px] border-b-[3px]';
+    // Access seats are square and icon-bearing — the icon is the identifier.
+    case 'wheelchair':
+    case 'companion':
+      return 'h-6 w-6 rounded-[3px]';
+    default:
+      return 'h-6 w-6 rounded-t-[3px] rounded-b-[1px]';
+  }
+}
+
 function seatTone(seat: Seat, selected: boolean, proposed: boolean): string {
   if (selected) return 'border-marigold bg-marigold text-paper';
   if (proposed) return 'border-marigold border-dashed bg-marigold/25 text-house-ink';
-  if (seat.status === 'sold') return 'border-transparent bg-house-ink/15 text-house-ink/30';
-  if (seat.status === 'held') return 'border-house-ink/25 bg-transparent text-house-ink/35';
+  // Sold seats recede. They were previously filled at house-ink/15, which on a
+  // dark ground is *lighter* than an available seat — the unbookable seats were
+  // the most prominent thing in the house.
+  if (seat.status === 'sold') return 'border-transparent bg-house-sunken text-house-ink/40';
+  if (seat.status === 'held') return 'border-house-ink/25 bg-transparent text-house-ink/45';
   if (seat.seatClass === 'wheelchair' || seat.seatClass === 'companion') {
     return 'border-projector-lit/70 bg-projector-lit/10 text-projector-lit hover:bg-projector-lit/25';
   }
@@ -47,9 +73,33 @@ function seatTone(seat: Seat, selected: boolean, proposed: boolean): string {
     return 'border-marigold-lit/60 bg-marigold-lit/10 text-marigold-lit hover:bg-marigold-lit/25';
   }
   if (seat.seatClass === 'premium') {
-    return 'border-house-ink/50 bg-house-ink/10 text-house-ink hover:bg-house-ink/25';
+    return 'border-house-ink/55 bg-house-ink/12 text-house-ink hover:bg-house-ink/28';
   }
-  return 'border-house-ink/30 bg-transparent text-house-ink/80 hover:bg-house-ink/15';
+  // /40 rather than /30: an available seat is an active control, so its outline
+  // is held to 1.4.11's 3:1 against the house ground (this measures 3.43:1).
+  // Sold and held seats are aria-disabled and therefore exempt.
+  return 'border-house-ink/40 bg-transparent text-house-ink/80 hover:bg-house-ink/15';
+}
+
+/**
+ * The sold cross.
+ *
+ * Both arms are pinned to the vertical centre before rotating. Anchoring them
+ * to the top edge instead — as this did originally — swings two edge-aligned
+ * rules into a caret rather than a cross.
+ */
+function SoldMark({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        'block',
+        'before:absolute before:inset-x-0 before:top-1/2 before:rotate-45 before:border-t before:border-current',
+        'after:absolute after:inset-x-0 after:top-1/2 after:-rotate-45 after:border-t after:border-current',
+        className,
+      )}
+    />
+  );
 }
 
 interface SeatMapProps {
@@ -313,8 +363,7 @@ export function SeatMap({
                         className={cn(
                           'seat relative grid place-items-center border',
                           'text-[0.5rem] font-bold leading-none',
-                          seat.seatClass === 'recliner' ? 'h-7 w-7' : 'h-6 w-6',
-                          seat.seatClass === 'premium' ? 'rounded-t-[4px] rounded-b-xs' : 'rounded-xs',
+                          seatShape(seat.seatClass),
                           disabled ? 'cursor-not-allowed' : 'cursor-pointer',
                           seatTone(seat, isSelected, isProposed),
                         )}
@@ -325,10 +374,7 @@ export function SeatMap({
                           <span aria-hidden="true">+</span>
                         ) : seat.status === 'sold' ? (
                           // A cross, so "sold" survives without colour.
-                          <span
-                            aria-hidden="true"
-                            className="absolute inset-1.5 before:absolute before:inset-0 before:rotate-45 before:border-t before:border-current after:absolute after:inset-0 after:-rotate-45 after:border-t after:border-current"
-                          />
+                          <SoldMark className="absolute inset-1.25" />
                         ) : seat.status === 'held' ? (
                           <span aria-hidden="true" className="block size-1.5 rounded-stub bg-current" />
                         ) : isSelected ? (
@@ -360,36 +406,55 @@ export function SeatMap({
         <ul className="flex flex-wrap gap-x-5 gap-y-2.5 text-[0.75rem] text-house-muted">
           {(
             [
-              { key: 'regular', label: `Regular · ${money(priceFor('regular'))}` },
-              { key: 'premium', label: `Premium · ${money(priceFor('premium'))}` },
+              { key: 'regular', shape: 'regular', label: `Regular · ${money(priceFor('regular'))}` },
+              { key: 'premium', shape: 'premium', label: `Premium · ${money(priceFor('premium'))}` },
               ...(screen?.layout.reclinerRows.length
-                ? [{ key: 'recliner', label: `Recliner · ${money(priceFor('recliner'))}` }]
+                ? [
+                    {
+                      key: 'recliner',
+                      shape: 'recliner',
+                      label: `Recliner · ${money(priceFor('recliner'))}`,
+                    } as const,
+                  ]
                 : []),
-              { key: 'wheelchair', label: `Wheelchair space · ${money(priceFor('wheelchair'))}` },
-              { key: 'companion', label: `Companion · ${money(priceFor('companion'))}` },
-              { key: 'selected', label: 'Chosen' },
-              { key: 'held', label: 'Being booked' },
-              { key: 'sold', label: 'Sold' },
+              {
+                key: 'wheelchair',
+                shape: 'wheelchair',
+                label: `Wheelchair space · ${money(priceFor('wheelchair'))}`,
+              },
+              {
+                key: 'companion',
+                shape: 'companion',
+                label: `Companion · ${money(priceFor('companion'))}`,
+              },
+              // The three status swatches use the ordinary seat silhouette —
+              // status is what varies, not the class.
+              { key: 'selected', shape: 'regular', label: 'Chosen' },
+              { key: 'held', shape: 'regular', label: 'Being booked' },
+              { key: 'sold', shape: 'regular', label: 'Sold' },
             ] as const
           ).map((entry) => (
             <li key={entry.key} className="flex items-center gap-2">
+              {/* The swatch reproduces the seat exactly — same silhouette, same
+                  tone — so the legend teaches the map rather than approximating it. */}
               <span
                 aria-hidden="true"
                 className={cn(
-                  'grid size-5 shrink-0 place-items-center rounded-xs border text-[0.5rem] font-bold',
+                  'relative grid shrink-0 place-items-center border text-[0.5rem] font-bold',
+                  seatShape(entry.shape),
                   entry.key === 'selected'
                     ? 'border-marigold bg-marigold text-paper'
                     : entry.key === 'sold'
-                      ? 'border-transparent bg-house-ink/15 text-house-ink/30'
+                      ? 'border-transparent bg-house-sunken text-house-ink/40'
                       : entry.key === 'held'
-                        ? 'border-house-ink/25 text-house-ink/35'
+                        ? 'border-house-ink/25 text-house-ink/45'
                         : entry.key === 'wheelchair' || entry.key === 'companion'
                           ? 'border-projector-lit/70 bg-projector-lit/10 text-projector-lit'
                           : entry.key === 'recliner'
-                            ? 'border-marigold-lit/60 bg-marigold-lit/10'
+                            ? 'border-marigold-lit/60 bg-marigold-lit/10 text-marigold-lit'
                             : entry.key === 'premium'
-                              ? 'rounded-t-[4px] border-house-ink/50 bg-house-ink/10'
-                              : 'border-house-ink/30',
+                              ? 'border-house-ink/55 bg-house-ink/12'
+                              : 'border-house-ink/40',
                 )}
               >
                 {entry.key === 'wheelchair' ? (
@@ -397,7 +462,7 @@ export function SeatMap({
                 ) : entry.key === 'companion' ? (
                   '+'
                 ) : entry.key === 'sold' ? (
-                  <span className="relative block size-2.5 before:absolute before:inset-0 before:rotate-45 before:border-t before:border-current after:absolute after:inset-0 after:-rotate-45 after:border-t after:border-current" />
+                  <SoldMark className="absolute inset-1.25" />
                 ) : entry.key === 'held' ? (
                   <span className="block size-1.5 rounded-stub bg-current" />
                 ) : null}

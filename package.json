@@ -13,7 +13,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:assets": "node scripts/check-assets.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run check:assets && npm run test && npm run build"
+    "verify": "npm run typecheck && npm run lint && npm run validate:content && npm run check:assets && npm run test && npm run build && npm run check:classes",
+    "check:classes": "node scripts/check-classes.mjs",
+    "test:e2e": "playwright test",
+    "validate:content": "node scripts/validate-content.mjs"
   },
   "dependencies": {
     "@fontsource-variable/anek-bangla": "^5.2.5",
@@ -49,6 +52,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "^4.0.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
@@ -62,6 +66,7 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
     "jsdom": "^25.0.1",
+    "sharp": "^0.35.3",
     "tailwindcss": "^4.0.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.19.0",

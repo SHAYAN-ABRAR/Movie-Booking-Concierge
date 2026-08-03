@@ -9,11 +9,11 @@ import { MotionProvider } from './MotionProvider';
 import { AnimatedNumber } from './AnimatedNumber';
 import { Reveal, Stagger, StaggerItem } from './Reveal';
 import { staggerFor, duration } from './tokens';
-import { artworkFor, artworkForId } from '@/data/artwork';
-import { CinematicArtwork } from '@/components/visual/CinematicArtwork';
 import { MovieCard } from '@/components/movie/MovieCard';
 import { FeaturedStage } from '@/components/home/FeaturedStage';
-import { movies, nowShowing } from '@/data/movies';
+import { nowShowing } from '@/data/movies';
+import { genreLabels, languageLabels } from '@/data';
+import { runtimeLabelShort } from '@/lib/movieMeta';
 
 function renderMotion(element: ReactElement) {
   return render(
@@ -24,67 +24,6 @@ function renderMotion(element: ReactElement) {
     </MemoryRouter>,
   );
 }
-
-/* ══════════════════════════════════════════════════════════════════════
-   ART DIRECTION
-   ══════════════════════════════════════════════════════════════════════ */
-
-describe('film art direction', () => {
-  it('gives every film in the programme an explicit direction', () => {
-    for (const movie of movies) {
-      const direction = artworkFor(movie);
-      expect(direction.family).toBeTruthy();
-      expect(direction.ground).toMatch(/^#[0-9a-f]{6}$/i);
-      expect(direction.ink).toMatch(/^#[0-9a-f]{6}$/i);
-      expect(direction.accent).toMatch(/^#[0-9a-f]{6}$/i);
-      expect(direction.titleTone).toMatch(/^#[0-9a-f]{6}$/i);
-    }
-  });
-
-  it('is deterministic — the same film always draws the same picture', () => {
-    for (const movie of movies) {
-      expect(artworkForId(movie.id)).toEqual(artworkForId(movie.id));
-    }
-  });
-
-  it('uses at least six structurally different composition families', () => {
-    const families = new Set(movies.map((movie) => artworkFor(movie).family));
-    expect(families.size).toBeGreaterThanOrEqual(6);
-  });
-
-  it('never gives two films the same family and ground together', () => {
-    // This is the guarantee that stops the catalogue reading as one template
-    // recoloured — the exact failure the old plate system had.
-    const seen = new Set<string>();
-    for (const movie of movies) {
-      const direction = artworkFor(movie);
-      const signature = `${direction.family}|${direction.ground}`;
-      expect(seen.has(signature)).toBe(false);
-      seen.add(signature);
-    }
-  });
-
-  it('renders artwork as decorative, with the SVG hidden from assistive tech', () => {
-    const movie = nowShowing[0]!;
-    const { container } = renderMotion(<CinematicArtwork movie={movie} variant="card" />);
-    const svg = container.querySelector('svg');
-    expect(svg).toHaveAttribute('aria-hidden', 'true');
-    // The title inside the plate is real text, not baked into the picture.
-    expect(screen.getByRole('heading', { name: movie.title })).toBeInTheDocument();
-  });
-
-  it('re-composes per variant rather than scaling one drawing', () => {
-    const movie = nowShowing[0]!;
-    const card = renderMotion(<CinematicArtwork movie={movie} variant="card" />);
-    const cardBox = card.container.querySelector('svg')?.getAttribute('viewBox');
-    card.unmount();
-
-    const hero = renderMotion(<CinematicArtwork movie={movie} variant="hero" />);
-    const heroBox = hero.container.querySelector('svg')?.getAttribute('viewBox');
-
-    expect(cardBox).not.toEqual(heroBox);
-  });
-});
 
 /* ══════════════════════════════════════════════════════════════════════
    MOTION PRIMITIVES
@@ -171,10 +110,33 @@ describe('movie cards', () => {
     expect(cue).toBeDefined();
   });
 
-  it('shows the film\'s essential metadata without any interaction', () => {
-    const movie = nowShowing.find((m) => m.titleBn)!;
-    renderMotion(<MovieCard movie={movie} />);
+  it('shows the film’s essential metadata without any interaction', () => {
+    const movie = nowShowing[0]!;
+    const { container } = renderMotion(<MovieCard movie={movie} />);
+
+    // Title, certificate, runtime, language and genre must all be readable
+    // before anybody hovers, focuses or taps anything.
     expect(screen.getByRole('heading', { name: movie.title })).toBeInTheDocument();
+    expect(container).toHaveTextContent(runtimeLabelShort(movie));
+    expect(container).toHaveTextContent(languageLabels[movie.language]);
+    expect(container).toHaveTextContent(genreLabels[movie.genres[0]!]);
+  });
+
+  it('renders a real local poster, not generated artwork', () => {
+    const movie = nowShowing[0]!;
+    const { container } = renderMotion(<MovieCard movie={movie} />);
+
+    const img = container.querySelector('img');
+    expect(img).not.toBeNull();
+    expect(img!.getAttribute('src')).toMatch(/^\/media\/movies\/posters\//);
+    // Intrinsic dimensions are set, so the grid cannot shift as posters load.
+    expect(img).toHaveAttribute('width');
+    expect(img).toHaveAttribute('height');
+    // Nothing may be fetched from a remote host.
+    expect(img!.getAttribute('src')).not.toMatch(/^https?:/);
+    for (const source of container.querySelectorAll('source')) {
+      expect(source.getAttribute('srcset')).not.toMatch(/^https?:/);
+    }
   });
 });
 

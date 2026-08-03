@@ -188,6 +188,7 @@ export function Bookings() {
         <div className="py-10">
           <EmptyState
             title="No bookings on this device yet"
+            variant="ticket-book"
             body={
               <p>
                 When you complete a booking it will appear here, with its reference and a printable

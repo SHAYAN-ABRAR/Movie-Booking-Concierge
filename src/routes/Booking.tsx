@@ -60,6 +60,8 @@ export function Booking() {
   const setPreferredCinema = usePreferences((s) => s.setCinema);
 
   const [guestValid, setGuestValid] = useState<GuestDetails | null>(null);
+  /** True from the moment Confirm is pressed until the route has changed. */
+  const [isCompleting, setIsCompleting] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [seeded, setSeeded] = useState(false);
 
@@ -166,11 +168,15 @@ export function Booking() {
   }, [guestValid]);
 
   function confirm() {
+    // Double-submit guard. Without it a second click creates a second
+    // reference and a second navigation.
+    if (isCompleting) return;
     if (!movie || !showtime || !guestValid) return;
     const cinema = cinemaById.get(showtime.cinemaId);
     const screen = screenFor(showtime);
     if (!cinema || !screen) return;
 
+    setIsCompleting(true);
     const createdAt = new Date().toISOString();
     const reference = makeReference({
       showtimeId: showtime.id,
@@ -186,6 +192,7 @@ export function Booking() {
       movieTitle: movie.title,
       cinemaId: cinema.id,
       cinemaName: cinema.name,
+      cinemaAddress: cinema.addressLines.join(', '),
       screenId: screen.id,
       screenName: screen.name,
       showtimeId: showtime.id,
@@ -218,8 +225,21 @@ export function Booking() {
       guestNote: guestValid.note,
     });
 
+    // Persist first, then verify, then navigate, and only then discard the
+    // in-progress booking. Resetting before the confirmation route has a
+    // persisted record to read is how a customer ends up on a page that can
+    // show them nothing.
+    const stored = useBookings.getState().bookings.find((b) => b.reference === reference);
+    if (!stored) {
+      setIsCompleting(false);
+      announce(
+        'We could not save your booking to this browser. Nothing has been charged. Please try again.',
+      );
+      return;
+    }
+
+    navigate(`/booking-confirmation/${reference}`, { replace: true });
     booking.reset();
-    navigate(`/booking-confirmation/${reference}`);
   }
 
   if (!movie) return <NotFound />;
@@ -424,11 +444,12 @@ export function Booking() {
               {isLast ? (
                 <Button
                   size="lg"
-                  disabled={Boolean(blocker)}
+                  disabled={Boolean(blocker) || isCompleting}
+                  aria-busy={isCompleting}
                   onClick={confirm}
                   className="min-w-52"
                 >
-                  Confirm booking · {money(quote.total)}
+                  {isCompleting ? 'Saving your booking…' : `Confirm booking · ${money(quote.total)}`}
                 </Button>
               ) : (
                 <Button
@@ -538,8 +559,13 @@ export function Booking() {
           </div>
 
           {isLast ? (
-            <Button disabled={Boolean(blocker)} onClick={confirm} className="shrink-0">
-              Confirm
+            <Button
+              disabled={Boolean(blocker) || isCompleting}
+              aria-busy={isCompleting}
+              onClick={confirm}
+              className="shrink-0"
+            >
+              {isCompleting ? 'Saving…' : 'Confirm'}
             </Button>
           ) : (
             <Button

@@ -53,8 +53,8 @@ describe('every route renders', () => {
   });
 
   it('a film page, with an honest trailer state', () => {
-    renderAt('/movies/kaanch', '/movies/:slug', <MovieDetails />);
-    expect(screen.getByRole('heading', { name: 'Kaanch', level: 1 })).toBeInTheDocument();
+    renderAt('/movies/the-odyssey', '/movies/:slug', <MovieDetails />);
+    expect(screen.getByRole('heading', { name: 'The Odyssey', level: 1 })).toBeInTheDocument();
     expect(screen.getByText(/no trailer available/i)).toBeInTheDocument();
   });
 
@@ -113,8 +113,8 @@ describe('every route renders', () => {
   });
 
   it('the booking wizard', () => {
-    renderAt('/booking/kaanch', '/booking/:movieSlug', <Booking />);
-    expect(screen.getByRole('heading', { name: 'Kaanch', level: 1 })).toBeInTheDocument();
+    renderAt('/booking/the-odyssey', '/booking/:movieSlug', <Booking />);
+    expect(screen.getByRole('heading', { name: 'The Odyssey', level: 1 })).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: /booking steps/i })).toBeInTheDocument();
   });
 
@@ -136,12 +136,12 @@ describe('honesty guarantees that must never regress', () => {
   });
 
   it('states on the booking flow that no payment is taken', () => {
-    renderAt('/booking/kaanch', '/booking/:movieSlug', <Booking />);
+    renderAt('/booking/the-odyssey', '/booking/:movieSlug', <Booking />);
     expect(screen.getByText(/no payment is taken/i)).toBeInTheDocument();
   });
 
   it('never renders a password field anywhere in the booking flow', () => {
-    const { container } = renderAt('/booking/kaanch', '/booking/:movieSlug', <Booking />);
+    const { container } = renderAt('/booking/the-odyssey', '/booking/:movieSlug', <Booking />);
     expect(container.querySelector('input[type="password"]')).toBeNull();
   });
 

@@ -125,6 +125,7 @@ export function Movies() {
           {results.length === 0 ? (
             <EmptyState
               title="Nothing matches all of that"
+            variant="index"
               body={
                 <>
                   <p>

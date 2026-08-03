@@ -1,10 +1,9 @@
 import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { CinematicArtwork } from '@/components/visual/CinematicArtwork';
+import { MovieImage } from '@/components/visual/MovieImage';
 import { CertificateChip } from './Chips';
-import { formatRuntime } from '@/lib/datetime';
-import { artworkFor } from '@/data/artwork';
 import { genreLabels, languageLabels } from '@/data';
+import { runtimeLabelShort, statusLabel } from '@/lib/movieMeta';
 import type { Movie } from '@/data/types';
 import { cn } from '@/lib/utils';
 
@@ -25,16 +24,11 @@ export function MovieCard({
   movie,
   className,
   showSynopsis = false,
-  /** Lets the artwork's single moving layer run. Off in dense grids. */
-  animated = false,
 }: {
   movie: Movie;
   className?: string;
   showSynopsis?: boolean;
-  animated?: boolean;
 }) {
-  const direction = artworkFor(movie);
-
   return (
     <article className={cn('group relative', className)}>
       <Link
@@ -53,9 +47,24 @@ export function MovieCard({
             'group-focus-within:shadow-[0_18px_36px_-20px_rgb(20_22_31_/_0.45)]',
           )}
         >
-          <div className="transition-transform duration-[--dur-slow] ease-[--ease-out] group-hover:scale-[1.035] group-focus-within:scale-[1.035]">
-            <CinematicArtwork movie={movie} variant="card" animated={animated} />
-          </div>
+          <MovieImage
+            movie={movie}
+            role="poster"
+            // One card is ~200px on a phone and ~260px in the widest grid.
+            sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 260px"
+            imgClassName={cn(
+              'transition-transform duration-[--dur-slow] ease-[--ease-out]',
+              'group-hover:scale-[1.04] group-focus-within:scale-[1.04]',
+              'motion-reduce:transform-none',
+            )}
+          />
+
+          {/* Status, for a film that is not on sale yet. */}
+          {movie.status === 'coming-soon' ? (
+            <span className="absolute left-0 top-0 bg-content px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-surface">
+              {statusLabel(movie)}
+            </span>
+          ) : null}
 
           {/* Projected light crossing the frame on approach. Decorative only. */}
           <span
@@ -78,14 +87,25 @@ export function MovieCard({
               'transition-transform duration-[--dur-base] ease-[--ease-out]',
               'group-hover:scale-x-100 group-focus-within:scale-x-100',
             )}
-            style={{ backgroundColor: direction.accent }}
+            style={{ backgroundColor: 'var(--marigold)' }}
           />
         </div>
 
         <div className="mt-3.5">
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] text-content-muted">
-            <CertificateChip code={movie.certificate} />
-            <span className="numeral">{formatRuntime(movie.runtimeMinutes)}</span>
+          {/* The title is real text under the poster, not drawn into it. */}
+          <h3 className="font-display text-[1.15rem] font-medium leading-[1.15] tracking-[-0.015em] group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+            {movie.title}
+          </h3>
+
+          <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] text-content-muted">
+            {movie.certificateConfirmed ? (
+              <CertificateChip code={movie.certificate} />
+            ) : (
+              <span className="border border-hairline-strong px-1.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em]">
+                Not yet rated
+              </span>
+            )}
+            <span className="numeral">{runtimeLabelShort(movie)}</span>
             <span aria-hidden="true">·</span>
             <span>{languageLabels[movie.language]}</span>
           </p>
@@ -112,7 +132,7 @@ export function MovieCard({
               '[@media(hover:none)]:opacity-100',
             )}
           >
-            View showtimes
+            {movie.status === 'coming-soon' ? 'See release details' : 'View showtimes'}
             <ArrowUpRight
               className="size-3.5 transition-transform duration-[--dur-base] ease-[--ease-out] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
               aria-hidden="true"
@@ -135,13 +155,18 @@ export function MovieTile({ movie, className }: { movie: Movie; className?: stri
         className,
       )}
     >
-      <CinematicArtwork movie={movie} variant="mark" className="size-14 shrink-0" />
+      <MovieImage
+        movie={movie}
+        role="poster"
+        sizes="56px"
+        className="w-14 shrink-0"
+      />
       <div className="min-w-0 flex-1">
         <h3 className="truncate font-display text-base leading-tight group-hover:underline">
           {movie.title}
         </h3>
         <p className="mt-1 truncate text-xs text-content-muted">
-          {formatRuntime(movie.runtimeMinutes)} · {languageLabels[movie.language]}
+          {runtimeLabelShort(movie)} · {languageLabels[movie.language]}
         </p>
         <p className="mt-1 truncate text-xs text-content-faint">
           {movie.genres.map((g) => genreLabels[g]).join(', ')}

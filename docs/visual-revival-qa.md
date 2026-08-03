@@ -2,8 +2,8 @@
 
 Verification of the motion-design and art-direction pass. Baseline commit `e624fe1`.
 
-**Result:** 139 tests passing (was 116) · 0 lint errors · asset check clean · production build clean ·
-no console errors · zero horizontal overflow on 11 routes at 320 px.
+**Result:** 156 tests passing (was 116) · 0 lint errors · asset check clean · dead-class check clean ·
+production build clean · no console errors · zero horizontal overflow on 11 routes at 320 px.
 
 ---
 
@@ -15,7 +15,8 @@ design system forbade the things that would fix it, the plate system produced on
 colours, and all interaction feedback was border-and-colour.
 
 Captures: [`screens/before/`](./screens/before/) · [`screens/after/`](./screens/after/) —
-`home-1440`, `movies-1440`, `movie-details-1440`, `showtimes-1440`, plus `home-390` in the baseline.
+`home-1440`, `movies-1440`, `movie-details-1440`, `showtimes-1440`, plus `home-390` in the baseline
+and `offers-1440`, `concessions-1440`, `seat-map-1440` from the second pass.
 Full-page WebP (2.2 MB total; the source PNGs were 12.7 MB and compressed 83 % with no loss of
 legibility).
 
@@ -59,6 +60,9 @@ springs. Documented in [`motion-system.md`](./motion-system.md).
 | Booking | Directional step transitions · film-transport stepper · animated totals |
 | Seat map | Lights-down arrival · screen glow · rows arrive front-to-back · seats settle |
 | Confirmation | Ticket settles · one light pass · QR fades in after the surface is stable |
+| Offers | Five pieces of stationery · the leader sweeps once on reveal, then rests |
+| Concessions | Drawn vessel per category, drawn contents per item · quantity marker on add |
+| Empty states | A drawing per context, not one dashed box |
 | Max | Launcher lifts, presses, and sweeps once on genuinely new events |
 
 ---
@@ -77,11 +81,18 @@ springs. Documented in [`motion-system.md`](./motion-system.md).
 ## Components changed
 
 **New** — `src/motion/*` (8 files) · `components/visual/CinematicArtwork.tsx` ·
-`components/home/FeaturedStage.tsx` · `data/artwork.ts`
+`components/visual/OfferComposition.tsx` · `components/visual/CounterIllustration.tsx` ·
+`components/visual/EmptyStates.tsx` · `components/home/FeaturedStage.tsx` · `data/artwork.ts` ·
+`data/offerArt.ts` · `scripts/check-classes.mjs`
+
+**Removed** — `components/brand/Plate.tsx`, once both consumers were replaced and it had no
+references left.
 
 **Modified** — `Layout` · `RouteFallback` · `MovieCard` · `ShowtimeButton` · `HouseDiagram` ·
-`QuickBook` · `SeatMap` · `MaxDock` · `Home` · `Movies` · `MovieDetails` · `Booking` ·
-`BookingConfirmation` · `hooks/index.ts` · `globals.css` · `vite.config.ts`
+`QuickBook` · `SeatMap` · `MaxDock` · `AlertBell` · `ConcessionCard` · `EmptyState` · `Home` ·
+`Movies` · `MovieDetails` · `Showtimes` · `Cinemas` · `CinemaDetails` · `Concessions` · `Offers` ·
+`Bookings` · `Booking` · `booking/steps` · `BookingConfirmation` · `hooks/index.ts` · `globals.css` ·
+`vite.config.ts` · `package.json`
 
 **Untouched, by design** — every file listed as protected business logic: `bookingMath.ts`,
 `seatFinder.ts`, `schedule.ts`, `max/nlu.ts`, `max/skills.ts`, `max/executor.ts`, all Zustand stores,
@@ -117,17 +128,41 @@ establishes a scroll container and would silently break every `position: sticky`
   relocating focus to `main` makes a screen reader re-read the whole page on every navigation.
 - No horizontal scroll at any tested width.
 
-**Verified by test** (23 new assertions)
+- Seat map re-measured after the second pass: 160 seats, **1 tab stop**, all 30 sold seats carrying a
+  non-colour mark.
+- **Reduced motion, JS path** — forced by stubbing `matchMedia` through a navigation init script.
+  The featured stage did not advance after 9 s (interval is ≥ 7 s), and no element on `/offers` was
+  left below 0.15 opacity while carrying text.
+- No console errors or warnings across 10 routes.
 
-- Artwork SVG is `aria-hidden`; the film title is a real heading beside it.
+**Contrast, measured against the house ground `#101322`**
+
+| | Before | After | Requirement |
+|---|---|---|---|
+| `--house-faint` small print | 3.96:1 ❌ | **4.71:1** ✅ | 4.5:1 (1.4.3) |
+| Available seat outline | 2.45:1 ❌ | **3.43:1** ✅ | 3:1 (1.4.11) |
+| `--house-muted` | 7.42:1 ✅ | 7.42:1 ✅ | 4.5:1 |
+| Premium seat outline | — | 5.37:1 ✅ | 3:1 |
+| Recliner / access outline | — | 3.50 / 4.82:1 ✅ | 3:1 |
+
+Both failures were latent rather than visible: the tokens emitted no CSS, so the elements were
+inheriting `house-ink` and passing by accident. Registering the tokens is what made the real values
+apply, and the two lifts are what make them pass on purpose.
+
+**Verified by test** (40 assertions across the two new files)
+
+- Artwork and stationery SVGs are `aria-hidden`; the real facts are text beside them.
 - Movie cards expose exactly one link; the hover cue is `aria-hidden` and never the only route.
 - The featured stage exposes a pause control, marks the current film with `aria-current`, and stops
   auto-advancing once the customer takes control.
 - Reveals, the stage and animated numbers all render real content under reduced motion.
+- `EmptyState` still exposes heading, body and action alongside a drawing, and still renders without
+  one.
+- The sold cross has both arms through the centre; seat classes differ by silhouette.
 
-**Not verified** — no screen-reader session, no axe scan. The MCP surface does not expose
-`Emulation.setEmulatedMedia`, so reduced motion was verified through unit tests and the CSS override
-rather than by browser emulation.
+**Not verified** — no screen-reader session, no axe scan. The **CSS** half of reduced motion still
+cannot be browser-emulated: neither the MCP `emulate` tool nor the exposed CDP surface offers a
+`prefers-reduced-motion` override, so the global `0.01ms` block is covered by inspection only.
 
 ---
 
@@ -160,20 +195,29 @@ deterministic. Only transform and opacity are animated.
 ## Test results
 
 ```
-Test Files  7 passed (7)
-Tests     139 passed (139)
+Test Files  8 passed (8)
+Tests     156 passed (156)
 ```
 
-23 new assertions in `src/motion/revival.test.tsx` covering art-direction determinism and
-distinctness, variant re-composition, animated-number accessibility, reveal content preservation,
-stagger capping, duration ceilings, card link semantics, stage controls, and three reduced-motion
-paths. **No existing test was weakened or deleted.**
+23 assertions in `src/motion/revival.test.tsx` cover art-direction determinism and distinctness,
+variant re-composition, animated-number accessibility, reveal content preservation, stagger capping,
+duration ceilings, card link semantics, stage controls, and three reduced-motion paths.
+
+A further 15 in `src/components/visual/stationery.test.tsx` cover the offer compositions (every offer
+designed, all five structurally different, figures traceable to the offer's own copy, variants
+re-composed), the counter illustrations (deterministic, the two boxes differ, two sizes of the same
+item differ) and the empty states (five distinct drawings, all `aria-hidden`, heading/body/action
+still exposed, no-variant fallback intact).
+
+Two more in `SeatMap.test.tsx` guard the cross geometry and the class silhouettes.
+**No existing test was weakened or deleted.**
 
 ```
 ✓ tsc -b --noEmit          clean
 ✓ eslint .                 0 errors (7 react-refresh HMR warnings)
 ✓ npm run check:assets     6 catalogued · 0 deployable · no violations
 ✓ vite build               clean
+✓ npm run check:classes    121 colour utilities checked, all resolved
 ```
 
 ---
@@ -195,25 +239,74 @@ overlays-only, nothing-animates-on-scroll, and Framer-Motion-on-exactly-two-elem
 
 ---
 
+## Second pass — the three gaps, and a rendering bug
+
+Items 4–6 below were open after the first pass. All three are now built, and closing them surfaced a
+defect that had been in the product from the beginning.
+
+### The auditorium was never rendering as designed
+
+Three palette tokens — `house-muted`, `house-faint`, `house-rule` — were used across the seat map,
+the confirmation ticket and the no-trailer screen but were **never registered in `@theme inline`**.
+Tailwind drops a utility whose token does not exist, silently: `text-house-muted` emitted no CSS at
+all, and every one of those ~21 elements fell back to `currentColor`.
+
+The visible result: row letters, legend text and the ticket's field labels all rendered at full
+`house-ink` brightness instead of their intended dim tones, and every hairline divider rendered as a
+bright `currentColor` rule instead of `#2a2f40`. The auditorium looked flat and over-bright because
+**it was drawing the wrong colours everywhere**, not because the design was too restrained.
+
+Nothing in typecheck, lint or the test suite could see this. `npm run check:classes`
+([`scripts/check-classes.mjs`](../scripts/check-classes.mjs)) now reads the built stylesheet and
+fails if any colour utility written in `src/` produced no rule. Verified by removing
+`--color-house-rule` and confirming the check exits 1 naming all 16 sites.
+
+Two related fixes in the same pass:
+
+- **The sold-seat cross was a caret.** Both arms were pinned to the box's *top* edge (`inset-0` +
+  `border-t`), so rotating them ±45° about the box centre swung them into a `^`. They are centred
+  first now. Guarded by a regression test.
+- **Sold seats outranked available ones.** `bg-house-ink/15` on a dark ground is *lighter* than a
+  transparent seat, so the unbookable seats were the most prominent thing in the house. Sold now
+  recedes to `house-sunken`.
+- **`--house-faint` lifted** `#6f7484` → `#7c8092`. At its authored value it measured 3.96:1 on the
+  house ground — under AA for the small print it carries. Now 4.71:1.
+- **Available seat outline lifted** `/30` → `/40`, from 2.45:1 to 3.43:1, since an available seat is
+  an active control and 1.4.11 wants 3:1. Sold and held are `aria-disabled` and therefore exempt.
+
+### Seat classes now carry a silhouette
+
+Regular and premium were distinguishable only by a 4px radius difference and a 10% fill — invisible
+at 24px. Class is now carried by shape as well as tone: a rounder back and a deeper bottom border
+mean a better seat, so the map reads in greyscale. Border thickening happens inside the box, so
+nothing shifts when state changes. The legend reproduces the same silhouettes rather than
+approximating them.
+
+### Offers, the counter, and empty states
+
+All three are documented in [`design-system.md`](./design-system.md). In short: five pieces of
+stationery replace `OfferPlate` (and `Plate.tsx` is now deleted — both consumers are gone); the
+counter is drawn on two axes so thirteen items do not become five repeated pictures; five empty-state
+drawings replace the one dashed box.
+
+The honesty rule extends to the artwork: a test asserts every offer figure is traceable to that
+offer's own copy, and the counter draws what each item actually contains — one carton and two cups
+for the interval box, two and four for the family box, froth rather than steam on a cold lassi.
+
+---
+
 ## Known limitations
 
 1. **No screen-reader or axe pass.** Semantics are asserted by test and by DOM inspection.
-2. **Reduced motion not browser-emulated** — unit-tested instead, for the reason above.
-3. **No Lighthouse or CPU-throttled profiling.**
-4. **Offers still use the original `OfferPlate`.** The brief asked for distinct promotional
-   compositions (ticket stubs, receipts, passes). Offers received the shared depth and interaction
-   improvements but not a bespoke composition system; this is the largest piece of the brief not
-   fully delivered.
-5. **Concessions has no hand-drawn category illustrations.** It gained the depth and interaction
-   vocabulary but not the drawn popcorn/drinks/nachos artwork the brief describes.
-6. **Empty states are still the shared dashed panel.** The per-context designed empties (empty
-   projection schedule, clipped programme index, counter receipt) are not built.
-7. **21st MCP was unavailable** — it requires `API_KEY_21ST`, which is not present. No component
-   ideas were sourced from it.
-8. **Hallmark's automated gate list was not machine-run.** The skill's `audit` verb is a
+2. **No Lighthouse or CPU-throttled profiling.**
+3. **21st MCP unavailable** — it requires `API_KEY_21ST`, which is not present, and the server is
+   unauthorised in this environment. No component ideas were sourced from it.
+4. **Hallmark's automated gate list was not machine-run.** The skill's `audit` verb is a
    read-and-report procedure; it was applied by hand against the highest-risk gates (320 px overflow,
    two-line clickables, `overflow-x` backstop, italic headers, stacked eyebrows, invented metrics).
    Findings from that pass were fixed — the `overflow-x: clip` backstop is the one change it produced.
 
-Items 4–6 are genuine gaps against the brief rather than deliberate design decisions, and are the
-first things to pick up next.
+**Now resolved.** Reduced motion is no longer only unit-tested: the JS behaviour path is verified in
+the browser by stubbing `matchMedia` through an init script, confirming the featured stage does not
+auto-advance after 9 s and that no revealed element is left parked at opacity 0. The CSS half still
+cannot be browser-emulated — the MCP surface exposes no `prefers-reduced-motion` override.

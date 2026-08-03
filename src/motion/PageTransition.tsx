@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { routeTransition } from './variants';
@@ -98,41 +98,49 @@ export function RouteProgress() {
 /* ── Route transition ──────────────────────────────────────────────────── */
 
 /**
- * Wraps the routed outlet so the outgoing view can leave before the next
- * arrives.
+ * Wraps the routed outlet with an **incoming-only** transition.
  *
  * Keyed by pathname only — a query-string change is a *filter* change, and
- * re-animating the whole page every time somebody ticks a genre would be
- * both slow and disorienting. Filter changes are animated in place instead.
+ * re-animating the whole page every time somebody ticks a genre would be both
+ * slow and disorienting. Filter changes are animated in place instead.
  *
- * `mode="popLayout"` is deliberately not used: it takes the outgoing view out
- * of flow, which collapses the page height and fights scroll restoration.
+ * ── Why there is no `AnimatePresence` here ──────────────────────────────
+ *
+ * There used to be one, with `mode="wait"`, and it broke every in-app
+ * navigation in the product: the outgoing route animated to `opacity: 0` and
+ * was then never removed, so the incoming route never mounted and the outlet
+ * showed a fully-transparent copy of the previous page forever. That is the
+ * "blank booking confirmation" defect — it was never specific to confirmation,
+ * it was every link in the application.
+ *
+ * The trigger was `LazyMotion` loading its feature bundle asynchronously (see
+ * MotionProvider). But the deeper problem is the shape: an exit-wait transition
+ * around the routed outlet means a single missed completion callback empties
+ * the page with no way back. An entrance-only transition cannot do that — the
+ * incoming route is mounted by React immediately and merely animates in, so the
+ * worst a motion failure can cost is the animation itself.
+ *
+ * Route transitions are not worth a page that can vanish.
  */
 export function PageTransition({ routeKey, children }: { routeKey: string; children: ReactNode }) {
   const motion = useMotionPreferences();
-
-  const onExitComplete = useCallback(() => {
-    // Scroll restoration is owned by the layout; this only makes sure the
-    // browser is not mid-scroll when the incoming view measures itself.
-    if (typeof window !== 'undefined') window.dispatchEvent(new Event('nokshi:route-settled'));
-  }, []);
 
   if (motion.reduced) {
     return <div key={routeKey}>{children}</div>;
   }
 
   return (
-    <AnimatePresence mode="wait" initial={false} onExitComplete={onExitComplete}>
-      <m.div
-        key={routeKey}
-        variants={routeTransition}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{ duration: duration.route, ease: ease.entrance }}
-      >
-        {children}
-      </m.div>
-    </AnimatePresence>
+    <m.div
+      // Remounting on the key is what replays the entrance. The variants object
+      // still carries an `exit` state; with no AnimatePresence above it, it is
+      // simply never used.
+      key={routeKey}
+      variants={routeTransition}
+      initial="initial"
+      animate="animate"
+      transition={{ duration: duration.route, ease: ease.entrance }}
+    >
+      {children}
+    </m.div>
   );
 }

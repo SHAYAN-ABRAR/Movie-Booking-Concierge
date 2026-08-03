@@ -165,6 +165,7 @@ export function CinemaDetails() {
             {byMovie.length === 0 ? (
               <EmptyState
                 title="Nothing scheduled"
+            variant="schedule"
                 body={`${cinema.name} has no screenings listed for this date in the sample programme. Try another day on the strip above.`}
               />
             ) : (
