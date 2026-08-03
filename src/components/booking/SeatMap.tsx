@@ -6,6 +6,8 @@ import { isWeekend, seatPrice } from '@/data/pricing';
 import { money } from '@/lib/format';
 import type { Seat, SeatClass, SeatRow, Showtime } from '@/data/types';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
+import { BOOKING_FEE_PER_TICKET } from '@/data/pricing';
 
 /**
  * The seat selector.
@@ -121,6 +123,7 @@ export function SeatMap({
   onReset,
   onAnnounce,
 }: SeatMapProps) {
+  const { t } = useTranslation();
   const rows = useMemo(() => seatMapFor(showtime), [showtime]);
   const screen = screenFor(showtime);
   const weekend = isWeekend(showtime.date);
@@ -248,7 +251,7 @@ export function SeatMap({
           viewBox="0 0 600 42"
           className="mx-auto block h-8 w-full max-w-2xl"
           role="img"
-          aria-label="The screen is at this end of the house"
+          aria-label={t('seatMap.screenEnd')}
         >
           <defs>
             <linearGradient id="screen-glow" x1="0" x2="1" y1="0" y2="0">
@@ -280,7 +283,7 @@ export function SeatMap({
           <Button
             variant="outline"
             size="icon-sm"
-            aria-label="Zoom out"
+            aria-label={t('seatMap.zoomOut')}
             disabled={zoom <= 0.7}
             onClick={() => setZoom((z) => Math.max(0.7, Number((z - 0.15).toFixed(2))))}
             className="border-house-rule text-house-ink"
@@ -290,7 +293,7 @@ export function SeatMap({
           <Button
             variant="outline"
             size="icon-sm"
-            aria-label="Zoom in"
+            aria-label={t('seatMap.zoomIn')}
             disabled={zoom >= 1.6}
             onClick={() => setZoom((z) => Math.min(1.6, Number((z + 0.15).toFixed(2))))}
             className="border-house-rule text-house-ink"
@@ -472,8 +475,7 @@ export function SeatMap({
           ))}
         </ul>
         <p className="mt-3 text-[0.75rem] leading-5 text-house-faint">
-          Prices are per seat before your ticket category is applied, and exclude the ৳20 per-ticket
-          booking fee. Wheelchair spaces and companion seats are always charged at the regular rate.
+          {t('seatMap.priceNote', { fee: money(BOOKING_FEE_PER_TICKET) })}
         </p>
       </div>
 
@@ -495,12 +497,12 @@ export function SeatMap({
             size="sm"
             onClick={() => {
               onReset();
-              onAnnounce?.('All seats released.');
+              onAnnounce?.(t('seatMap.allReleased'));
             }}
             className="border-house-rule text-house-ink hover:bg-house-ink/10"
           >
             <RotateCcw aria-hidden="true" />
-            Clear seats
+            {t('seatMap.clearSeats')}
           </Button>
         ) : null}
       </div>

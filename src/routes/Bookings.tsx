@@ -20,6 +20,7 @@ import { dayLabel, displayTime, longDayLabel, screeningStart } from '@/lib/datet
 import { money, seatRanges } from '@/lib/format';
 import { buildIcs, downloadUrl } from '@/lib/external';
 import { screeningEndMinutes, getShowtime } from '@/data/schedule';
+import { useTranslation } from 'react-i18next';
 
 function BookingRow({
   booking,
@@ -30,6 +31,7 @@ function BookingRow({
   past: boolean;
   onRemove: (reference: string) => void;
 }) {
+  const { t } = useTranslation();
   const movie = movieById.get(booking.movieId);
   const cinema = cinemaById.get(booking.cinemaId);
 
@@ -133,13 +135,13 @@ function BookingRow({
         <Button asChild size="sm">
           <Link to={`/booking-confirmation/${booking.reference}`}>
             <Printer aria-hidden="true" />
-            View ticket
+            {t('bookings.viewTicket')}
           </Link>
         </Button>
         {!past ? (
           <Button size="sm" variant="outline" onClick={addToCalendar}>
             <CalendarPlus aria-hidden="true" />
-            Add to calendar
+            {t('bookings.addToCalendar')}
           </Button>
         ) : null}
         <Button
@@ -159,6 +161,7 @@ function BookingRow({
 }
 
 export function Bookings() {
+  const { t } = useTranslation();
   const bookings = useBookings((s) => s.bookings);
   const remove = useBookings((s) => s.remove);
   const clear = useBookings((s) => s.clear);
@@ -171,14 +174,14 @@ export function Bookings() {
   return (
     <div className="shell">
       <PageHeader
-        eyebrow="On this device"
-        title="My bookings"
-        lede="Every booking you have made in this browser. They are stored on this device only — not on a server, and not on any other device you use."
+        eyebrow={t('bookings.eyebrow')}
+        title={t('bookings.title')}
+        lede={t('bookings.lede')}
         aside={
           bookings.length > 0 ? (
             <Button variant="outline" onClick={() => setConfirmClear(true)}>
               <Trash2 aria-hidden="true" />
-              Clear history
+              {t('bookings.clearHistory')}
             </Button>
           ) : undefined
         }
@@ -187,17 +190,12 @@ export function Bookings() {
       {bookings.length === 0 ? (
         <div className="py-10">
           <EmptyState
-            title="No bookings on this device yet"
+            title={t('bookings.emptyTitle')}
             variant="ticket-book"
-            body={
-              <p>
-                When you complete a booking it will appear here, with its reference and a printable
-                ticket. Nothing is stored anywhere else, so this list starts empty on a new browser.
-              </p>
-            }
+            body={<p>{t('bookings.emptyBody')}</p>}
             action={
               <Button asChild>
-                <Link to="/showtimes">Find a screening</Link>
+                <Link to="/showtimes">{t('bookings.findScreening')}</Link>
               </Button>
             }
           />
@@ -237,22 +235,20 @@ export function Bookings() {
       )}
 
       <DemoNote className="mb-10" tone="loud">
-        Demonstration bookings. No payment was taken, no ticket is valid for entry anywhere, and
-        nothing here has been sent to a cinema. Clearing your browser data deletes all of it.
+        {t('bookings.demoNote')}
       </DemoNote>
 
       <Dialog open={confirmClear} onOpenChange={setConfirmClear}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Clear all booking history?</DialogTitle>
+            <DialogTitle>{t('bookings.clearTitle')}</DialogTitle>
             <DialogDescription>
-              This deletes all {bookings.length} bookings stored in this browser. It cannot be undone,
-              and there is no copy anywhere else.
+              {t('bookings.clearBody', { count: bookings.length })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmClear(false)}>
-              Keep them
+              {t('bookings.keepThem')}
             </Button>
             <Button
               variant="danger"
@@ -261,7 +257,7 @@ export function Bookings() {
                 setConfirmClear(false);
               }}
             >
-              Delete everything
+              {t('bookings.deleteEverything')}
             </Button>
           </DialogFooter>
         </DialogContent>

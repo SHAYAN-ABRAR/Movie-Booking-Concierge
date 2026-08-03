@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useWatches, watchKindLabels } from '@/store/watches';
+import { useWatches, watchKindLabel } from '@/store/watches';
 import { usePreferences } from '@/store/preferences';
 import { movieById, cinemaById } from '@/data';
 import { getShowtime } from '@/data/schedule';
@@ -80,7 +80,7 @@ export function DemoAlertRunner() {
             break;
           }
           default: {
-            title = `Demo: ${watchKindLabels[watch.kind]}`;
+            title = `Demo: ${watchKindLabel(watch.kind)}`;
             body = where;
           }
         }

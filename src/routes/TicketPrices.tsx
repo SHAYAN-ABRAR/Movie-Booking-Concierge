@@ -57,7 +57,7 @@ export function TicketPrices() {
             <ol className="space-y-8">
               <li>
                 <div className="flex items-baseline gap-4">
-                  <span aria-hidden="true" className="numeral font-display text-2xl text-ink/30">
+                  <span aria-hidden="true" className="numeral font-display text-2xl text-content/30">
                     01
                   </span>
                   <h3 className="font-display text-xl leading-tight">Start with the seat</h3>
@@ -70,7 +70,7 @@ export function TicketPrices() {
                     >
                       <dt>
                         <span className="font-medium">{seat.label}</span>
-                        <span className="block text-[0.8125rem] text-ink-muted">{seat.note}</span>
+                        <span className="block text-[0.8125rem] text-content-muted">{seat.note}</span>
                       </dt>
                       <dd className="numeral shrink-0 font-semibold">
                         {money(seatClassBase[seat.id])}
@@ -82,7 +82,7 @@ export function TicketPrices() {
 
               <li>
                 <div className="flex items-baseline gap-4">
-                  <span aria-hidden="true" className="numeral font-display text-2xl text-ink/30">
+                  <span aria-hidden="true" className="numeral font-display text-2xl text-content/30">
                     02
                   </span>
                   <h3 className="font-display text-xl leading-tight">Add the format</h3>
@@ -104,7 +104,7 @@ export function TicketPrices() {
 
               <li>
                 <div className="flex items-baseline gap-4">
-                  <span aria-hidden="true" className="numeral font-display text-2xl text-ink/30">
+                  <span aria-hidden="true" className="numeral font-display text-2xl text-content/30">
                     03
                   </span>
                   <h3 className="font-display text-xl leading-tight">Adjust for when</h3>
@@ -113,7 +113,7 @@ export function TicketPrices() {
                   <div className="flex items-baseline justify-between gap-6 border-b border-hairline py-2.5">
                     <dt>
                       <span className="font-medium">Before three</span>
-                      <span className="block text-[0.8125rem] text-ink-muted">
+                      <span className="block text-[0.8125rem] text-content-muted">
                         Any screening starting before 15:00, seven days a week.
                       </span>
                     </dt>
@@ -124,7 +124,7 @@ export function TicketPrices() {
                   <div className="flex items-baseline justify-between gap-6 border-b border-hairline py-2.5">
                     <dt>
                       <span className="font-medium">Friday and Saturday</span>
-                      <span className="block text-[0.8125rem] text-ink-muted">
+                      <span className="block text-[0.8125rem] text-content-muted">
                         The weekend uplift, applied to the seat price.
                       </span>
                     </dt>
@@ -135,12 +135,12 @@ export function TicketPrices() {
 
               <li>
                 <div className="flex items-baseline gap-4">
-                  <span aria-hidden="true" className="numeral font-display text-2xl text-ink/30">
+                  <span aria-hidden="true" className="numeral font-display text-2xl text-content/30">
                     04
                   </span>
                   <h3 className="font-display text-xl leading-tight">Apply the age category</h3>
                 </div>
-                <p className="mt-2 max-w-prose pl-11 text-[0.9375rem] leading-7 text-ink-muted">
+                <p className="mt-2 max-w-prose pl-11 text-[0.9375rem] leading-7 text-content-muted">
                   You choose a category when you pick your tickets. We never ask for a date of birth,
                   and this site does not verify anyone's age — the door does.
                 </p>
@@ -152,10 +152,10 @@ export function TicketPrices() {
                     >
                       <dt>
                         <span className="font-medium">{category.label}</span>
-                        <span lang="bn" className="ml-2 text-ink-muted">
+                        <span lang="bn" className="ml-2 text-content-muted">
                           {category.labelBn}
                         </span>
-                        <span className="block text-[0.8125rem] text-ink-muted">
+                        <span className="block text-[0.8125rem] text-content-muted">
                           {category.description}
                         </span>
                       </dt>
@@ -168,7 +168,7 @@ export function TicketPrices() {
               </li>
             </ol>
 
-            <div className="mt-8 border-2 border-ink p-5">
+            <div className="mt-8 border-2 border-content p-5">
               <h3 className="eyebrow mb-2">The only fee</h3>
               <p className="max-w-prose text-[0.9375rem] leading-7">
                 <span className="numeral font-semibold">{money(BOOKING_FEE_PER_TICKET)} per ticket</span>{' '}
@@ -184,11 +184,11 @@ export function TicketPrices() {
             <RuleHeading id="worked" className="mb-5">
               A worked example
             </RuleHeading>
-            <p className="mb-4 max-w-prose text-[0.9375rem] leading-7 text-ink-muted">
+            <p className="mb-4 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
               Two adults and one child, in premium seats, at a Grandscreen screening at 18:30 on a
               Saturday.
             </p>
-            <dl className="max-w-lg border-t-2 border-ink">
+            <dl className="max-w-lg border-t-2 border-content">
               {[
                 { label: 'Premium seat', value: money(450) },
                 { label: 'Grandscreen uplift', value: `+ ${money(150)}` },
@@ -200,13 +200,13 @@ export function TicketPrices() {
               ].map((row) => (
                 <div
                   key={row.label}
-                  className={`flex items-baseline justify-between gap-6 py-2.5 ${row.rule ? 'border-b-2 border-ink font-semibold' : 'border-b border-hairline'}`}
+                  className={`flex items-baseline justify-between gap-6 py-2.5 ${row.rule ? 'border-b-2 border-content font-semibold' : 'border-b border-hairline'}`}
                 >
                   <dt>{row.label}</dt>
                   <dd className="numeral shrink-0">{row.value}</dd>
                 </div>
               ))}
-              <div className="flex items-baseline justify-between gap-6 border-b-2 border-ink py-3 font-display text-xl">
+              <div className="flex items-baseline justify-between gap-6 border-b-2 border-content py-3 font-display text-xl">
                 <dt>Total</dt>
                 <dd className="numeral">{money(1815)}</dd>
               </div>
@@ -222,7 +222,7 @@ export function TicketPrices() {
               {Object.values(certificates).map((certificate) => (
                 <div key={certificate.code} className="border-b border-hairline py-3">
                   <dt className="font-semibold">{certificate.label}</dt>
-                  <dd className="mt-1 text-[0.9375rem] leading-7 text-ink-muted">
+                  <dd className="mt-1 text-[0.9375rem] leading-7 text-content-muted">
                     {certificate.guidance}
                   </dd>
                 </div>
@@ -254,15 +254,15 @@ export function TicketPrices() {
             </h2>
             <p className="numeral mb-3 font-display text-2xl leading-none">
               {money(insurancePolicy.fee)}
-              <span className="ml-1.5 text-sm font-sans text-ink-muted">per booking</span>
+              <span className="ml-1.5 text-sm font-sans text-content-muted">per booking</span>
             </p>
-            <p className="text-[0.875rem] leading-7 text-ink-muted">
+            <p className="text-[0.875rem] leading-7 text-content-muted">
               {insurancePolicy.coverageSummary}
             </p>
             <h3 className="eyebrow mb-2 mt-4">Covers</h3>
             <ul className="space-y-1.5">
               {insurancePolicy.coveredReasons.map((reason) => (
-                <li key={reason.id} className="flex gap-2 text-[0.875rem] leading-6 text-ink-muted">
+                <li key={reason.id} className="flex gap-2 text-[0.875rem] leading-6 text-content-muted">
                   <span aria-hidden="true" className="mt-[0.55em] block size-1 shrink-0 bg-ok" />
                   {reason.label}
                 </li>
@@ -271,7 +271,7 @@ export function TicketPrices() {
             <h3 className="eyebrow mb-2 mt-4">Does not cover</h3>
             <ul className="space-y-1.5">
               {insurancePolicy.exclusions.map((exclusion) => (
-                <li key={exclusion} className="flex gap-2 text-[0.875rem] leading-6 text-ink-muted">
+                <li key={exclusion} className="flex gap-2 text-[0.875rem] leading-6 text-content-muted">
                   <span aria-hidden="true" className="mt-[0.55em] block size-1 shrink-0 bg-danger" />
                   {exclusion}
                 </li>
@@ -283,8 +283,8 @@ export function TicketPrices() {
             <h2 id="refunds" className="eyebrow mb-3">
               Refunds and exchanges
             </h2>
-            <p className="text-[0.875rem] leading-7 text-ink-muted">{refundPolicy.summary}</p>
-            <p className="mt-3 text-[0.8125rem] leading-6 text-ink-muted">{refundPolicy.demoNote}</p>
+            <p className="text-[0.875rem] leading-7 text-content-muted">{refundPolicy.summary}</p>
+            <p className="mt-3 text-[0.8125rem] leading-6 text-content-muted">{refundPolicy.demoNote}</p>
           </section>
 
           <div className="mt-6">

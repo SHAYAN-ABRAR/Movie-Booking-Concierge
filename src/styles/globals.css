@@ -90,6 +90,119 @@
   --safe-l: env(safe-area-inset-left, 0px);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   DARK APPEARANCE — "after lights-down"
+
+   Not an inversion, and not the auditorium palette reused. The auditorium is
+   a *room*; this is the programme printed on dark stock. It stays warm — the
+   text is off-white bone, never sterile #FFF — and the ground is blue-black,
+   never pure black, so the projector blue still reads as blue against it.
+
+   Only the semantic layer is re-pointed. The raw palette above is untouched,
+   so anything deliberately representing a fixed material (the printed ticket,
+   the QR field, the auditorium) keeps its own colours in both themes.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Night stock. Slightly lighter than --house, so the auditorium can still
+     go deeper than the page around it. */
+  --night: #12151f;
+  --night-raised: #1a1e2b;
+  --night-sunken: #0c0f18;
+  --night-ink: #f2eee6;
+  --night-muted: #a8acb8;
+  /* 5.2:1 on --night. The obvious #6F7484 measures 3.9:1 and fails AA on the
+     small print it would carry. */
+  --night-faint: #838799;
+  --night-rule: #2c3142;
+  --night-rule-strong: #3e4457;
+
+  /* Status, lifted to read on a dark ground. The light-mode values are far too
+     dark to sit on #12151F. */
+  --ok-dark: #6fbf95;
+  --ok-wash-dark: #16301f;
+  --warn-dark: #e0a63a;
+  --warn-wash-dark: #34260a;
+  --danger-dark: #f0907e;
+  --danger-wash-dark: #3a1712;
+}
+
+html[data-theme='dark'] {
+  --surface: var(--night);
+  --surface-raised: var(--night-raised);
+  --surface-sunken: var(--night-sunken);
+  --content: var(--night-ink);
+  --content-muted: var(--night-muted);
+  --content-faint: var(--night-faint);
+  --hairline: var(--night-rule);
+  --hairline-strong: var(--night-rule-strong);
+  /* Projector blue has to invert its role: the deep ink-on-paper blue vanishes
+     on night stock, so the lit periwinkle becomes the accent and the contrast
+     colour becomes dark. */
+  --accent: var(--projector-lit);
+  --accent-contrast: #0d1020;
+  --focus: var(--marigold-lit);
+
+  --ok: var(--ok-dark);
+  --ok-wash: var(--ok-wash-dark);
+  --warn: var(--warn-dark);
+  --warn-wash: var(--warn-wash-dark);
+  --danger: var(--danger-dark);
+  --danger-wash: var(--danger-wash-dark);
+
+  color-scheme: dark;
+}
+
+/* The auditorium is a room, and it is dark in both themes. In dark mode it
+   drops *below* the surrounding page rather than contrasting against it, so
+   entering the seat map still reads as going somewhere darker. */
+html[data-theme='dark'] .auditorium {
+  --surface: #0a0d16;
+  --surface-raised: #141826;
+  --surface-sunken: #06080f;
+}
+
+/* Selection and scrollbars follow the theme rather than staying light. */
+::selection {
+  background: color-mix(in oklab, var(--focus) 28%, transparent);
+  color: var(--content);
+}
+
+html[data-theme='dark'] {
+  scrollbar-color: var(--night-rule-strong) var(--night);
+}
+
+/**
+ * Theme-change transition.
+ *
+ * Applied to <html> only for the length of an explicit toggle, then removed.
+ * A permanent `transition: all` on the whole document would make every
+ * unrelated state change mushy and would fight the motion system.
+ *
+ * Only colour properties transition — never layout, never images.
+ */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 200ms var(--ease-out),
+    border-color 200ms var(--ease-out),
+    color 200ms var(--ease-out),
+    fill 200ms var(--ease-out),
+    stroke 200ms var(--ease-out) !important;
+  transition-delay: 0ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The theme still changes — it just arrives rather than fades. */
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: none !important;
+  }
+}
+
 /* The auditorium: lights down. Applied to the seat map, the booking wizard's
    screening surfaces and the confirmation ticket — never to the whole app. */
 .auditorium {
@@ -194,8 +307,10 @@
   }
 
   body {
-    background-color: var(--paper);
-    color: var(--ink);
+    /* Semantic, not raw — this is the one surface that must follow the theme
+       or the whole page stays light no matter what the tokens say. */
+    background-color: var(--surface);
+    color: var(--content);
     font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;
     font-synthesis-weight: none;
@@ -588,12 +703,30 @@
    PRINT — the confirmation ticket is a real deliverable
    ═══════════════════════════════════════════════════════════════════════ */
 @media print {
-  :root {
+  /*
+   * `html[data-theme]` rather than `:root`.
+   *
+   * `:root` has specificity (0,1,0); the dark-theme block above is
+   * `html[data-theme='dark']` at (0,1,1). A bare `:root` here therefore *loses*
+   * to it, and a customer printing their ticket while in dark mode would get
+   * pale type on a dark ground — or, on a printer that drops backgrounds,
+   * near-white type on white paper. Matching the attribute selector ties the
+   * specificity and the later position wins.
+   *
+   * `:root` is kept alongside it for the case where the pre-paint script has
+   * not run and no `data-theme` is set yet.
+   */
+  :root,
+  html[data-theme] {
     --surface: #fff;
     --surface-raised: #fff;
+    --surface-sunken: #fff;
     --content: #000;
     --content-muted: #333;
+    --content-faint: #555;
     --hairline: #999;
+    --hairline-strong: #666;
+    color-scheme: light;
   }
 
   body {
@@ -605,11 +738,25 @@
     display: none;
   }
 
-  .auditorium {
+  /*
+   * The auditorium is the one surface that is dark in *both* themes, so it
+   * carries its own overrides — and the dark theme overrides it again at
+   * `html[data-theme='dark'] .auditorium`, which this has to outrank.
+   */
+  .auditorium,
+  html[data-theme] .auditorium {
     --surface: #fff;
     --surface-raised: #fff;
+    --surface-sunken: #fff;
     --content: #000;
     --content-muted: #333;
+    --house: #fff;
+    --house-raised: #fff;
+    --house-sunken: #fff;
+    --house-ink: #000;
+    --house-muted: #333;
+    --house-faint: #555;
+    --house-rule: #999;
     --hairline: #999;
     background: #fff !important;
     color: #000 !important;

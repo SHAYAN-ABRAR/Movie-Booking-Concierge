@@ -6,6 +6,7 @@ import { ConcessionPhoto } from '@/components/visual/ConcessionPhoto';
 import { money } from '@/lib/format';
 import type { ConcessionItem } from '@/data/types';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const dietaryLabels: Record<string, string> = {
   vegetarian: 'Vegetarian',
@@ -42,6 +43,7 @@ export function ConcessionCard({
   onQuantityChange: (quantity: number) => void;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const inputId = `qty-${item.id}`;
 
   return (
@@ -114,10 +116,10 @@ export function ConcessionCard({
           ) : null}
 
           {!item.allergenDataComplete ? (
-            <InfoTip label="The kitchen has not confirmed a full allergen declaration for this item. Ask at the counter before ordering if you have an allergy.">
+            <InfoTip label={t('concessionCard.allergenIncompleteTip')}>
               <p className="mt-1 inline-flex cursor-help items-center gap-1.5 font-medium text-warn">
                 <TriangleAlert aria-hidden="true" className="size-3.5" />
-                Allergen list incomplete — check at the counter
+                {t('concessionCard.allergenIncomplete')}
               </p>
             </InfoTip>
           ) : null}

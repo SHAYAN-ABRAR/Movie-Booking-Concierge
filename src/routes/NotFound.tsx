@@ -19,7 +19,7 @@ export function NotFound({ isNotFound = true }: { isNotFound?: boolean }) {
         <h1 className="font-display text-[2.5rem] leading-[1] tracking-[-0.03em] sm:text-[4rem]">
           {isNotFound ? 'We could not find that page.' : 'That page failed to load.'}
         </h1>
-        <p className="mt-5 max-w-prose text-[1.0625rem] leading-7 text-ink-muted">
+        <p className="mt-5 max-w-prose text-[1.0625rem] leading-7 text-content-muted">
           {isNotFound
             ? 'The link may be out of date, or the film may have finished its run. The current programme is below.'
             : 'Reloading usually clears it. If it keeps happening, the programme and showtimes pages are the quickest way back in.'}
@@ -49,7 +49,7 @@ export function NotFound({ isNotFound = true }: { isNotFound?: boolean }) {
                   className="group flex items-baseline justify-between gap-4 border-b border-hairline py-2.5"
                 >
                   <span className="font-display text-lg group-hover:underline">{movie.title}</span>
-                  <span className="numeral shrink-0 text-sm text-ink-muted">
+                  <span className="numeral shrink-0 text-sm text-content-muted">
                     {movie.runtimeMinutes}m
                   </span>
                 </Link>

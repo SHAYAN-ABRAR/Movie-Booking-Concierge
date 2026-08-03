@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { SlidersHorizontal } from 'lucide-react';
 import { PageHeader, EmptyState } from '@/components/common';
 import { Button } from '@/components/ui/button';
@@ -12,9 +13,8 @@ import { ActiveFilters, FilterPanel } from '@/components/movie/FilterPanel';
 import { AccessibilityLegend, CertificateChip } from '@/components/movie/Chips';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
 import { cinemaById, filterShowtimes, genreLabels, groupShowtimesByMovie, languageLabels } from '@/data';
-import { dateWindow, formatRuntime, timeOfDay, timeOfDayLabels } from '@/lib/datetime';
+import { dateWindow, formatRuntime, timeOfDay, timeOfDayKeys } from '@/lib/datetime';
 import type { TimeOfDayBand } from '@/lib/datetime';
-import { pluralise } from '@/lib/format';
 import { usePreferences } from '@/store/preferences';
 
 const bands: TimeOfDayBand[] = ['morning', 'afternoon', 'evening', 'late'];
@@ -27,6 +27,7 @@ const bandWindows: Record<TimeOfDayBand, { after: string; before: string }> = {
 };
 
 export function Showtimes() {
+  const { t } = useTranslation();
   const controls = useMovieFilters();
   const { filter, setFilter, clear } = controls;
   const dates = useMemo(() => dateWindow(10), []);
@@ -72,22 +73,24 @@ export function Showtimes() {
   return (
     <div className="shell">
       <PageHeader
-        eyebrow="Find a time"
-        title="Showtimes"
-        lede={`Every screening across the circuit, day by day. ${cinemaNames ? `Showing ${cinemaNames}.` : 'Showing all five houses.'}`}
+        eyebrow={t('showtimes.eyebrow')}
+        title={t('showtimes.title')}
+        lede={
+          cinemaNames ? t('showtimes.ledeCinemas', { cinemas: cinemaNames }) : t('showtimes.ledeAll')
+        }
       />
 
       <div className="border-b border-hairline py-6">
-        <p className="eyebrow mb-2.5">Date</p>
+        <p className="eyebrow mb-2.5">{t('showtimes.date')}</p>
         <DateStrip value={date} onChange={(next) => setFilter({ date: next })} />
       </div>
 
       <div className="flex flex-col gap-6 py-6 lg:flex-row lg:gap-12 lg:py-8">
-        <aside className="hidden w-64 shrink-0 lg:block" aria-label="Filters">
+        <aside className="hidden w-64 shrink-0 lg:block" aria-label={t('filters.heading')}>
           <div className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto pb-6 pr-2">
             <div className="mb-7">
               <RuleHeading as="h3" className="mb-3">
-                Time of day
+                {t('showtimes.timeOfDayHeading')}
               </RuleHeading>
               <div className="flex flex-wrap gap-1.5">
                 {bands.map((band) => (
@@ -96,7 +99,7 @@ export function Showtimes() {
                     checked={activeBand === band}
                     onCheckedChange={() => toggleBand(band)}
                   >
-                    {timeOfDayLabels[band]}
+                    {t(timeOfDayKeys[band])}
                   </FilterChip>
                 ))}
               </div>
@@ -108,10 +111,16 @@ export function Showtimes() {
         <div className="min-w-0 flex-1">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-hairline pb-3">
             <p className="text-sm text-content-muted" role="status" aria-live="polite">
-              <span className="font-semibold text-content">
-                {pluralise(results.length, 'screening')}
-              </span>{' '}
-              across {pluralise(byMovie.length, 'film')}
+              {/* The count is the part worth emphasising, so it is rendered as
+                  its own element rather than baked into the sentence. */}
+              <Trans
+                i18nKey="showtimes.summary"
+                values={{
+                  screenings: t('showtimes.screenings', { count: results.length }),
+                  films: t('showtimes.films', { count: byMovie.length }),
+                }}
+                components={{ strong: <span className="font-semibold text-content" /> }}
+              />
             </p>
 
             <div className="flex items-center gap-2">
@@ -122,7 +131,7 @@ export function Showtimes() {
                     checked={activeBand === band}
                     onCheckedChange={() => toggleBand(band)}
                   >
-                    {timeOfDayLabels[band]}
+                    {t(timeOfDayKeys[band])}
                   </FilterChip>
                 ))}
               </div>
@@ -131,17 +140,17 @@ export function Showtimes() {
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" className="lg:hidden">
                     <SlidersHorizontal aria-hidden="true" />
-                    Filters
+                    {t('filters.heading')}
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="bottom" className="max-h-[85dvh]">
                   <div className="border-b border-hairline px-5 pb-3 pt-2">
-                    <SheetTitle className="text-lg">Filters</SheetTitle>
+                    <SheetTitle className="text-lg">{t('filters.heading')}</SheetTitle>
                   </div>
                   <div className="flex-1 overflow-y-auto px-5 py-5">
                     <div className="mb-7">
                       <RuleHeading as="h3" className="mb-3">
-                        Time of day
+                        {t('showtimes.timeOfDayHeading')}
                       </RuleHeading>
                       <div className="flex flex-wrap gap-1.5">
                         {bands.map((band) => (
@@ -150,7 +159,7 @@ export function Showtimes() {
                             checked={activeBand === band}
                             onCheckedChange={() => toggleBand(band)}
                           >
-                            {timeOfDayLabels[band]}
+                            {t(timeOfDayKeys[band])}
                           </FilterChip>
                         ))}
                       </div>
@@ -159,10 +168,10 @@ export function Showtimes() {
                   </div>
                   <div className="flex gap-3 border-t border-hairline px-5 py-4">
                     <Button variant="outline" block onClick={clear}>
-                      Clear all
+                      {t('filters.clearAll')}
                     </Button>
                     <SheetClose asChild>
-                      <Button block>Show {results.length}</Button>
+                      <Button block>{t('filters.showCount', { count: results.length })}</Button>
                     </SheetClose>
                   </div>
                 </SheetContent>
@@ -174,20 +183,22 @@ export function Showtimes() {
 
           {byMovie.length === 0 ? (
             <EmptyState
-              title="Nothing scheduled for that combination"
-            variant="schedule"
+              title={t('showtimes.emptyTitle')}
+              variant="schedule"
               body={
                 <p>
-                  No screening on this date matches your filters. Try a different day on the strip
-                  above, widen the time of day, or{' '}
-                  <button
-                    type="button"
-                    onClick={clear}
-                    className="font-semibold underline underline-offset-4"
-                  >
-                    clear the filters
-                  </button>
-                  .
+                  <Trans
+                    i18nKey="showtimes.emptyBody"
+                    components={{
+                      clear: (
+                        <button
+                          type="button"
+                          onClick={clear}
+                          className="font-semibold underline underline-offset-4"
+                        />
+                      ),
+                    }}
+                  />
                 </p>
               }
             />
@@ -195,7 +206,7 @@ export function Showtimes() {
             <div className="space-y-10">
               {byMovie.map(({ movie, showtimes }) => (
                 <section key={movie.id} aria-labelledby={`film-${movie.id}`}>
-                  <div className="mb-4 border-b-2 border-ink pb-2.5">
+                  <div className="mb-4 border-b-2 border-content pb-2.5">
                     <h2 id={`film-${movie.id}`} className="font-display text-2xl leading-tight tracking-[-0.02em]">
                       <Link to={`/movies/${movie.slug}`} className="underline-offset-4 hover:underline">
                         {movie.title}
@@ -219,7 +230,7 @@ export function Showtimes() {
                     .filter((group) => group.list.length > 0)
                     .map((group) => (
                       <div key={group.band} className="mb-5 last:mb-0">
-                        <p className="eyebrow mb-2.5">{timeOfDayLabels[group.band]}</p>
+                        <p className="eyebrow mb-2.5">{t(timeOfDayKeys[group.band])}</p>
                         <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr))]">
                           {group.list.map((showtime) => {
                             const cinema = cinemaById.get(showtime.cinemaId);
@@ -243,8 +254,7 @@ export function Showtimes() {
           )}
 
           <DemoNote className="mt-10" tone="loud">
-            Sample schedule and seat availability, generated locally in your browser. These are not
-            real listings and no live inventory is being checked.
+            {t('showtimes.demoNote')}
           </DemoNote>
 
           <div className="mt-8 border-t border-hairline pt-6">

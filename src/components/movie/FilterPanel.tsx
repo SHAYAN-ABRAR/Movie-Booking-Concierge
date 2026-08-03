@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input, Label } from '@/components/ui/field';
@@ -11,7 +12,8 @@ import {
   genreLabels,
   languageLabels,
 } from '@/data';
-import { certificates } from '@/data/pricing';
+import { certificateShort } from '@/i18n/domain';
+import { useFormatters } from '@/i18n/useFormatters';
 import type { CertificateCode, Format, Language, ScreeningAccessibility } from '@/data/types';
 import type { FilterControls } from '@/hooks/useMovieFilters';
 import { cn } from '@/lib/utils';
@@ -27,11 +29,8 @@ const accessibilityFeatures: ScreeningAccessibility[] = [
   'hearing-loop',
   'sensory-friendly',
 ];
-const runtimeOptions = [
-  { value: 100, label: 'Under 1h 40m' },
-  { value: 120, label: 'Under 2h' },
-  { value: 150, label: 'Under 2h 30m' },
-];
+/** Thresholds in minutes; the label is built from the active locale. */
+const runtimeOptions = [100, 120, 150];
 
 /**
  * The filter panel.
@@ -51,12 +50,14 @@ export function FilterPanel({
   showAccessibility?: boolean;
   className?: string;
 }) {
+  const { t } = useTranslation();
+  const f = useFormatters();
   const { filter, setFilter, toggleIn } = controls;
 
   return (
     <div className={cn('space-y-7', className)}>
       <div className="space-y-1.5">
-        <Label htmlFor="filter-search">Search</Label>
+        <Label htmlFor="filter-search">{t('filters.search')}</Label>
         <div className="relative">
           <Search
             aria-hidden="true"
@@ -66,7 +67,7 @@ export function FilterPanel({
             id="filter-search"
             type="search"
             value={filter.query ?? ''}
-            placeholder="Title, director, cast…"
+            placeholder={t('filters.searchPlaceholder')}
             className="pl-9"
             onChange={(event) => setFilter({ query: event.target.value || undefined }, { replace: true })}
           />
@@ -75,7 +76,7 @@ export function FilterPanel({
 
       <fieldset>
         <RuleHeading as="h3" className="mb-3">
-          Genre
+          {t('filters.genre')}
         </RuleHeading>
         <div className="flex flex-wrap gap-1.5">
           {allGenres.map((genre) => (
@@ -92,7 +93,7 @@ export function FilterPanel({
 
       <fieldset>
         <RuleHeading as="h3" className="mb-3">
-          Language
+          {t('filters.language')}
         </RuleHeading>
         <div className="flex flex-wrap gap-1.5">
           {languages.map((language) => (
@@ -109,7 +110,7 @@ export function FilterPanel({
 
       <fieldset>
         <RuleHeading as="h3" className="mb-3">
-          Format
+          {t('filters.format')}
         </RuleHeading>
         <div className="flex flex-wrap gap-1.5">
           {formats.map((format) => (
@@ -127,7 +128,7 @@ export function FilterPanel({
       {showCinemas ? (
         <fieldset>
           <RuleHeading as="h3" className="mb-3">
-            Cinema
+            {t('filters.cinema')}
           </RuleHeading>
           <div className="flex flex-wrap gap-1.5">
             {cinemas.map((cinema) => (
@@ -145,7 +146,7 @@ export function FilterPanel({
 
       <fieldset>
         <RuleHeading as="h3" className="mb-3">
-          Certificate
+          {t('filters.certificate')}
         </RuleHeading>
         <div className="flex flex-wrap gap-1.5">
           {certificateCodes.map((code) => (
@@ -154,7 +155,7 @@ export function FilterPanel({
               checked={filter.certificates?.includes(code) ?? false}
               onCheckedChange={() => toggleIn('certificates', code)}
             >
-              {certificates[code].label.split('—')[0]?.trim()}
+              {certificateShort(code)}
             </FilterChip>
           ))}
         </div>
@@ -162,18 +163,16 @@ export function FilterPanel({
 
       <fieldset>
         <RuleHeading as="h3" className="mb-3">
-          Running time
+          {t('filters.runningTime')}
         </RuleHeading>
         <div className="flex flex-wrap gap-1.5">
-          {runtimeOptions.map((option) => (
+          {runtimeOptions.map((minutes) => (
             <FilterChip
-              key={option.value}
-              checked={filter.maxRuntime === option.value}
-              onCheckedChange={(checked) =>
-                setFilter({ maxRuntime: checked ? option.value : undefined })
-              }
+              key={minutes}
+              checked={filter.maxRuntime === minutes}
+              onCheckedChange={(checked) => setFilter({ maxRuntime: checked ? minutes : undefined })}
             >
-              {option.label}
+              {t('filters.under', { duration: f.runtime(minutes) })}
             </FilterChip>
           ))}
         </div>
@@ -182,11 +181,10 @@ export function FilterPanel({
       {showAccessibility ? (
         <fieldset>
           <RuleHeading as="h3" className="mb-2">
-            Accessibility
+            {t('filters.accessibility')}
           </RuleHeading>
           <p className="mb-3 text-[0.8125rem] leading-5 text-content-muted">
-            Filters screenings, not films. Open captions are on the print; closed captions come on a
-            device from the box office.
+            {t('filters.accessibilityNote')}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {accessibilityFeatures.map((feature) => (
@@ -213,6 +211,8 @@ export function ActiveFilters({
   controls: FilterControls;
   className?: string;
 }) {
+  const { t } = useTranslation();
+  const f = useFormatters();
   const { filter, setFilter, toggleIn, clear } = controls;
 
   const chips: Array<{ key: string; label: string; remove: () => void }> = [];
@@ -220,7 +220,7 @@ export function ActiveFilters({
   if (filter.query?.trim()) {
     chips.push({
       key: 'q',
-      label: `“${filter.query.trim()}”`,
+      label: t('filters.quotedQuery', { query: filter.query.trim() }),
       remove: () => setFilter({ query: undefined }),
     });
   }
@@ -261,31 +261,35 @@ export function ActiveFilters({
   for (const code of filter.certificates ?? []) {
     chips.push({
       key: `cert-${code}`,
-      label: certificates[code].label.split('—')[0]?.trim() ?? code,
+      label: certificateShort(code),
       remove: () => toggleIn('certificates', code),
     });
   }
   if (filter.maxRuntime !== undefined) {
     chips.push({
       key: 'runtime',
-      label: `Under ${Math.floor(filter.maxRuntime / 60)}h ${filter.maxRuntime % 60}m`,
+      label: t('filters.under', { duration: f.runtime(filter.maxRuntime) }),
       remove: () => setFilter({ maxRuntime: undefined }),
     });
   }
   if (filter.after) {
-    chips.push({ key: 'after', label: `After ${filter.after}`, remove: () => setFilter({ after: undefined }) });
+    chips.push({
+      key: 'after',
+      label: t('filters.after', { time: f.time(filter.after) }),
+      remove: () => setFilter({ after: undefined }),
+    });
   }
   if (filter.before) {
     chips.push({
       key: 'before',
-      label: `Before ${filter.before}`,
+      label: t('filters.before', { time: f.time(filter.before) }),
       remove: () => setFilter({ before: undefined }),
     });
   }
   if (filter.maxPrice !== undefined) {
     chips.push({
       key: 'price',
-      label: `Under ৳${filter.maxPrice}`,
+      label: t('filters.underPrice', { price: f.money(filter.maxPrice) }),
       remove: () => setFilter({ maxPrice: undefined }),
     });
   }
@@ -294,7 +298,7 @@ export function ActiveFilters({
 
   return (
     <div className={cn('flex flex-wrap items-center gap-1.5', className)}>
-      <span className="eyebrow mr-1">Filtering by</span>
+      <span className="eyebrow mr-1">{t('filters.filteringBy')}</span>
       {chips.map((chip) => (
         <button
           key={chip.key}
@@ -304,11 +308,11 @@ export function ActiveFilters({
         >
           {chip.label}
           <X aria-hidden="true" className="size-3.5" />
-          <span className="sr-only">Remove filter</span>
+          <span className="sr-only">{t('filters.removeFilter')}</span>
         </button>
       ))}
       <Button variant="link" size="sm" className="px-1" onClick={clear}>
-        Clear all
+        {t('filters.clearAll')}
       </Button>
     </div>
   );

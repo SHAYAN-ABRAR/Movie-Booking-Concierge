@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { dateWindow, dayLabelParts, longDayLabel } from '@/lib/datetime';
 import { useRailScroll } from '@/hooks';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 /**
  * The date selector.
@@ -23,6 +24,7 @@ export function DateStrip({
   days?: number;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const dates = dateWindow(days);
   const { ref, canLeft, canRight, scrollBy } = useRailScroll<HTMLDivElement>();
   const buttonRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -59,7 +61,7 @@ export function DateStrip({
           className="hidden shrink-0 sm:inline-flex"
           onClick={() => scrollBy(-1)}
           disabled={!canLeft}
-          aria-label="Scroll dates backwards"
+          aria-label={t('dateStrip.back')}
         >
           <ChevronLeft aria-hidden="true" />
         </Button>
@@ -67,7 +69,7 @@ export function DateStrip({
         <div
           ref={ref}
           role="radiogroup"
-          aria-label="Choose a date"
+          aria-label={t('dateStrip.label')}
           onKeyDown={onKeyDown}
           className="rail flex flex-1 gap-1.5 pb-1"
         >
@@ -110,7 +112,7 @@ export function DateStrip({
           className="hidden shrink-0 sm:inline-flex"
           onClick={() => scrollBy(1)}
           disabled={!canRight}
-          aria-label="Scroll dates forwards"
+          aria-label={t('dateStrip.forward')}
         >
           <ChevronRight aria-hidden="true" />
         </Button>

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { ArrowUpRight } from 'lucide-react';
 import { SectionHeading } from '@/components/common';
 import { Stagger, StaggerItem } from '@/motion';
@@ -9,22 +10,15 @@ import { ShowtimePill } from '@/components/showtime/ShowtimeButton';
 import { OfferComposition } from '@/components/visual/OfferComposition';
 import { QuickBook } from '@/components/home/QuickBook';
 import { FeaturedStage } from '@/components/home/FeaturedStage';
-import {
-  cinemas,
-  comingSoon,
-  formatBlurbs,
-  formatLabels,
-  languageLabels,
-  movieById,
-  nowShowing,
-  offers,
-  showtimesForCinemaDate,
-} from '@/data';
+import { cinemas, comingSoon, movieById, nowShowing, offers, showtimesForCinemaDate } from '@/data';
+import { formatBlurbKeys, formatKeys, languageKeys } from '@/i18n/domain';
+import { useFormatters } from '@/i18n/useFormatters';
 import { usePreferences } from '@/store/preferences';
 import { dateWindow, formatRuntime, longDayLabel, minutesFromTime, todayIso } from '@/lib/datetime';
-import { format } from 'date-fns';
 
 export function Home() {
+  const { t } = useTranslation();
+  const f = useFormatters();
   const preferredCinemaId = usePreferences((s) => s.cinemaId);
   const cinema = cinemas.find((c) => c.id === preferredCinemaId) ?? cinemas[0]!;
   const today = todayIso();
@@ -53,12 +47,15 @@ export function Home() {
   return (
     <>
       {/* ── The stage ─────────────────────────────────────────────────── */}
-      <section aria-label="This week's featured films" className="relative overflow-hidden">
+      <section aria-label={t('home.featuredLabel')} className="relative overflow-hidden">
         <div className="shell">
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 pt-8">
-            <p className="eyebrow">The Programme</p>
-            <p className="numeral text-[0.6875rem] uppercase tracking-[0.14em] text-ink-muted">
-              {format(new Date(), 'd MMM')} – {format(new Date(weekEnd), 'd MMM yyyy')}
+            <p className="eyebrow">{t('home.programmeEyebrow')}</p>
+            <p className="numeral text-[0.6875rem] uppercase tracking-[0.14em] text-content-muted">
+              {t('home.dateRange', {
+                from: f.date(new Date(), 'dayMonth'),
+                to: f.date(weekEnd, 'dayMonthYear'),
+              })}
             </p>
           </div>
           <FeaturedStage />
@@ -69,8 +66,8 @@ export function Home() {
           Quick Book is treated as a programme insert torn along a
           perforation: it belongs to the hero above it, and its full width
           gives the four dependent fields room to sit on one line. */}
-      <section className="relative border-b-2 border-ink bg-paper-sunken/50">
-        <div aria-hidden="true" className="sprocket-t h-3 bg-paper" />
+      <section className="relative border-b-2 border-content bg-surface-sunken/50">
+        <div aria-hidden="true" className="sprocket-t h-3 bg-surface" />
         <div className="shell pb-9 pt-2">
           <QuickBook />
         </div>
@@ -81,20 +78,23 @@ export function Home() {
         <SectionHeading
           id="tonight-heading"
           eyebrow={`${cinema.shortName} · ${longDayLabel(today)}`}
-          title="On tonight"
+          title={t('home.onTonight')}
           to="/showtimes"
-          linkLabel="All showtimes"
+          linkLabel={t('home.allShowtimes')}
         />
 
         {tonightByMovie.length === 0 ? (
           <div className="border border-dashed border-hairline-strong px-6 py-10">
-            <p className="max-w-prose text-[0.9375rem] leading-7 text-ink-muted">
-              Tonight's screenings at {cinema.name} have all started. The programme picks up again
-              tomorrow morning —{' '}
-              <Link to="/showtimes" className="font-semibold underline underline-offset-4">
-                see tomorrow's times
-              </Link>
-              .
+            <p className="max-w-prose text-[0.9375rem] leading-7 text-content-muted">
+              <Trans
+                i18nKey="home.tonightEmpty"
+                values={{ cinema: cinema.name }}
+                components={{
+                  tomorrow: (
+                    <Link to="/showtimes" className="font-semibold underline underline-offset-4" />
+                  ),
+                }}
+              />
             </p>
           </div>
         ) : (
@@ -111,13 +111,13 @@ export function Home() {
                     >
                       {movie.title}
                     </Link>
-                    <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-ink-muted">
+                    <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-content-muted">
                       <CertificateChip code={movie.certificate} />
                       <span className="numeral">{formatRuntime(movie.runtimeMinutes)}</span>
                       <span aria-hidden="true">·</span>
-                      <span>{languageLabels[movie.language]}</span>
+                      <span>{t(languageKeys[movie.language])}</span>
                     </p>
-                    <p className="mt-2 max-w-prose text-[0.875rem] leading-6 text-ink-muted">
+                    <p className="mt-2 max-w-prose text-[0.875rem] leading-6 text-content-muted">
                       {movie.tagline}
                     </p>
                   </div>
@@ -139,10 +139,10 @@ export function Home() {
       <section aria-labelledby="now-showing-heading" className="shell py-12 sm:py-16">
         <SectionHeading
           id="now-showing-heading"
-          eyebrow={`${nowShowing.length} films`}
-          title="Now showing"
+          eyebrow={t('home.filmCount', { count: nowShowing.length })}
+          title={t('home.nowShowing')}
           to="/movies"
-          linkLabel="Full programme"
+          linkLabel={t('home.fullProgramme')}
         />
         <Stagger
           as="ul"
@@ -158,14 +158,14 @@ export function Home() {
       </section>
 
       {/* ── The houses — editorial, set in two columns ────────────────── */}
-      <section aria-labelledby="houses-heading" className="border-y border-hairline bg-paper-sunken/50">
+      <section aria-labelledby="houses-heading" className="border-y border-hairline bg-surface-sunken/50">
         <div className="shell py-12 sm:py-16">
           <SectionHeading
             id="houses-heading"
-            eyebrow="How we show films"
-            title="Four ways to watch"
+            eyebrow={t('home.howWeShowFilms')}
+            title={t('home.fourWaysToWatch')}
             to="/ticket-prices"
-            linkLabel="What it costs"
+            linkLabel={t('home.whatItCosts')}
             className="border-hairline-strong"
           />
           <dl className="grid gap-x-10 gap-y-7 sm:grid-cols-2">
@@ -173,16 +173,16 @@ export function Home() {
               <div key={formatId} className="flex gap-5">
                 <span
                   aria-hidden="true"
-                  className="numeral shrink-0 font-display text-3xl leading-none text-ink/25"
+                  className="numeral shrink-0 font-display text-3xl leading-none text-content/25"
                 >
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <div>
                   <dt className="font-display text-xl leading-tight tracking-[-0.02em]">
-                    {formatLabels[formatId]}
+                    {t(formatKeys[formatId])}
                   </dt>
-                  <dd className="mt-1.5 max-w-prose text-[0.9375rem] leading-7 text-ink-muted">
-                    {formatBlurbs[formatId]}
+                  <dd className="mt-1.5 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
+                    {t(formatBlurbKeys[formatId])}
                   </dd>
                 </div>
               </div>
@@ -195,31 +195,31 @@ export function Home() {
       <section aria-labelledby="coming-heading" className="shell py-12 sm:py-16">
         <SectionHeading
           id="coming-heading"
-          eyebrow="Advance notice"
-          title="Coming soon"
+          eyebrow={t('home.advanceNotice')}
+          title={t('home.comingSoon')}
           to="/movies?status=coming-soon"
-          linkLabel="All upcoming"
+          linkLabel={t('home.allUpcoming')}
         />
-        <Stagger as="ol" count={comingSoon.length} className="border-t-2 border-ink">
+        <Stagger as="ol" count={comingSoon.length} className="border-t-2 border-content">
           {comingSoon.map((movie) => (
             <StaggerItem as="li" key={movie.id} className="border-b border-hairline">
               <Link
                 to={`/movies/${movie.slug}`}
                 className="group grid items-baseline gap-x-6 gap-y-1 py-5 sm:grid-cols-[8rem_minmax(0,1fr)_auto]"
               >
-                <span className="numeral text-sm uppercase tracking-[0.1em] text-ink-muted">
-                  {format(new Date(movie.releaseDate), 'd MMM yyyy')}
+                <span className="numeral text-sm uppercase tracking-[0.1em] text-content-muted">
+                  {f.date(movie.releaseDate, 'dayMonthYear')}
                 </span>
                 <span className="min-w-0">
                   <span className="font-display text-[1.375rem] leading-tight tracking-[-0.02em] group-hover:underline">
                     {movie.title}
                   </span>
-                  <span className="mt-1 block max-w-prose text-[0.875rem] leading-6 text-ink-muted">
+                  <span className="mt-1 block max-w-prose text-[0.875rem] leading-6 text-content-muted">
                     {movie.tagline}
                   </span>
                 </span>
-                <span className="flex items-center gap-2 text-[0.8125rem] text-ink-muted">
-                  <span>{languageLabels[movie.language]}</span>
+                <span className="flex items-center gap-2 text-[0.8125rem] text-content-muted">
+                  <span>{t(languageKeys[movie.language])}</span>
                   <ArrowUpRight aria-hidden="true" className="size-4 shrink-0" />
                 </span>
               </Link>
@@ -232,17 +232,17 @@ export function Home() {
       <section aria-labelledby="offers-heading" className="shell py-12 sm:py-16">
         <SectionHeading
           id="offers-heading"
-          eyebrow="Running now"
-          title="Offers"
+          eyebrow={t('home.runningNow')}
+          title={t('home.offers')}
           to="/offers"
-          linkLabel="All offers"
+          linkLabel={t('home.allOffers')}
         />
         <ul className="grid gap-6 md:grid-cols-2">
           {offers.slice(0, 2).map((offer) => (
             <li key={offer.id}>
               <Link
                 to="/offers"
-                className="group block border border-hairline-strong transition-colors hover:border-ink focus-visible:border-ink"
+                className="group block border border-hairline-strong transition-colors hover:border-content focus-visible:border-content"
               >
                 <div className="overflow-hidden">
                   <div className="transition-transform duration-500 ease-out group-hover:scale-[1.02] group-focus-visible:scale-[1.02] motion-reduce:transform-none">
@@ -253,11 +253,13 @@ export function Home() {
                   {/* The title is real text rather than something drawn into the
                       composition, so it is readable, selectable and announced. */}
                   <h3 className="font-display text-xl leading-tight">{offer.title}</h3>
-                  <p lang="bn" className="mt-0.5 text-[0.875rem] text-ink-muted">
+                  <p lang="bn" className="mt-0.5 text-[0.875rem] text-content-muted">
                     {offer.titleBn}
                   </p>
-                  <p className="mt-2.5 text-[0.9375rem] leading-7 text-ink-muted">{offer.summary}</p>
-                  <p className="eyebrow mt-3 group-hover:text-ink">Read the terms</p>
+                  <p className="mt-2.5 text-[0.9375rem] leading-7 text-content-muted">{offer.summary}</p>
+                  <p className="eyebrow mt-3 group-hover:text-content">
+                    {t('home.readTheTerms')}
+                  </p>
                 </div>
               </Link>
             </li>
@@ -269,26 +271,26 @@ export function Home() {
       <section aria-labelledby="cinemas-heading" className="shell pb-4 pt-12 sm:pt-16">
         <SectionHeading
           id="cinemas-heading"
-          eyebrow="Five houses"
-          title="Where we are"
+          eyebrow={t('home.fiveHouses')}
+          title={t('home.whereWeAre')}
           to="/cinemas"
-          linkLabel="All cinemas"
+          linkLabel={t('home.allCinemas')}
         />
         <ul className="grid gap-px bg-hairline sm:grid-cols-2 lg:grid-cols-3">
           {cinemas.map((venue) => (
-            <li key={venue.id} className="bg-paper">
+            <li key={venue.id} className="bg-surface">
               <Link to={`/cinemas/${venue.slug}`} className="group block h-full p-5">
                 <p className="eyebrow">{venue.city}</p>
                 <h3 className="mt-2 font-display text-xl leading-tight tracking-[-0.02em] group-hover:underline">
                   {venue.shortName}
                 </h3>
-                <p className="mt-1.5 text-[0.8125rem] leading-6 text-ink-muted">
+                <p className="mt-1.5 text-[0.8125rem] leading-6 text-content-muted">
                   {venue.addressLines[1]}
                 </p>
-                <p className="numeral mt-3 text-[0.75rem] uppercase tracking-[0.1em] text-ink-muted">
-                  {venue.screens.length} screens
+                <p className="numeral mt-3 text-[0.75rem] uppercase tracking-[0.1em] text-content-muted">
+                  {t('home.screenCount', { count: venue.screens.length })}
                 </p>
-                <p className="mt-3 max-w-prose text-[0.875rem] leading-6 text-ink-muted">
+                <p className="mt-3 max-w-prose text-[0.875rem] leading-6 text-content-muted">
                   {venue.signature}
                 </p>
               </Link>

@@ -10,6 +10,85 @@
       content="Nokshi Cinemas — browse the programme, compare showtimes and book seats. A local, frontend-only demonstration build."
     />
     <title>Nokshi Cinemas — The Programme</title>
+
+    <!--
+      Pre-paint preference bootstrap.
+
+      Runs before the first frame so a customer who saved Bangla + dark never
+      sees an English light flash. Deliberately blocking and deliberately tiny:
+      no imports, no network, no eval, no framework. It only reads storage and
+      stamps four things the CSS and the browser need before anything paints.
+
+      Everything is wrapped so that a malformed record cannot stop the page
+      loading — the worst case is the default theme, not a blank screen.
+    -->
+    <script>
+      (function () {
+        var root = document.documentElement;
+
+        function readSaved() {
+          try {
+            var raw = window.localStorage.getItem('nokshi.preferences.v1');
+            if (!raw) return {};
+            // zustand/persist wraps the payload as { state, version }.
+            var parsed = JSON.parse(raw);
+            return (parsed && parsed.state) || {};
+          } catch (error) {
+            return {};
+          }
+        }
+
+        function prefersDark() {
+          try {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches;
+          } catch (error) {
+            return false;
+          }
+        }
+
+        function prefersBangla() {
+          try {
+            var tags = navigator.languages && navigator.languages.length
+              ? navigator.languages
+              : [navigator.language];
+            for (var i = 0; i < tags.length; i += 1) {
+              if (typeof tags[i] === 'string' && tags[i].toLowerCase().indexOf('bn') === 0) return true;
+            }
+          } catch (error) {
+            /* fall through */
+          }
+          return false;
+        }
+
+        var saved = readSaved();
+
+        // A saved value only counts once it was chosen deliberately. Otherwise
+        // the system preference is the honest answer, on every visit.
+        var theme =
+          saved.themeChosen === true && (saved.theme === 'light' || saved.theme === 'dark')
+            ? saved.theme
+            : prefersDark()
+              ? 'dark'
+              : 'light';
+
+        var locale =
+          saved.localeChosen === true && (saved.locale === 'en' || saved.locale === 'bn')
+            ? saved.locale
+            : prefersBangla()
+              ? 'bn'
+              : 'en';
+
+        root.setAttribute('data-theme', theme);
+        root.setAttribute('lang', locale);
+        // Tells the browser which palette to use for form controls, scrollbars
+        // and the canvas behind the page — without this the flash simply moves
+        // to the native widgets.
+        root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
+
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', theme === 'dark' ? '#0B0E1A' : '#F4F1EA');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

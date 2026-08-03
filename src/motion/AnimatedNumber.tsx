@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { animate } from 'framer-motion';
 import { duration, ease } from './tokens';
 import { useMotionPreferences } from './useMotionPreferences';
+import { useFormatters } from '@/i18n/useFormatters';
 import { cn } from '@/lib/utils';
 
 /**
@@ -19,7 +20,7 @@ import { cn } from '@/lib/utils';
  */
 export function AnimatedNumber({
   value,
-  format = (n: number) => String(Math.round(n)),
+  format,
   className,
   /** Skips the animation on first paint — only *changes* are worth animating. */
   animateOnMount = false,
@@ -30,6 +31,11 @@ export function AnimatedNumber({
   animateOnMount?: boolean;
 }) {
   const motion = useMotionPreferences();
+  // Without an explicit formatter the counter still has to speak the reader's
+  // numerals — a ticker running 1, 2, 3 beside Bangla copy is jarring, and the
+  // hook means it re-renders when the language changes.
+  const formatters = useFormatters();
+  const render = format ?? ((n: number) => formatters.number(Math.round(n)));
   const [display, setDisplay] = useState(value);
   const previous = useRef(value);
   const mounted = useRef(false);
@@ -54,11 +60,11 @@ export function AnimatedNumber({
     return () => controls.stop();
   }, [value, motion.reduced, animateOnMount]);
 
-  const final = format(value);
+  const final = render(value);
 
   return (
     <span className={cn('tabular-nums', className)}>
-      <span aria-hidden="true">{format(display)}</span>
+      <span aria-hidden="true">{render(display)}</span>
       <span className="sr-only">{final}</span>
     </span>
   );

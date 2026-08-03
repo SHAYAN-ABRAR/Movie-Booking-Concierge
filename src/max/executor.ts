@@ -10,7 +10,7 @@ import { useBooking } from '@/store/booking';
 import { useBookings } from '@/store/bookings';
 import { usePreferences } from '@/store/preferences';
 import { useReports, lostItemSummary } from '@/store/reports';
-import { useWatches, watchKindLabels } from '@/store/watches';
+import { useWatches, watchKindLabel } from '@/store/watches';
 import { useMax } from '@/store/max';
 import { claimChecklistTemplate } from '@/store/reports';
 import type { MaxAction } from './types';
@@ -245,7 +245,7 @@ export function useMaxExecutor() {
           });
           return {
             ok: true,
-            message: `${watchKindLabels[action.kind]} alert saved in this browser. It does not monitor live inventory.`,
+            message: `${watchKindLabel(action.kind)} alert saved in this browser. It does not monitor live inventory.`,
             undo: {
               label: 'Remove the alert',
               run: () => useWatches.getState().removeWatch(created.id),

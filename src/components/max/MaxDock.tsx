@@ -10,6 +10,7 @@ import { useActiveSeconds, useIsDesktop, useSessionFlag } from '@/hooks';
 import { useMotionPreferences } from '@/motion';
 import { ease, spring } from '@/motion/tokens';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Max's engine — the language pipeline, the skills and the block renderers —
@@ -38,6 +39,7 @@ const NUDGE_AFTER_SECONDS = 120;
  * worse full-screen dialog.
  */
 export function MaxDock() {
+  const { t } = useTranslation();
   const location = useLocation();
   const [params, setParams] = useSearchParams();
   const isDesktop = useIsDesktop();
@@ -177,27 +179,27 @@ export function MaxDock() {
                 exit={motion.reduced ? { opacity: 0 } : { opacity: 0, y: 6 }}
                 transition={{ duration: motion.reduced ? 0 : 0.24, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
-                  'relative max-w-[min(20rem,calc(100vw-2rem))] border-2 border-ink bg-paper-raised p-3.5 pr-9',
+                  'relative max-w-[min(20rem,calc(100vw-2rem))] border-2 border-content bg-surface-raised p-3.5 pr-9',
                   'shadow-[0_16px_40px_-16px_rgb(20_22_31_/_0.4)]',
                 )}
               >
-                <p className="text-[0.9375rem] font-semibold leading-snug text-ink">
-                  Finding it hard to book? Ask me — I can help.
+                <p className="text-[0.9375rem] font-semibold leading-snug text-content">
+                  {t('max.nudgeTitle')}
                 </p>
-                <p className="mt-1 text-[0.8125rem] leading-5 text-ink-muted">
-                  I can find movies, compare showtimes and help you choose seats.
+                <p className="mt-1 text-[0.8125rem] leading-5 text-content-muted">
+                  {t('max.nudgeBody')}
                 </p>
                 <button
                   type="button"
                   onClick={dismissNudge}
-                  aria-label="Dismiss this message"
-                  className="absolute right-1.5 top-1.5 grid size-7 place-items-center text-ink-muted transition-colors hover:bg-ink/10 hover:text-ink"
+                  aria-label={t('max.dismissNudge')}
+                  className="absolute right-1.5 top-1.5 grid size-7 place-items-center text-content-muted transition-colors hover:bg-content/10 hover:text-content"
                 >
                   <X aria-hidden="true" className="size-4" />
                 </button>
                 <span
                   aria-hidden="true"
-                  className="absolute -bottom-[7px] right-8 size-3 rotate-45 border-b-2 border-r-2 border-ink bg-paper-raised"
+                  className="absolute -bottom-[7px] right-8 size-3 rotate-45 border-b-2 border-r-2 border-content bg-surface-raised"
                 />
               </m.div>
             ) : null}
@@ -215,7 +217,7 @@ export function MaxDock() {
                 transition={{ duration: motion.reduced ? 0 : 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   'flex h-[min(38rem,calc(100dvh-8rem))] w-[26rem] max-w-[calc(100vw-2rem)] flex-col',
-                  'border-2 border-ink bg-surface',
+                  'border-2 border-content bg-surface',
                   'shadow-[0_24px_64px_-24px_rgb(20_22_31_/_0.45)]',
                 )}
               >
@@ -244,12 +246,12 @@ export function MaxDock() {
             whileHover={motion.reduced ? undefined : { y: -2 }}
             whileTap={motion.reduced ? undefined : { y: 1, scale: 0.985 }}
             className={cn(
-              'group relative inline-flex min-h-11 items-center gap-2.5 overflow-hidden border-2 border-ink px-3.5 py-2.5',
+              'group relative inline-flex min-h-11 items-center gap-2.5 overflow-hidden border-2 border-content px-3.5 py-2.5',
               'font-sans text-sm font-semibold',
               'transition-[background-color,color,box-shadow] duration-[--dur-fast]',
               open
-                ? 'bg-ink text-paper shadow-[0_6px_18px_-10px_rgb(20_22_31_/_0.5)]'
-                : 'bg-paper-raised text-ink shadow-[0_10px_30px_-12px_rgb(20_22_31_/_0.45)] hover:bg-ink hover:text-paper hover:shadow-[0_16px_34px_-14px_rgb(20_22_31_/_0.55)]',
+                ? 'bg-content text-surface shadow-[0_6px_18px_-10px_rgb(20_22_31_/_0.5)]'
+                : 'bg-surface-raised text-content shadow-[0_10px_30px_-12px_rgb(20_22_31_/_0.45)] hover:bg-content hover:text-surface hover:shadow-[0_16px_34px_-14px_rgb(20_22_31_/_0.55)]',
             )}
           >
             {/* A single projected sweep when something new has arrived. */}
@@ -272,7 +274,7 @@ export function MaxDock() {
                 initial={motion.reduced ? false : { scale: 0.6, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={motion.reduced ? { duration: 0 } : spring.press}
-                className="numeral relative grid min-w-[1.15rem] place-items-center bg-marigold px-1 text-[0.6875rem] font-bold leading-[1.15rem] text-paper"
+                className="numeral relative grid min-w-[1.15rem] place-items-center bg-marigold px-1 text-[0.6875rem] font-bold leading-[1.15rem] text-surface"
               >
                 {unread}
               </m.span>

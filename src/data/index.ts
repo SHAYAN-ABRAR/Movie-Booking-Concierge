@@ -279,58 +279,19 @@ export function nextScreening(
   return null;
 }
 
-export const languageLabels: Record<Language, string> = {
-  bn: 'Bangla',
-  en: 'English',
-  hi: 'Hindi',
-};
-
-export const formatLabels: Record<Format, string> = {
-  standard: '2D',
-  'three-d': '3D',
-  grandscreen: 'Grandscreen',
-  velvet: 'Velvet Room',
-};
-
-export const formatBlurbs: Record<Format, string> = {
-  standard: 'Our standard presentation: 2D, digital projection, 5.1 sound.',
-  'three-d': 'Stereoscopic 3D. Glasses are handed out at the door and collected on the way out.',
-  grandscreen: 'The largest screens in the circuit, with a wider frame and a 12-channel sound bed.',
-  velvet: 'Reclining seats, table service before the feature, and a house that seats under eighty.',
-};
-
-export const genreLabels: Record<Genre, string> = {
-  drama: 'Drama',
-  thriller: 'Thriller',
-  action: 'Action',
-  comedy: 'Comedy',
-  romance: 'Romance',
-  'sci-fi': 'Sci-fi',
-  documentary: 'Documentary',
-  animation: 'Animation',
-  family: 'Family',
-  horror: 'Horror',
-  musical: 'Musical',
-  historical: 'Historical',
-};
-
-export const accessibilityLabels: Record<ScreeningAccessibility, string> = {
-  'open-captions': 'Open captions',
-  'closed-captions': 'Closed captions',
-  'audio-description': 'Audio description',
-  'wheelchair-spaces': 'Wheelchair spaces',
-  'hearing-loop': 'Hearing loop',
-  'sensory-friendly': 'Sensory friendly',
-};
-
-export const accessibilityBlurbs: Record<ScreeningAccessibility, string> = {
-  'open-captions': 'Captions are part of the picture. Everyone in the house sees them; no equipment needed.',
-  'closed-captions': 'Captions on a personal device collected from the box office. Only you see them.',
-  'audio-description': 'A described soundtrack through a headset collected from the box office.',
-  'wheelchair-spaces': 'Wheelchair spaces with companion seats immediately alongside.',
-  'hearing-loop': 'An induction loop covering the whole house, for hearing aids set to T.',
-  'sensory-friendly': 'House lights partly up, sound reduced, no trailers, and freedom to move about.',
-};
+/**
+ * The display vocabulary now lives in `@/i18n/domain`, because what to *call* a
+ * genre depends on the reader's language while the schedule does not. Re-exported
+ * here so every existing `from '@/data'` import keeps working.
+ */
+export {
+  accessibilityBlurbs,
+  accessibilityLabels,
+  formatBlurbs,
+  formatLabels,
+  genreLabels,
+  languageLabels,
+} from '@/i18n/domain';
 
 export {
   allGenres,

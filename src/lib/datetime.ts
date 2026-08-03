@@ -1,8 +1,21 @@
 import { addDays, format, isSameDay, parse, startOfDay } from 'date-fns';
+import { activeFormatters } from '@/i18n/active';
 
 /**
  * Date helpers. Every relative label ("today", "tonight", "this weekend") is
  * resolved against the viewer's own local clock — never a hard-coded date.
+ *
+ * Two halves, deliberately separated:
+ *
+ * - **Arithmetic** (`toIsoDate`, `dateWindow`, `minutesFromTime`, `isWeekend`…)
+ *   is locale-independent and stays on date-fns with the ISO calendar. Booking
+ *   logic depends on it, so it does not move.
+ * - **Display** (`dayLabel`, `displayTime`, `formatRuntime`…) delegates to the
+ *   active locale's formatter bundle, so "Sat 9 Aug" becomes "শনি ৯ আগ".
+ *
+ * In a component prefer `useFormatters()`, which subscribes; these bare helpers
+ * read the store without subscribing and exist for non-React callers and for
+ * the call sites that already had them.
  */
 
 export const ISO_DATE = 'yyyy-MM-dd';
@@ -36,20 +49,20 @@ export function isTomorrow(iso: string, now: Date = new Date()): boolean {
 
 /** "Today", "Tomorrow", or "Sat 9 Aug" — generated from the real local date. */
 export function dayLabel(iso: string, now: Date = new Date()): string {
-  if (isToday(iso, now)) return 'Today';
-  if (isTomorrow(iso, now)) return 'Tomorrow';
-  return format(fromIsoDate(iso), 'EEE d MMM');
+  const f = activeFormatters();
+  return f.relativeDay(iso, now) ?? f.date(iso, 'weekdayDayMonth');
 }
 
 export function dayLabelParts(iso: string, now: Date = new Date()): { top: string; bottom: string } {
-  const date = fromIsoDate(iso);
-  if (isToday(iso, now)) return { top: 'Today', bottom: format(date, 'd MMM') };
-  if (isTomorrow(iso, now)) return { top: 'Tomorrow', bottom: format(date, 'd MMM') };
-  return { top: format(date, 'EEE'), bottom: format(date, 'd MMM') };
+  const f = activeFormatters();
+  return {
+    top: f.relativeDay(iso, now) ?? f.date(iso, 'weekday'),
+    bottom: f.date(iso, 'dayMonth'),
+  };
 }
 
 export function longDayLabel(iso: string): string {
-  return format(fromIsoDate(iso), 'EEEE d MMMM yyyy');
+  return activeFormatters().date(iso, 'full');
 }
 
 export function minutesFromTime(time: string): number {
@@ -64,14 +77,14 @@ export function timeFromMinutes(minutes: number): string {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
-/** 24h "20:45" → "8:45 pm". Used everywhere a time is shown to a customer. */
+/**
+ * 24h "20:45" → "8:45 pm" · "রাত ৮:৪৫". Used everywhere a time is shown.
+ *
+ * Bangla names the part of the day before the clock reading rather than after
+ * it; the formatter handles that, so callers just pass the 24h string.
+ */
 export function displayTime(time: string): string {
-  const minutes = minutesFromTime(time);
-  const h24 = Math.floor(minutes / 60) % 24;
-  const m = minutes % 60;
-  const suffix = h24 >= 12 ? 'pm' : 'am';
-  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
-  return `${h12}:${String(m).padStart(2, '0')} ${suffix}`;
+  return activeFormatters().time(time);
 }
 
 export type TimeOfDayBand = 'morning' | 'afternoon' | 'evening' | 'late';
@@ -84,12 +97,16 @@ export function timeOfDay(time: string): TimeOfDayBand {
   return 'late';
 }
 
-export const timeOfDayLabels: Record<TimeOfDayBand, string> = {
-  morning: 'Morning',
-  afternoon: 'Afternoon',
-  evening: 'Evening',
-  late: 'Late night',
-};
+/**
+ * Translation keys for the bands, rather than the words themselves — the two
+ * call sites are React components and read them through `t()`.
+ */
+export const timeOfDayKeys = {
+  morning: 'showtimes.timeOfDay.morning',
+  afternoon: 'showtimes.timeOfDay.afternoon',
+  evening: 'showtimes.timeOfDay.evening',
+  late: 'showtimes.timeOfDay.late',
+} as const satisfies Record<TimeOfDayBand, string>;
 
 /** A real Date for a screening's start, in the viewer's local time. */
 export function screeningStart(date: string, time: string): Date {
@@ -99,9 +116,5 @@ export function screeningStart(date: string, time: string): Date {
 }
 
 export function formatRuntime(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h === 0) return `${m}m`;
-  if (m === 0) return `${h}h`;
-  return `${h}h ${m}m`;
+  return activeFormatters().runtime(minutes);
 }

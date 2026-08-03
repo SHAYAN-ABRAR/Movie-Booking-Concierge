@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import { m, AnimatePresence } from 'framer-motion';
 import { SlidersHorizontal } from 'lucide-react';
 import { AnimatedNumber, useMotionPreferences } from '@/motion';
@@ -15,9 +16,9 @@ import { DateStrip } from '@/components/showtime/DateStrip';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
 import { activeFilterCount, filterMovies } from '@/data';
 import { dateWindow } from '@/lib/datetime';
-import { pluralise } from '@/lib/format';
 
 export function Movies() {
+  const { t } = useTranslation();
   const motionPrefs = useMotionPreferences();
   const controls = useMovieFilters({ status: 'now-showing' });
   const { filter, setFilter, clear } = controls;
@@ -30,18 +31,16 @@ export function Movies() {
   return (
     <div className="shell">
       <PageHeader
-        eyebrow="The Programme"
-        title={status === 'coming-soon' ? 'Coming soon' : 'Now showing'}
+        eyebrow={t('movies.eyebrow')}
+        title={status === 'coming-soon' ? t('movies.comingSoon') : t('movies.nowShowing')}
         lede={
-          status === 'coming-soon'
-            ? 'Films we have booked but not yet opened. Advance booking opens four weeks before release.'
-            : 'Everything on across the five houses this week. Filter by what you can get to, when you are free, and what you need on screen.'
+          status === 'coming-soon' ? t('movies.ledeComingSoon') : t('movies.ledeNowShowing')
         }
       />
 
       <div className="flex flex-col gap-6 py-6 lg:flex-row lg:gap-12 lg:py-10">
         {/* ── Sidebar filters (desktop) ──────────────────────────────── */}
-        <aside className="hidden w-64 shrink-0 lg:block" aria-label="Filters">
+        <aside className="hidden w-64 shrink-0 lg:block" aria-label={t('filters.heading')}>
           <div className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto pb-6 pr-2">
             <FilterPanel controls={controls} showAccessibility={status === 'now-showing'} />
           </div>
@@ -55,14 +54,14 @@ export function Movies() {
             }
           >
             <TabsList className="mb-6">
-              <TabsTrigger value="now-showing">Now showing</TabsTrigger>
-              <TabsTrigger value="coming-soon">Coming soon</TabsTrigger>
+              <TabsTrigger value="now-showing">{t('movies.nowShowing')}</TabsTrigger>
+              <TabsTrigger value="coming-soon">{t('movies.comingSoon')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
           {status === 'now-showing' ? (
             <div className="mb-6">
-              <p className="eyebrow mb-2.5">Screening on</p>
+              <p className="eyebrow mb-2.5">{t('movies.screeningOn')}</p>
               <DateStrip
                 value={filter.date ?? dates[0]!}
                 onChange={(date) => setFilter({ date })}
@@ -74,7 +73,7 @@ export function Movies() {
                   className="mt-1 px-0"
                   onClick={() => setFilter({ date: undefined })}
                 >
-                  Show every day
+                  {t('movies.showEveryDay')}
                 </Button>
               ) : null}
             </div>
@@ -82,18 +81,24 @@ export function Movies() {
 
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-y border-hairline py-3">
             <p className="text-sm text-content-muted" aria-live="polite" role="status">
+              {/* The numeral animates, so the count cannot simply be interpolated
+                  into the sentence — `<n>` marks where the ticker belongs and
+                  each language puts it where its own grammar wants it. */}
               <span className="font-semibold text-content">
-                <AnimatedNumber value={results.length} />{' '}
-                {results.length === 1 ? 'film' : 'films'}
+                <Trans
+                  i18nKey={results.length === 1 ? 'movies.films_one' : 'movies.films_other'}
+                  count={results.length}
+                  components={{ n: <AnimatedNumber value={results.length} /> }}
+                />
               </span>
-              {count > 0 ? ` matching ${pluralise(count, 'filter')}` : ''}
+              {count > 0 ? <> {t('movies.matchingFilters', { count })}</> : null}
             </p>
 
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="sm" className="lg:hidden">
                   <SlidersHorizontal aria-hidden="true" />
-                  Filters
+                  {t('filters.heading')}
                   {count > 0 ? (
                     <span className="numeral ml-1 bg-content px-1.5 text-[0.6875rem] text-surface">
                       {count}
@@ -103,17 +108,17 @@ export function Movies() {
               </SheetTrigger>
               <SheetContent side="bottom" className="max-h-[85dvh]">
                 <div className="flex items-center justify-between border-b border-hairline px-5 pb-3 pt-2">
-                  <SheetTitle className="text-lg">Filters</SheetTitle>
+                  <SheetTitle className="text-lg">{t('filters.heading')}</SheetTitle>
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-5">
                   <FilterPanel controls={controls} showAccessibility={status === 'now-showing'} />
                 </div>
                 <div className="flex gap-3 border-t border-hairline px-5 py-4">
                   <Button variant="outline" block onClick={clear}>
-                    Clear all
+                    {t('filters.clearAll')}
                   </Button>
                   <SheetClose asChild>
-                    <Button block>Show {results.length}</Button>
+                    <Button block>{t('filters.showCount', { count: results.length })}</Button>
                   </SheetClose>
                 </div>
               </SheetContent>
@@ -124,26 +129,29 @@ export function Movies() {
 
           {results.length === 0 ? (
             <EmptyState
-              title="Nothing matches all of that"
-            variant="index"
+              title={t('movies.emptyTitle')}
+              variant="index"
               body={
                 <>
-                  <p>
-                    No film in the programme fits every filter you have applied. Removing the
-                    narrowest one usually helps — accessibility and running time cut the list hardest.
-                  </p>
+                  <p>{t('movies.emptyBody')}</p>
                   <p className="mt-2">
-                    You can also{' '}
-                    <Link to="/showtimes" className="font-semibold underline underline-offset-4">
-                      browse by showtime
-                    </Link>{' '}
-                    instead.
+                    <Trans
+                      i18nKey="movies.emptyAlternative"
+                      components={{
+                        showtimes: (
+                          <Link
+                            to="/showtimes"
+                            className="font-semibold underline underline-offset-4"
+                          />
+                        ),
+                      }}
+                    />
                   </p>
                 </>
               }
               action={
                 <Button variant="outline" onClick={clear}>
-                  Clear all filters
+                  {t('movies.clearAllFilters')}
                 </Button>
               }
             />

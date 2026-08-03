@@ -1021,7 +1021,7 @@ export function ReviewStep({
       </section>
 
       {/* ── Total ──────────────────────────────────────────────────── */}
-      <section className="border-2 border-ink p-5">
+      <section className="border-2 border-content p-5">
         <dl>
           <DataRow label="Tickets">{money(quote.ticketSubtotal)}</DataRow>
           <DataRow label="Add-ons">{money(quote.concessionSubtotal)}</DataRow>
@@ -1030,7 +1030,7 @@ export function ReviewStep({
             {money(quote.bookingFee)}
           </DataRow>
         </dl>
-        <div className="mt-3 flex items-baseline justify-between gap-6 border-t-2 border-ink pt-3">
+        <div className="mt-3 flex items-baseline justify-between gap-6 border-t-2 border-content pt-3">
           <p className="font-display text-xl">Total</p>
           <p className="numeral font-display text-3xl leading-none">{money(quote.total)}</p>
         </div>

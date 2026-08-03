@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { EmptyDrawing } from '@/components/visual/EmptyStates';
@@ -91,12 +92,13 @@ export function Announcer({ message }: { message: string }) {
 }
 
 export function SkipLink() {
+  const { t } = useTranslation();
   return (
     <a
       href="#main"
       className="sr-only-focusable left-4 top-4 bg-content px-4 py-3 text-sm font-semibold text-surface"
     >
-      Skip to content
+      {t('nav.skipToContent')}
     </a>
   );
 }

@@ -9,8 +9,9 @@ import { ConcessionCard } from '@/components/concessions/ConcessionCard';
 import { concessionById, concessionCategories, concessionsFor, cinemas } from '@/data';
 import { useBooking } from '@/store/booking';
 import { usePreferences } from '@/store/preferences';
-import { money, pluralise } from '@/lib/format';
+import { money } from '@/lib/format';
 import { useAnnouncer } from '@/hooks';
+import { Trans, useTranslation } from 'react-i18next';
 
 const dietaryFilters = [
   { id: 'vegetarian', label: 'Vegetarian' },
@@ -19,6 +20,7 @@ const dietaryFilters = [
 ] as const;
 
 export function Concessions() {
+  const { t } = useTranslation();
   const cinemaId = usePreferences((s) => s.cinemaId);
   const cinema = cinemas.find((c) => c.id === cinemaId) ?? null;
   const concessions = useBooking((s) => s.concessions);
@@ -63,11 +65,11 @@ export function Concessions() {
       <Announcer message={message} />
 
       <PageHeader
-        eyebrow="The counter"
-        title="Food and drink"
+        eyebrow={t('concessions.eyebrow')}
+        title={t('concessions.title')}
         lede={
           cinema
-            ? `What the counter is serving at ${cinema.name}. Add anything here and it carries into your booking.`
+            ? t('concessions.ledeCinema', { cinema: cinema.name })
             : 'What the counter serves across the circuit. Add anything here and it carries into your booking — a couple of items are only stocked at some houses.'
         }
       />
@@ -110,22 +112,25 @@ export function Concessions() {
                   </FilterChip>
                 ))}
                 <FilterChip checked={excludeIncomplete} onCheckedChange={setExcludeIncomplete}>
-                  Full allergen data only
+                  {t('concessions.fullAllergenOnly')}
                 </FilterChip>
               </div>
             </div>
           </div>
 
-          <p className="mb-5 text-sm text-ink-muted" role="status" aria-live="polite">
-            <span className="font-semibold text-ink">{pluralise(items.length, 'item')}</span> on the
-            counter
+          <p className="mb-5 text-sm text-content-muted" role="status" aria-live="polite">
+            <Trans
+              i18nKey="concessions.onTheCounter"
+              values={{ items: t('concessions.itemCount', { count: items.length }) }}
+              components={{ strong: <span className="font-semibold text-content" /> }}
+            />
           </p>
 
           {items.length === 0 ? (
             <EmptyState
-              title="Nothing matches that"
-            variant="index"
-              body="No item on the counter fits every filter. Clearing the dietary filters usually brings the list back."
+              title={t('concessions.emptyTitle')}
+              variant="index"
+              body={t('concessions.emptyBody')}
               action={
                 <Button
                   variant="outline"
@@ -135,7 +140,7 @@ export function Concessions() {
                     setCategory(null);
                   }}
                 >
-                  Clear filters
+                  {t('concessions.clearFilters')}
                 </Button>
               }
             />
@@ -154,9 +159,7 @@ export function Concessions() {
           )}
 
           <DemoNote className="mt-8" tone="loud">
-            Sample menu and sample prices in Bangladeshi taka, written for this demonstration.
-            Allergen information is illustrative and must not be relied on — several items are
-            deliberately marked as having an incomplete declaration.
+            {t('concessions.demoNote')}
           </DemoNote>
         </div>
 
@@ -165,19 +168,18 @@ export function Concessions() {
           <div className="lg:sticky lg:top-24">
             <section
               aria-labelledby="counter-summary"
-              className="border-2 border-ink bg-paper-raised p-5"
+              className="border-2 border-content bg-surface-raised p-5"
             >
               <h2 id="counter-summary" className="font-display text-xl leading-none">
-                Your counter order
+                {t('concessions.orderHeading')}
               </h2>
 
               {lines.length === 0 ? (
                 <>
                   {/* A till roll with nothing printed on it yet. */}
                   <EmptyDrawing variant="receipt" className="mx-auto mt-4 max-w-36" />
-                  <p className="mt-3 text-[0.9375rem] leading-7 text-ink-muted">
-                    Nothing added yet. Anything you pick here waits for you at the add-ons step of
-                    your booking — you do not have to decide now.
+                  <p className="mt-3 text-[0.9375rem] leading-7 text-content-muted">
+                    {t('concessions.orderEmpty')}
                   </p>
                 </>
               ) : (
@@ -190,14 +192,19 @@ export function Concessions() {
                           <>
                             {line.item!.name}
                             {line.item!.size ? ` (${line.item!.size})` : ''}
-                            <span className="text-ink-muted"> × {line.quantity}</span>
+                            <span className="text-content-muted"> × {line.quantity}</span>
                           </>
                         }
                       >
                         {money(line.item!.price * line.quantity)}
                       </DataRow>
                     ))}
-                    <DataRow label={`Subtotal · ${pluralise(itemCount, 'item')}`} emphasis>
+                    <DataRow
+                      label={t('concessions.subtotal', {
+                        items: t('concessions.itemCount', { count: itemCount }),
+                      })}
+                      emphasis
+                    >
                       {money(subtotal)}
                     </DataRow>
                   </dl>
@@ -205,17 +212,18 @@ export function Concessions() {
                   <div className="mt-5 space-y-2">
                     <Button asChild block>
                       <Link to={movieId ? `/booking/${movieId}` : '/showtimes'}>
-                        {movieId ? 'Back to your booking' : 'Pick a film and book'}
+                        {movieId
+                          ? t('concessions.backToBooking')
+                          : t('concessions.pickAFilm')}
                       </Link>
                     </Button>
                     <Button variant="ghost" block onClick={clearConcessions}>
-                      Clear the order
+                      {t('concessions.clearOrder')}
                     </Button>
                   </div>
 
-                  <p className="mt-3 text-[0.75rem] leading-5 text-ink-muted">
-                    Add-ons are paid for with your tickets at the booking's payment step, and
-                    collected from the counter on the day.
+                  <p className="mt-3 text-[0.75rem] leading-5 text-content-muted">
+                    {t('concessions.orderNote')}
                   </p>
                 </>
               )}

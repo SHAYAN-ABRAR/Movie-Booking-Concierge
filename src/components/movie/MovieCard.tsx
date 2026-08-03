@@ -6,6 +6,7 @@ import { genreLabels, languageLabels } from '@/data';
 import { runtimeLabelShort, statusLabel } from '@/lib/movieMeta';
 import type { Movie } from '@/data/types';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 /**
  * A catalogue entry.
@@ -29,6 +30,7 @@ export function MovieCard({
   className?: string;
   showSynopsis?: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <article className={cn('group relative', className)}>
       <Link
@@ -102,7 +104,7 @@ export function MovieCard({
               <CertificateChip code={movie.certificate} />
             ) : (
               <span className="border border-hairline-strong px-1.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em]">
-                Not yet rated
+                {t('movieCard.notYetRated')}
               </span>
             )}
             <span className="numeral">{runtimeLabelShort(movie)}</span>

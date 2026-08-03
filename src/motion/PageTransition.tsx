@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { routeTransition } from './variants';
 import { useMotionPreferences } from './useMotionPreferences';
 import { duration, ease } from './tokens';
+import { useTranslation } from 'react-i18next';
 
 /* ── Chunk-loading signal ──────────────────────────────────────────────
  *
@@ -60,6 +61,7 @@ export function useReportRouteLoading(): void {
  * layout space and disappears the moment the chunk resolves.
  */
 export function RouteProgress() {
+  const { t } = useTranslation();
   const loading = useRouteLoading();
   const motion = useMotionPreferences();
 
@@ -69,7 +71,7 @@ export function RouteProgress() {
         <m.div
           key="route-progress"
           role="status"
-          aria-label="Loading page"
+          aria-label={t('loading.page')}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: duration.fast } }}

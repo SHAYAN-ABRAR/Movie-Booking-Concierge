@@ -58,7 +58,7 @@ export function About() {
                     className="group flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1"
                   >
                     <span className="font-display text-lg group-hover:underline">{cinema.name}</span>
-                    <span className="text-[0.8125rem] text-ink-muted">{cinema.signature}</span>
+                    <span className="text-[0.8125rem] text-content-muted">{cinema.signature}</span>
                   </Link>
                 </li>
               ))}
@@ -128,12 +128,12 @@ export function About() {
                 { label: 'Opened', value: COMPANY.foundedYear },
               ].map((fact) => (
                 <div key={fact.label} className="flex items-baseline justify-between gap-4">
-                  <dt className="text-sm text-ink-muted">{fact.label}</dt>
+                  <dt className="text-sm text-content-muted">{fact.label}</dt>
                   <dd className="numeral font-display text-2xl leading-none">{fact.value}</dd>
                 </div>
               ))}
             </dl>
-            <p className="mt-5 border-t border-hairline pt-3 text-[0.75rem] leading-5 text-ink-muted">
+            <p className="mt-5 border-t border-hairline pt-3 text-[0.75rem] leading-5 text-content-muted">
               Figures describe the sample circuit in this demonstration, not a real business.
             </p>
           </section>
@@ -142,14 +142,14 @@ export function About() {
             <h2 id="office" className="eyebrow mb-3">
               Registered office
             </h2>
-            <address className="not-italic text-[0.9375rem] leading-7 text-ink-muted">
+            <address className="not-italic text-[0.9375rem] leading-7 text-content-muted">
               {COMPANY.registeredOffice.map((line) => (
                 <span key={line} className="block">
                   {line}
                 </span>
               ))}
             </address>
-            <p className="mt-3 text-[0.8125rem] text-ink-muted">
+            <p className="mt-3 text-[0.8125rem] text-content-muted">
               A fictional address for a fictional company.
             </p>
           </section>

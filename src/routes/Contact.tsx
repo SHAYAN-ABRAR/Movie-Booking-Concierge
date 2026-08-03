@@ -209,14 +209,14 @@ export function Contact() {
             {prepared ? (
               <div
                 role="status"
-                className="mt-6 max-w-xl border-2 border-ink bg-paper-raised p-5"
+                className="mt-6 max-w-xl border-2 border-content bg-surface-raised p-5"
               >
                 <h3 className="font-display text-xl leading-tight">Your message is ready</h3>
-                <p className="mt-2 text-[0.9375rem] leading-7 text-ink-muted">
+                <p className="mt-2 text-[0.9375rem] leading-7 text-content-muted">
                   Nothing has been sent yet. Open it in your mail app, or copy the text and send it
                   however you prefer.
                 </p>
-                <pre className="mt-4 max-h-56 overflow-auto border border-hairline bg-paper-sunken/60 p-3 text-[0.75rem] leading-5">
+                <pre className="mt-4 max-h-56 overflow-auto border border-hairline bg-surface-sunken/60 p-3 text-[0.75rem] leading-5">
                   {prepared.text}
                 </pre>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -277,14 +277,14 @@ export function Contact() {
                 {COMPANY.supportEmail}
               </a>
             </p>
-            <p className="numeral mt-2 text-[0.8125rem] text-ink-muted">{COMPANY.supportHours}</p>
+            <p className="numeral mt-2 text-[0.8125rem] text-content-muted">{COMPANY.supportHours}</p>
           </section>
 
           <section id="access" aria-labelledby="access-heading" className="scroll-mt-24 border border-hairline-strong p-5">
             <h2 id="access-heading" className="eyebrow mb-3">
               Accessibility
             </h2>
-            <p className="text-[0.9375rem] leading-7 text-ink-muted">
+            <p className="text-[0.9375rem] leading-7 text-content-muted">
               For anything that needs arranging in advance — a companion ticket, a sensory-friendly
               screening, or help getting to your seat — contact the house directly or email the access
               team. This site cannot arrange it for you.
@@ -301,7 +301,7 @@ export function Contact() {
             <h2 id="lost-heading" className="eyebrow mb-3">
               Lost property
             </h2>
-            <p className="mb-4 text-[0.9375rem] leading-7 text-ink-muted">
+            <p className="mb-4 text-[0.9375rem] leading-7 text-content-muted">
               Each house keeps its own found items and has its own desk. Max can assemble a report
               with your booking and seat already filled in — you send it yourself.
             </p>
@@ -309,7 +309,7 @@ export function Contact() {
               {cinemas.map((cinema) => (
                 <li key={cinema.id} className="border-t border-hairline pt-3">
                   <p className="font-semibold">{cinema.shortName}</p>
-                  <p className="numeral text-[0.8125rem] text-ink-muted">
+                  <p className="numeral text-[0.8125rem] text-content-muted">
                     Held {cinema.lostAndFound.holdingPeriodDays} days · {cinema.lostAndFound.hours}
                   </p>
                   <p className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-[0.8125rem]">

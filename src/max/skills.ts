@@ -24,7 +24,7 @@ import { dateWindow, dayLabel, displayTime, formatRuntime, minutesFromTime, time
 import { listSentence, money, pluralise, seatRanges } from '@/lib/format';
 import { useBookings } from '@/store/bookings';
 import { claimChecklistTemplate } from '@/store/reports';
-import { useWatches, watchKindLabels } from '@/store/watches';
+import { useWatches, watchKindLabel } from '@/store/watches';
 import type { MovieFilter } from '@/data';
 import type { Movie, Showtime } from '@/data/types';
 import type { MaxAction, MaxBlock, MaxContext, MaxParse, MaxReply } from './types';
@@ -1474,7 +1474,7 @@ function watchSkill(parse: MaxParse, context: MaxContext): MaxReply {
     blocks: [
       {
         kind: 'text',
-        text: `${watchKindLabels[kind]} — ${screeningLine(showtime)}`,
+        text: `${watchKindLabel(kind)} — ${screeningLine(showtime)}`,
       },
       {
         kind: 'demo-note',
@@ -1485,7 +1485,7 @@ function watchSkill(parse: MaxParse, context: MaxContext): MaxReply {
     actions: [
       {
         type: 'create_watch',
-        label: `Save a ${watchKindLabels[kind].toLowerCase()} alert`,
+        label: `Save a ${watchKindLabel(kind).toLowerCase()} alert`,
         kind,
         showtimeId: showtime.id,
         ...(parse.entities.partySize ? { partySize: parse.entities.partySize } : {}),

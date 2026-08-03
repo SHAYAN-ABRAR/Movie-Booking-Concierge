@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ErrorInfo, ReactNode } from 'react';
 
 /**
@@ -50,21 +51,33 @@ export class AppErrorBoundary extends Component<Props, State> {
   render() {
     const { error } = this.state;
     if (!error) return this.props.children;
+    return <ErrorPanel error={error} />;
+  }
+}
 
-    return (
-      <div className="shell py-16">
+/**
+ * The visible half, as a function component.
+ *
+ * A class cannot call `useTranslation`, and the alternative — threading `t`
+ * down as a prop from every call site — would make the boundary harder to place
+ * than the problem it solves. Splitting it keeps `componentDidCatch` where it
+ * has to be and the copy where it can be translated.
+ */
+function ErrorPanel({ error }: { error: Error }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="shell py-16">
         <div className="max-w-2xl">
-          <p className="eyebrow mb-4">Something went wrong on this page</p>
+          <p className="eyebrow mb-4">{t('errors.eyebrow')}</p>
           <h1 className="font-display text-[2.25rem] leading-[1.02] tracking-[-0.03em] sm:text-[3rem]">
-            This page could not be displayed.
+            {t('errors.title')}
           </h1>
           <p className="mt-5 text-[1.0625rem] leading-7 text-content-muted">
-            The rest of the site is still working, and nothing you have saved in this browser has
-            been lost — any completed bookings are still on the My bookings page.
+            {t('errors.reassurance')}
           </p>
           <p className="mt-3 text-[0.9375rem] leading-7 text-content-muted">
-            This is a demonstration build with no error-reporting service behind it, so the details
-            below are only in your browser console.
+            {t('errors.noReporting')}
           </p>
 
           <pre className="mt-6 max-w-full overflow-x-auto border border-hairline bg-surface-sunken/60 p-4 font-mono text-[0.8125rem] leading-6 text-content-muted">
@@ -76,23 +89,22 @@ export class AppErrorBoundary extends Component<Props, State> {
               href="/bookings"
               className="inline-flex h-11 items-center border-2 border-content bg-content px-5 text-sm font-semibold text-surface transition-colors hover:bg-transparent hover:text-content"
             >
-              My bookings
+              {t('nav.myBookings')}
             </a>
             <a
               href="/showtimes"
               className="inline-flex h-11 items-center border-2 border-content px-5 text-sm font-semibold text-content transition-colors hover:bg-content hover:text-surface"
             >
-              Book a movie
+              {t('errors.bookAMovie')}
             </a>
             <a
               href="/"
               className="inline-flex h-11 items-center border border-hairline-strong px-5 text-sm font-semibold text-content transition-colors hover:bg-surface-sunken"
             >
-              Home
+              {t('errors.home')}
             </a>
           </div>
         </div>
       </div>
     );
-  }
 }

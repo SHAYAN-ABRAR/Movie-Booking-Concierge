@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Bell, Trash2 } from 'lucide-react';
 import { requestNotificationPermission } from '@/components/max/DemoAlertRunner';
 import { usePreferences } from '@/store/preferences';
@@ -7,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DemoNote } from '@/components/ui/misc';
 import { EmptyDrawing } from '@/components/visual/EmptyStates';
-import { useWatches, unreadAlertCount, watchKindLabels } from '@/store/watches';
+import { useWatches, unreadAlertCount, watchKindKeys } from '@/store/watches';
 import { movieById } from '@/data/movies';
 import { cinemaById } from '@/data/cinemas';
 import { displayTime, dayLabel } from '@/lib/datetime';
@@ -21,6 +22,7 @@ import { cn } from '@/lib/utils';
  * guaranteed to appear.
  */
 export function AlertBell() {
+  const { t } = useTranslation();
   const alerts = useWatches((s) => s.alerts);
   const watches = useWatches((s) => s.watches);
   const markAllRead = useWatches((s) => s.markAllRead);
@@ -51,14 +53,18 @@ export function AlertBell() {
           size="icon"
           className="relative"
           aria-label={
-            unread > 0 ? `Alerts — ${unread} unread` : hasAnything ? 'Alerts' : 'Alerts — none yet'
+            unread > 0
+              ? t('alerts.labelUnread', { count: unread })
+              : hasAnything
+                ? t('alerts.title')
+                : t('alerts.labelNone')
           }
         >
           <Bell aria-hidden="true" />
           {unread > 0 ? (
             <span
               aria-hidden="true"
-              className="numeral absolute right-1.5 top-1.5 grid min-w-[1.1rem] place-items-center bg-marigold px-1 text-[0.625rem] font-bold leading-[1.1rem] text-paper"
+              className="numeral absolute right-1.5 top-1.5 grid min-w-[1.1rem] place-items-center bg-marigold px-1 text-[0.625rem] font-bold leading-[1.1rem] text-surface"
             >
               {unread}
             </span>
@@ -68,10 +74,10 @@ export function AlertBell() {
 
       <PopoverContent align="end" className="w-[min(22rem,calc(100vw-2rem))] p-0">
         <div className="flex items-center justify-between border-b border-hairline px-4 py-3">
-          <h2 className="font-display text-lg leading-none">Alerts</h2>
+          <h2 className="font-display text-lg leading-none">{t('alerts.title')}</h2>
           {hasAnything ? (
             <Button variant="link" size="sm" className="px-0 text-xs" onClick={clearAll}>
-              Clear all
+              {t('alerts.clearAll')}
             </Button>
           ) : null}
         </div>
@@ -83,8 +89,8 @@ export function AlertBell() {
               <EmptyDrawing variant="alerts" className="mx-auto max-w-36" />
               <p className="mt-2 text-sm leading-6 text-content-muted">
                 {watches.length > 0
-                  ? `You have ${watches.length} demo alert${watches.length === 1 ? '' : 's'} saved. Nothing has fired yet.`
-                  : 'No alerts. Max can save a demo alert for a screening you are watching.'}
+                  ? t('alerts.emptyWithWatches', { count: watches.length })
+                  : t('alerts.empty')}
               </p>
             </div>
           ) : (
@@ -97,7 +103,7 @@ export function AlertBell() {
                   <li key={alert.id} className={cn('px-4 py-3', !alert.read ? 'bg-marigold-wash/40' : '')}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="eyebrow mb-1">{watchKindLabels[alert.kind]}</p>
+                        <p className="eyebrow mb-1">{t(watchKindKeys[alert.kind])}</p>
                         <p className="text-sm font-semibold leading-snug">{alert.title}</p>
                         <p className="mt-1 text-[0.8125rem] leading-5 text-content-muted">{alert.body}</p>
                         {movie ? (
@@ -105,14 +111,14 @@ export function AlertBell() {
                             to={`/movies/${movie.slug}`}
                             className="mt-1.5 inline-block text-[0.8125rem] font-semibold underline underline-offset-4"
                           >
-                            View {movie.title}
+                            {t('alerts.view', { title: movie.title })}
                           </Link>
                         ) : null}
                       </div>
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        aria-label={`Dismiss alert: ${alert.title}`}
+                        aria-label={t('alerts.dismiss', { title: alert.title })}
                         onClick={() => dismissAlert(alert.id)}
                       >
                         <Trash2 aria-hidden="true" />
@@ -127,7 +133,7 @@ export function AlertBell() {
 
         {watches.length > 0 ? (
           <div className="border-t border-hairline px-4 py-3">
-            <p className="eyebrow mb-2">Saved watches</p>
+            <p className="eyebrow mb-2">{t('alerts.savedWatches')}</p>
             <ul className="space-y-1.5">
               {watches.slice(0, 4).map((watch) => {
                 const movie = movieById.get(watch.movieId);
@@ -135,10 +141,11 @@ export function AlertBell() {
                 return (
                   <li key={watch.id} className="flex items-baseline justify-between gap-2 text-[0.8125rem]">
                     <span className="min-w-0 truncate">
-                      {movie?.title ?? 'Screening'} · {dayLabel(watch.date)} {displayTime(watch.time)}
+                      {movie?.title ?? t('alerts.screening')} · {dayLabel(watch.date)}{' '}
+                      {displayTime(watch.time)}
                       {cinema ? ` · ${cinema.shortName}` : ''}
                     </span>
-                    <span className="shrink-0 text-content-faint">{watchKindLabels[watch.kind]}</span>
+                    <span className="shrink-0 text-content-faint">{t(watchKindKeys[watch.kind])}</span>
                   </li>
                 );
               })}
@@ -149,7 +156,7 @@ export function AlertBell() {
         {watches.length > 0 && canAskForNotifications ? (
           <div className="border-t border-hairline px-4 py-3">
             <p className="mb-2 text-[0.8125rem] leading-5 text-content-muted">
-              Alerts always appear here. You can also have them pop up as browser notifications.
+              {t('alerts.browserPitch')}
             </p>
             <Button
               size="sm"
@@ -160,16 +167,13 @@ export function AlertBell() {
                 setPermission(result === 'unsupported' ? 'denied' : result);
               }}
             >
-              Allow browser notifications
+              {t('alerts.allowBrowser')}
             </Button>
           </div>
         ) : null}
 
         <div className="border-t border-hairline px-4 py-3">
-          <DemoNote>
-            Demo alerts only. Nothing here monitors live cinema inventory, and nothing is emailed or
-            sent to another device. Watches live in this browser and disappear if you clear its data.
-          </DemoNote>
+          <DemoNote>{t('alerts.demoNote')}</DemoNote>
         </div>
       </PopoverContent>
     </Popover>

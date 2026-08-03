@@ -88,7 +88,9 @@ export function MovieImage({
           height={height}
           alt={asset.alt}
           loading={priority ? 'eager' : 'lazy'}
-          fetchPriority={priority ? 'high' : 'auto'}
+          // Lowercase: React 18 does not recognise the camelCase form and
+          // passes it straight through, warning on every render.
+          {...{ fetchpriority: priority ? 'high' : 'auto' }}
           decoding={priority ? 'sync' : 'async'}
           onError={() => setFailed(true)}
           style={{ objectPosition: asset.focalPoint }}

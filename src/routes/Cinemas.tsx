@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ExternalLink, MapPin, Phone } from 'lucide-react';
 import { PageHeader } from '@/components/common';
 import { Button } from '@/components/ui/button';
@@ -8,29 +9,11 @@ import { HouseDiagram } from '@/components/cinema/HouseDiagram';
 import { cinemas, cities, moviesAtCinema } from '@/data';
 import { todayIso } from '@/lib/datetime';
 import { mapUrl } from '@/lib/external';
+import { accessLabels, amenityLabels } from '@/i18n/domain';
 
-const amenityLabels: Record<string, string> = {
-  parking: 'Parking',
-  cafe: 'Café',
-  lounge: 'Lounge',
-  atm: 'ATM',
-  'prayer-room': 'Prayer room',
-  'baby-change': 'Baby change',
-  cloakroom: 'Cloakroom',
-  'gift-card': 'Gift cards',
-};
-
-const accessLabels: Record<string, string> = {
-  'step-free-access': 'Step-free access',
-  'accessible-toilet': 'Accessible toilet',
-  'hearing-loop': 'Hearing loop',
-  'companion-seat': 'Companion seats',
-  'assistance-dogs': 'Assistance dogs welcome',
-  'lift-access': 'Lift access',
-  'accessible-parking': 'Accessible parking',
-};
 
 export function Cinemas() {
+  const { t } = useTranslation();
   const today = todayIso();
   const showing = useMemo(
     () => Object.fromEntries(cinemas.map((c) => [c.id, moviesAtCinema(c.id, today)])),
@@ -40,9 +23,9 @@ export function Cinemas() {
   return (
     <div className="shell">
       <PageHeader
-        eyebrow="Five houses"
-        title="Our cinemas"
-        lede="Three cities, nineteen screens. Each house runs its own programme — the strands below are what makes each one different."
+        eyebrow={t('cinemas.eyebrow')}
+        title={t('cinemas.title')}
+        lede={t('cinemas.lede')}
       />
 
       {cities.map((city) => (
@@ -63,11 +46,11 @@ export function Cinemas() {
                           {cinema.name}
                         </Link>
                       </h3>
-                      <p lang="bn" className="mt-1 text-base text-ink-muted">
+                      <p lang="bn" className="mt-1 text-base text-content-muted">
                         {cinema.nameBn}
                       </p>
 
-                      <p className="mt-4 max-w-prose text-[0.9375rem] leading-7 text-ink-muted">
+                      <p className="mt-4 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
                         {cinema.description}
                       </p>
 
@@ -75,7 +58,7 @@ export function Cinemas() {
                         {cinema.signature}
                       </p>
 
-                      <address className="mt-5 not-italic text-[0.9375rem] leading-7 text-ink-muted">
+                      <address className="mt-5 not-italic text-[0.9375rem] leading-7 text-content-muted">
                         {cinema.addressLines.join(', ')}
                       </address>
 
@@ -99,7 +82,7 @@ export function Cinemas() {
                         </a>
                       </div>
 
-                      <p className="numeral mt-3 text-[0.8125rem] text-ink-muted">
+                      <p className="numeral mt-3 text-[0.8125rem] text-content-muted">
                         Open {cinema.openingHours} · Box office {cinema.boxOfficeHours}
                       </p>
 
@@ -150,8 +133,8 @@ export function Cinemas() {
                             ))}
                           </ul>
                         ) : (
-                          <p className="text-[0.9375rem] text-ink-muted">
-                            Nothing scheduled here today.
+                          <p className="text-[0.9375rem] text-content-muted">
+                            {t('cinemas.nothingToday')}
                           </p>
                         )}
                       </div>

@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-import { availabilityFor, formatLabels, movieFor, screenFor } from '@/data';
+import { useTranslation } from 'react-i18next';
+import { availabilityFor, movieFor, screenFor } from '@/data';
+import { formatKeys } from '@/i18n/domain';
 import { adultPriceRange } from '@/lib/bookingMath';
 import { displayTime, minutesFromTime, timeFromMinutes, todayIso } from '@/lib/datetime';
 import { useNowMinutes } from '@/hooks';
@@ -9,11 +11,12 @@ import type { Showtime } from '@/data/types';
 import { cn } from '@/lib/utils';
 import { AccessibilityChips } from '@/components/movie/Chips';
 
+/** Tone is presentation; the wording lives in the catalogue. */
 const levelCopy = {
-  available: { label: 'Available', tone: 'text-content-muted' },
-  'filling-fast': { label: 'Filling fast', tone: 'text-warn' },
-  'almost-full': { label: 'Almost full', tone: 'text-warn' },
-  'sold-out': { label: 'Sold out', tone: 'text-danger' },
+  available: { key: 'showtime.availability.available', tone: 'text-content-muted' },
+  'filling-fast': { key: 'showtime.availability.fillingFast', tone: 'text-warn' },
+  'almost-full': { key: 'showtime.availability.almostFull', tone: 'text-warn' },
+  'sold-out': { key: 'showtime.availability.soldOut', tone: 'text-danger' },
 } as const;
 
 /**
@@ -33,6 +36,7 @@ export function ShowtimeButton({
   showCinema?: boolean;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const availability = availabilityFor(showtime);
   const movie = movieFor(showtime);
   const screen = screenFor(showtime);
@@ -52,14 +56,19 @@ export function ShowtimeButton({
     displayTime(showtime.time),
     movie?.title,
     showCinema ? undefined : screen?.name,
-    formatLabels[showtime.format],
-    soldOut ? 'sold out' : `${availability.available} seats left, from ${money(price.min)}`,
+    t(formatKeys[showtime.format]),
+    soldOut
+      ? t('showtime.availability.soldOut')
+      : t('showtime.seatsAndPrice', {
+          seats: t('showtime.seatsLeft', { count: availability.available }),
+          price: money(price.min),
+        }),
     imminent !== null && !soldOut
       ? imminent === 0
-        ? 'starting now'
-        : `starts in ${imminent} minutes`
+        ? t('showtime.startingNow')
+        : t('showtime.startsIn', { count: imminent })
       : undefined,
-    `ends about ${displayTime(endTime)}`,
+    t('showtime.endsAboutSpoken', { time: displayTime(endTime) }),
   ]
     .filter(Boolean)
     .join(', ');
@@ -71,20 +80,24 @@ export function ShowtimeButton({
           {displayTime(showtime.time)}
         </span>
         {showFormat ? (
-          <span className="eyebrow text-[0.625rem] leading-none">{formatLabels[showtime.format]}</span>
+          <span className="eyebrow text-[0.625rem] leading-none">
+            {t(formatKeys[showtime.format])}
+          </span>
         ) : null}
       </span>
 
       <span className="mt-1.5 block text-[0.75rem] leading-4 text-content-faint">
         {screen?.name}
         <span aria-hidden="true"> · </span>
-        ends ~{displayTime(endTime)}
+        {t('showtime.endsAbout', { time: displayTime(endTime) })}
       </span>
 
       <span className="mt-2 flex items-center justify-between gap-2">
-        <span className={cn('text-[0.6875rem] font-semibold', level.tone)}>{level.label}</span>
+        <span className={cn('text-[0.6875rem] font-semibold', level.tone)}>{t(level.key)}</span>
         {!soldOut ? (
-          <span className="numeral text-[0.6875rem] text-content-muted">from {money(price.min)}</span>
+          <span className="numeral text-[0.6875rem] text-content-muted">
+            {t('showtime.fromPrice', { price: money(price.min) })}
+          </span>
         ) : null}
       </span>
 
@@ -152,6 +165,7 @@ export function ShowtimeButton({
 
 /** The dense variant used inside Max's showtime results and the cinema page. */
 export function ShowtimePill({ showtime, className }: { showtime: Showtime; className?: string }) {
+  const { t } = useTranslation();
   const availability = availabilityFor(showtime);
   const movie = movieFor(showtime);
   const soldOut = availability.level === 'sold-out';
@@ -169,7 +183,7 @@ export function ShowtimePill({ showtime, className }: { showtime: Showtime; clas
     <>
       <span className="numeral text-sm font-semibold leading-none">{displayTime(showtime.time)}</span>
       <span className="text-[0.625rem] uppercase tracking-[0.08em] text-content-faint">
-        {formatLabels[showtime.format]}
+        {t(formatKeys[showtime.format])}
       </span>
     </>
   );
@@ -186,7 +200,11 @@ export function ShowtimePill({ showtime, className }: { showtime: Showtime; clas
     <Link
       to={`/booking/${movie?.slug ?? ''}?showtime=${encodeURIComponent(showtime.id)}`}
       className={base}
-      aria-label={`Book ${displayTime(showtime.time)}, ${formatLabels[showtime.format]}, ${availability.available} seats left`}
+      aria-label={t('showtime.bookLabel', {
+        time: displayTime(showtime.time),
+        format: t(formatKeys[showtime.format]),
+        seats: t('showtime.seatsLeft', { count: availability.available }),
+      })}
       data-start={start}
     >
       {content}

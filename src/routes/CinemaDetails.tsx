@@ -19,29 +19,11 @@ import {
 import { dateWindow, formatRuntime, longDayLabel } from '@/lib/datetime';
 import { mapUrl, telUrl } from '@/lib/external';
 import { usePreferences } from '@/store/preferences';
-
-const accessLabels: Record<string, string> = {
-  'step-free-access': 'Step-free access from the street',
-  'accessible-toilet': 'Accessible toilet on the cinema floor',
-  'hearing-loop': 'Induction loop in every house',
-  'companion-seat': 'Companion seats beside every wheelchair space',
-  'assistance-dogs': 'Assistance dogs welcome throughout',
-  'lift-access': 'Lift access to the cinema floor',
-  'accessible-parking': 'Accessible parking bays',
-};
-
-const amenityLabels: Record<string, string> = {
-  parking: 'Parking',
-  cafe: 'Café',
-  lounge: 'Lounge',
-  atm: 'ATM',
-  'prayer-room': 'Prayer room',
-  'baby-change': 'Baby change',
-  cloakroom: 'Cloakroom',
-  'gift-card': 'Gift cards',
-};
+import { accessDetailLabels as accessLabels, amenityLabels } from '@/i18n/domain';
+import { Trans, useTranslation } from 'react-i18next';
 
 export function CinemaDetails() {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const cinema = slug ? getCinema(slug) : null;
   const dates = useMemo(() => dateWindow(10), []);
@@ -57,11 +39,11 @@ export function CinemaDetails() {
 
   return (
     <>
-      <header className="border-b-2 border-ink">
+      <header className="border-b-2 border-content">
         <div className="shell py-10 sm:py-14">
-          <nav aria-label="Breadcrumb" className="mb-6">
+          <nav aria-label={t('cinemaDetails.breadcrumb')} className="mb-6">
             <Link to="/cinemas" className="eyebrow underline-offset-4 hover:underline">
-              ← All cinemas
+              {t('cinemaDetails.backToCinemas')}
             </Link>
           </nav>
 
@@ -73,7 +55,7 @@ export function CinemaDetails() {
               <h1 className="font-display text-[2.5rem] leading-[0.96] tracking-[-0.035em] sm:text-[3.5rem]">
                 {cinema.name}
               </h1>
-              <p lang="bn" className="mt-2 font-display text-2xl text-ink-muted">
+              <p lang="bn" className="mt-2 font-display text-2xl text-content-muted">
                 {cinema.nameBn}
               </p>
 
@@ -101,11 +83,11 @@ export function CinemaDetails() {
             </div>
 
             <div className="lg:pt-2">
-              <dl className="border-t-2 border-ink text-sm">
+              <dl className="border-t-2 border-content text-sm">
                 <div className="border-b border-hairline py-3.5">
                   <dt className="eyebrow mb-1.5">Address</dt>
                   <dd>
-                    <address className="not-italic leading-7 text-ink-muted">
+                    <address className="not-italic leading-7 text-content-muted">
                       {cinema.addressLines.map((line) => (
                         <span key={line} className="block">
                           {line}
@@ -116,7 +98,7 @@ export function CinemaDetails() {
                 </div>
                 <div className="border-b border-hairline py-3.5">
                   <dt className="eyebrow mb-1.5">Opening</dt>
-                  <dd className="numeral leading-7 text-ink-muted">
+                  <dd className="numeral leading-7 text-content-muted">
                     {cinema.openingHours}
                     <span className="block">Box office {cinema.boxOfficeHours}</span>
                   </dd>
@@ -143,7 +125,7 @@ export function CinemaDetails() {
                 </div>
                 <div className="py-3.5">
                   <dt className="eyebrow mb-2">Before the feature</dt>
-                  <dd className="numeral text-ink-muted">
+                  <dd className="numeral text-content-muted">
                     {cinema.trailerMinutes} minutes of trailers and adverts
                   </dd>
                 </div>
@@ -157,16 +139,16 @@ export function CinemaDetails() {
         <div className="min-w-0">
           <section aria-labelledby="cin-showtimes">
             <RuleHeading id="cin-showtimes" className="mb-5">
-              Showtimes
+              {t('cinemaDetails.showtimes')}
             </RuleHeading>
             <DateStrip value={date} onChange={setDate} className="mb-5" />
             <p className="eyebrow mb-4">{longDayLabel(date)}</p>
 
             {byMovie.length === 0 ? (
               <EmptyState
-                title="Nothing scheduled"
-            variant="schedule"
-                body={`${cinema.name} has no screenings listed for this date in the sample programme. Try another day on the strip above.`}
+                title={t('cinemaDetails.nothingScheduledTitle')}
+                variant="schedule"
+                body={t('cinemaDetails.nothingScheduledBody', { cinema: cinema.name })}
               />
             ) : (
               <ul className="divide-y divide-hairline border-y border-hairline">
@@ -179,7 +161,7 @@ export function CinemaDetails() {
                       >
                         {movie.title}
                       </Link>
-                      <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-ink-muted">
+                      <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-content-muted">
                         <CertificateChip code={movie.certificate} />
                         <span className="numeral">{formatRuntime(movie.runtimeMinutes)}</span>
                         <span aria-hidden="true">·</span>
@@ -202,7 +184,7 @@ export function CinemaDetails() {
             )}
 
             <DemoNote className="mt-5" tone="loud">
-              Sample schedule generated locally. Not a real listing for any cinema.
+              {t('cinemaDetails.sampleSchedule')}
             </DemoNote>
 
             <div className="mt-8 border-t border-hairline pt-6">
@@ -212,7 +194,7 @@ export function CinemaDetails() {
 
           <section aria-labelledby="cin-access" className="mt-14">
             <RuleHeading id="cin-access" className="mb-5">
-              Access
+              {t('cinemaDetails.access')}
             </RuleHeading>
             <ul className="space-y-2.5">
               {cinema.accessibility.map((feature) => (
@@ -222,27 +204,33 @@ export function CinemaDetails() {
                 </li>
               ))}
             </ul>
-            <p className="mt-5 max-w-prose text-[0.9375rem] leading-7 text-ink-muted">
-              Wheelchair spaces appear on the seat map with their own marker and are always charged at
-              the regular seat rate. If you need something that is not listed here, call the house on{' '}
-              <a href={telUrl(cinema.phone)} className="font-semibold underline underline-offset-4">
-                {cinema.phone}
-              </a>{' '}
-              — this site cannot arrange it for you.
+            <p className="mt-5 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
+              <Trans
+                i18nKey="cinemaDetails.accessNote"
+                values={{ phone: cinema.phone }}
+                components={{
+                  phone: (
+                    <a
+                      href={telUrl(cinema.phone)}
+                      className="font-semibold underline underline-offset-4"
+                    />
+                  ),
+                }}
+              />
             </p>
           </section>
 
           <section aria-labelledby="cin-getting" className="mt-14">
             <RuleHeading id="cin-getting" className="mb-5">
-              Getting here
+              {t('cinemaDetails.gettingHere')}
             </RuleHeading>
-            <div className="space-y-5 text-[0.9375rem] leading-7 text-ink-muted">
+            <div className="space-y-5 text-[0.9375rem] leading-7 text-content-muted">
               <div>
-                <h3 className="mb-1 font-semibold text-ink">Transport</h3>
+                <h3 className="mb-1 font-semibold text-content">{t('cinemaDetails.transport')}</h3>
                 <p className="max-w-prose">{cinema.transportNote}</p>
               </div>
               <div>
-                <h3 className="mb-1 font-semibold text-ink">Parking</h3>
+                <h3 className="mb-1 font-semibold text-content">{t('cinemaDetails.parking')}</h3>
                 <p className="max-w-prose">{cinema.parkingNote}</p>
               </div>
             </div>
@@ -250,36 +238,37 @@ export function CinemaDetails() {
 
           <section aria-labelledby="cin-policies" className="mt-14">
             <RuleHeading id="cin-policies" className="mb-5">
-              House policies
+              {t('cinemaDetails.housePolicies')}
             </RuleHeading>
-            <div className="space-y-6 text-[0.9375rem] leading-7 text-ink-muted">
+            <div className="space-y-6 text-[0.9375rem] leading-7 text-content-muted">
               <div>
-                <h3 className="mb-1 font-semibold text-ink">Arriving late</h3>
+                <h3 className="mb-1 font-semibold text-content">{t('cinemaDetails.arrivingLate')}</h3>
                 <p className="max-w-prose">{cinema.lateArrivalPolicy}</p>
               </div>
               <div id="lost-found" className="scroll-mt-24">
-                <h3 className="mb-1 font-semibold text-ink">Lost property</h3>
+                <h3 className="mb-1 font-semibold text-content">{t('cinemaDetails.lostProperty')}</h3>
                 <p className="max-w-prose">
-                  Items found in this house are kept for {cinema.lostAndFound.holdingPeriodDays} days.
-                  The lost property desk is open {cinema.lostAndFound.hours}.
+                  {t('cinemaDetails.lostPropertyBody', {
+                    days: cinema.lostAndFound.holdingPeriodDays,
+                    hours: cinema.lostAndFound.hours,
+                  })}
                 </p>
                 <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
                   <a
                     href={`mailto:${cinema.lostAndFound.email}`}
-                    className="break-all font-semibold text-ink underline underline-offset-4"
+                    className="break-all font-semibold text-content underline underline-offset-4"
                   >
                     {cinema.lostAndFound.email}
                   </a>
                   <a
                     href={telUrl(cinema.lostAndFound.phone)}
-                    className="font-semibold text-ink underline underline-offset-4"
+                    className="font-semibold text-content underline underline-offset-4"
                   >
                     {cinema.lostAndFound.phone}
                   </a>
                 </p>
                 <p className="mt-2 max-w-prose text-[0.875rem]">
-                  Max can assemble a lost-item report with your booking, screen and seat already
-                  filled in — you then send it yourself using the details above.
+                  {t('cinemaDetails.lostPropertyMax')}
                 </p>
               </div>
             </div>
@@ -289,7 +278,7 @@ export function CinemaDetails() {
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           <section aria-labelledby="cin-houses" className="border border-hairline-strong p-5">
             <h2 id="cin-houses" className="eyebrow mb-4">
-              The houses
+              {t('cinemaDetails.theHouses')}
             </h2>
             <HouseDiagram screens={cinema.screens} />
             <ul className="mt-5 space-y-3 border-t border-hairline pt-4">
@@ -297,7 +286,7 @@ export function CinemaDetails() {
                 <li key={screen.id}>
                   <p className="text-sm font-semibold">
                     {screen.name}{' '}
-                    <span className="font-normal text-ink-muted">— {formatLabels[screen.format]}</span>
+                    <span className="font-normal text-content-muted">— {formatLabels[screen.format]}</span>
                   </p>
                   <AccessibilityChips features={screen.accessibility} size="sm" className="mt-1.5" />
                 </li>
@@ -307,7 +296,7 @@ export function CinemaDetails() {
 
           <section aria-labelledby="cin-amenities" className="mt-6 border border-hairline-strong p-5">
             <h2 id="cin-amenities" className="eyebrow mb-3">
-              Amenities
+              {t('cinemaDetails.amenities')}
             </h2>
             <div className="flex flex-wrap gap-1.5">
               {cinema.amenities.map((amenity) => (

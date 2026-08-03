@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Nokshi Cinemas — a local, frontend-only movie discovery and ticket-booking demonstration with Max, an on-device booking concierge.",
+  "description": "Nokshi Cinemas \u2014 a local, frontend-only movie discovery and ticket-booking demonstration with Max, an on-device booking concierge.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,10 +13,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:assets": "node scripts/check-assets.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run validate:content && npm run check:assets && npm run test && npm run build && npm run check:classes",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run validate:content && npm run check:assets && npm run check:i18n && npm run check:untranslated && npm run test && npm run build && npm run check:classes",
     "check:classes": "node scripts/check-classes.mjs",
     "test:e2e": "playwright test",
-    "validate:content": "node scripts/validate-content.mjs"
+    "validate:content": "node scripts/validate-content.mjs",
+    "check:untranslated": "node scripts/check-untranslated.mjs"
   },
   "dependencies": {
     "@fontsource-variable/anek-bangla": "^5.2.5",
@@ -40,11 +42,13 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.15.0",
+    "i18next": "^26.3.6",
     "lucide-react": "^0.469.0",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
+    "react-i18next": "^17.0.11",
     "react-router-dom": "^6.28.1",
     "tailwind-merge": "^2.6.0",
     "zod": "^3.24.1",

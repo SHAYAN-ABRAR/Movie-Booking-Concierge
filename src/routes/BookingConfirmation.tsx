@@ -20,10 +20,12 @@ import {
   screeningStart,
   timeFromMinutes,
 } from '@/lib/datetime';
-import { money, pluralise, seatRanges } from '@/lib/format';
+import { money, seatRanges } from '@/lib/format';
 import { buildIcs, downloadUrl, mapUrl } from '@/lib/external';
+import { useTranslation } from 'react-i18next';
 
 export function BookingConfirmation() {
+  const { t } = useTranslation();
   const { bookingId } = useParams<{ bookingId: string }>();
   const [, setParams] = useSearchParams();
   const motionPrefs = useMotionPreferences();
@@ -43,21 +45,19 @@ export function BookingConfirmation() {
     return (
       <div className="shell py-16">
         <div className="max-w-2xl">
-          <p className="eyebrow mb-4">Not found on this device</p>
+          <p className="eyebrow mb-4">{t('confirmation.notFoundEyebrow')}</p>
           <h1 className="font-display text-[2.5rem] leading-[1] tracking-[-0.03em] sm:text-[3.5rem]">
-            We have no booking with that reference.
+            {t('confirmation.notFoundTitle')}
           </h1>
-          <p className="mt-5 text-[1.0625rem] leading-7 text-ink-muted">
-            Bookings in this demonstration are stored in the browser that made them. If you booked in
-            a different browser, on another device, or since cleared your browsing data, there is
-            nothing here to show — and no server to look it up on.
+          <p className="mt-5 text-[1.0625rem] leading-7 text-content-muted">
+            {t('confirmation.notFoundBody')}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild>
-              <Link to="/bookings">See bookings on this device</Link>
+              <Link to="/bookings">{t('confirmation.seeBookings')}</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/showtimes">Book a screening</Link>
+              <Link to="/showtimes">{t('confirmation.bookAScreening')}</Link>
             </Button>
           </div>
         </div>
@@ -115,9 +115,9 @@ export function BookingConfirmation() {
         <h1 className="font-display text-[2.25rem] leading-[1.02] tracking-[-0.03em] sm:text-[3rem]">
           You're booked for {booking.movieTitle}.
         </h1>
-        <p className="mt-4 text-[1.0625rem] leading-7 text-ink-muted">
+        <p className="mt-4 text-[1.0625rem] leading-7 text-content-muted">
           Your reference is{' '}
-          <span className="font-mono font-semibold tracking-[0.06em] text-ink">
+          <span className="font-mono font-semibold tracking-[0.06em] text-content">
             {booking.reference}
           </span>
           . It is saved in this browser and shown on the ticket below.
@@ -136,7 +136,7 @@ export function BookingConfirmation() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={motionPrefs.reduced ? { duration: 0 } : { duration: 0.55, ease: ease.entrance }}
       >
-        <div className="auditorium relative overflow-hidden border-2 border-ink">
+        <div className="auditorium relative overflow-hidden border-2 border-content">
           {/* One pass of projected light across the stock. */}
           {!motionPrefs.reduced ? (
             <m.span
@@ -150,7 +150,7 @@ export function BookingConfirmation() {
           ) : null}
 
           {/* Perforated top edge */}
-          <div aria-hidden="true" className="sprocket-t h-3 bg-ink" />
+          <div aria-hidden="true" className="sprocket-t h-3 bg-content" />
 
           <div className="grid gap-0 sm:grid-cols-[1fr_auto]">
             <div className="p-6 sm:p-8">
@@ -239,6 +239,9 @@ export function BookingConfirmation() {
                   motionPrefs.reduced ? { duration: 0 } : { duration: 0.4, delay: 0.62 }
                 }
               >
+                {/* Raw `paper`, deliberately, in both themes and in print: a QR
+                    code is only scannable as dark modules on a light field. The
+                    `bgColor`/`fgColor` below are fixed for the same reason. */}
                 <div className="bg-paper p-2.5">
                   <QRCodeSVG
                     value={booking.reference}
@@ -246,27 +249,26 @@ export function BookingConfirmation() {
                     level="M"
                     bgColor="#f4f1ea"
                     fgColor="#14161f"
-                    title={`Booking reference ${booking.reference}`}
+                    title={t('confirmation.reference', { reference: booking.reference })}
                   />
                 </div>
                 <p className="numeral mt-3 font-mono text-lg font-semibold tracking-[0.08em] text-house-ink">
                   {booking.reference}
                 </p>
                 <p className="mt-1 text-center text-[0.6875rem] leading-4 text-house-faint">
-                  The code contains this reference and nothing else — no name, contact details or
-                  payment information.
+                  {t('confirmation.qrNote')}
                 </p>
                 <p className="mt-4 border border-marigold px-2 py-1 text-center text-[0.625rem] font-bold uppercase tracking-[0.1em] text-marigold-lit">
-                  Demonstration ticket
+                  {t('confirmation.demoTicket')}
                   <span className="block font-normal normal-case tracking-normal">
-                    Not valid for entry
+                    {t('confirmation.notValid')}
                   </span>
                 </p>
               </m.div>
             </div>
           </div>
 
-          <div aria-hidden="true" className="sprocket-b h-3 bg-ink" />
+          <div aria-hidden="true" className="sprocket-b h-3 bg-content" />
         </div>
       </m.div>
 
@@ -274,15 +276,15 @@ export function BookingConfirmation() {
       <div data-print="hide" className="mt-8 flex max-w-3xl flex-wrap gap-3">
         <Button onClick={() => window.print()}>
           <Printer aria-hidden="true" />
-          Print or save as PDF
+          {t('confirmation.print')}
         </Button>
         <Button variant="outline" onClick={addToCalendar}>
           <CalendarPlus aria-hidden="true" />
-          Add to calendar
+          {t('confirmation.addToCalendar')}
         </Button>
         <Button variant="outline" onClick={() => setParams({ max: 'open' })}>
           <MessageSquare aria-hidden="true" />
-          Ask Max about this booking
+          {t('confirmation.askMax')}
         </Button>
       </div>
 
@@ -290,13 +292,13 @@ export function BookingConfirmation() {
       <div data-print="hide" className="mt-12 grid max-w-4xl gap-8 sm:grid-cols-2">
         <section aria-labelledby="next-heading">
           <h2 id="next-heading" className="eyebrow mb-4 border-b border-hairline pb-2">
-            On the day
+            {t('confirmation.onTheDay')}
           </h2>
-          <ul className="space-y-3 text-[0.9375rem] leading-7 text-ink-muted">
+          <ul className="space-y-3 text-[0.9375rem] leading-7 text-content-muted">
             <li className="flex gap-2.5">
               <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-marigold" />
               <span>
-                Arrive by <span className="numeral font-semibold text-ink">{displayTime(arriveBy)}</span>{' '}
+                Arrive by <span className="numeral font-semibold text-content">{displayTime(arriveBy)}</span>{' '}
                 for tickets, the counter and finding your seat.
               </span>
             </li>
@@ -315,7 +317,7 @@ export function BookingConfirmation() {
                       href={mapUrl(cinema.mapQuery)}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="font-semibold text-ink underline underline-offset-4"
+                      className="font-semibold text-content underline underline-offset-4"
                     >
                       Directions to {cinema.shortName}
                     </a>{' '}
@@ -325,7 +327,7 @@ export function BookingConfirmation() {
                   // The venue is no longer in the programme; the ticket still
                   // knows where it was, so print that rather than nothing.
                   <>
-                    <span className="font-semibold text-ink">{booking.cinemaName}</span>
+                    <span className="font-semibold text-content">{booking.cinemaName}</span>
                     {booking.cinemaAddress ? ` — ${booking.cinemaAddress}.` : '.'}
                   </>
                 )}
@@ -336,25 +338,25 @@ export function BookingConfirmation() {
 
         <section aria-labelledby="cost-heading">
           <h2 id="cost-heading" className="eyebrow mb-4 border-b border-hairline pb-2">
-            What you paid
+            {t('confirmation.whatYouPaid')}
           </h2>
           <dl>
-            <DataRow label={pluralise(booking.seats.length, 'ticket')}>
+            <DataRow label={t('confirmation.tickets', { count: booking.seats.length })}>
               {money(booking.ticketSubtotal)}
             </DataRow>
             {booking.concessions.length > 0 ? (
-              <DataRow label="Add-ons">{money(booking.concessionSubtotal)}</DataRow>
+              <DataRow label={t('confirmation.addOns')}>{money(booking.concessionSubtotal)}</DataRow>
             ) : null}
             {booking.insurance ? (
               <DataRow label={insurancePolicy.name}>{money(booking.insuranceFee)}</DataRow>
             ) : null}
-            <DataRow label="Booking fee">{money(booking.bookingFee)}</DataRow>
-            <DataRow label="Total" emphasis>
+            <DataRow label={t('confirmation.bookingFee')}>{money(booking.bookingFee)}</DataRow>
+            <DataRow label={t('confirmation.total')} emphasis>
               {money(booking.total)}
             </DataRow>
           </dl>
-          <p className="mt-3 text-[0.8125rem] leading-6 text-ink-muted">
-            No payment was actually taken. This is a record of what the booking would have cost.
+          <p className="mt-3 text-[0.8125rem] leading-6 text-content-muted">
+            {t('confirmation.noPaymentNote')}
           </p>
         </section>
       </div>
@@ -363,24 +365,22 @@ export function BookingConfirmation() {
         <Button asChild variant="outline">
           <Link to="/bookings">
             <Ticket aria-hidden="true" />
-            My bookings
+            {t('nav.myBookings')}
           </Link>
         </Button>
         <Button asChild variant="outline">
-          <Link to="/movies">Book another film</Link>
+          <Link to="/movies">{t('confirmation.bookAnother')}</Link>
         </Button>
         <Button asChild variant="ghost">
           <Link to="/">
             <Home aria-hidden="true" />
-            Home
+            {t('errors.home')}
           </Link>
         </Button>
       </div>
 
       <DemoNote className="mt-8 max-w-3xl" tone="loud">
-        This ticket is part of a demonstration build. No payment was taken, no cinema has been
-        notified, and the ticket admits you nowhere. The booking exists only in this browser's local
-        storage and will be lost if you clear your browsing data.
+        {t('confirmation.demoNote')}
       </DemoNote>
     </div>
   );

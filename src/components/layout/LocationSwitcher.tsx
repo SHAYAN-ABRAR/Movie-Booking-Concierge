@@ -1,4 +1,5 @@
 import { MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cinemas, cities } from '@/data';
 import { usePreferences } from '@/store/preferences';
 import {
@@ -20,6 +21,7 @@ const ALL = '__all__';
  * all read from.
  */
 export function LocationSwitcher({ fullWidth = false }: { fullWidth?: boolean }) {
+  const { t } = useTranslation();
   const cinemaId = usePreferences((s) => s.cinemaId);
   const setCinema = usePreferences((s) => s.setCinema);
 
@@ -29,17 +31,17 @@ export function LocationSwitcher({ fullWidth = false }: { fullWidth?: boolean })
       onValueChange={(value) => setCinema(value === ALL ? null : value)}
     >
       <SelectTrigger
-        aria-label="Choose your cinema"
+        aria-label={t('location.label')}
         className={cn(
           'h-9 gap-1.5 border-transparent bg-transparent px-2 text-[0.8125rem] font-semibold hover:border-hairline-strong',
           fullWidth ? 'w-full' : 'w-auto max-w-52',
         )}
       >
         <MapPin className="size-4 shrink-0 opacity-60" aria-hidden="true" />
-        <SelectValue placeholder="All cinemas" />
+        <SelectValue placeholder={t('location.all')} />
       </SelectTrigger>
       <SelectContent className="min-w-60">
-        <SelectItem value={ALL}>All cinemas</SelectItem>
+        <SelectItem value={ALL}>{t('location.all')}</SelectItem>
         {cities.map((city) => (
           <SelectGroup key={city}>
             <SelectLabel>{city}</SelectLabel>

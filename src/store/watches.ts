@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { hashString } from '@/lib/deterministic';
+import { i18next } from '@/i18n';
 
 /**
  * Local demonstration alerts.
@@ -17,19 +18,33 @@ import { hashString } from '@/lib/deterministic';
 
 export type WatchKind = 'price-drop' | 'premium-seat' | 'adjacent-seats' | 'accessible-seat';
 
-export const watchKindLabels: Record<WatchKind, string> = {
-  'price-drop': 'Price drop',
-  'premium-seat': 'Premium seat opening',
-  'adjacent-seats': 'Seats together',
-  'accessible-seat': 'Accessible seat opening',
-};
+/**
+ * Translation keys rather than words. The store is not a React component and
+ * has no business holding display copy in one language; every consumer of these
+ * is a component with a `t()` to hand.
+ */
+export const watchKindKeys = {
+  'price-drop': 'alerts.kinds.priceDrop',
+  'premium-seat': 'alerts.kinds.premiumSeat',
+  'adjacent-seats': 'alerts.kinds.adjacentSeats',
+  'accessible-seat': 'alerts.kinds.accessibleSeat',
+} as const satisfies Record<WatchKind, string>;
 
-export const watchKindBlurbs: Record<WatchKind, string> = {
-  'price-drop': 'Tells you if the sample price for this screening goes down.',
-  'premium-seat': 'Tells you if a premium or recliner seat frees up.',
-  'adjacent-seats': 'Tells you if enough seats together come back into the map.',
-  'accessible-seat': 'Tells you if a wheelchair space or companion seat frees up.',
-};
+/**
+ * The translated label, for the non-React callers — Max's executor and skills
+ * build reply text in plain functions and have no `t()` to hand. Components
+ * should use `t(watchKindKeys[kind])` so they re-render on a language change.
+ */
+export function watchKindLabel(kind: WatchKind): string {
+  return i18next.t(watchKindKeys[kind]);
+}
+
+export const watchKindBlurbKeys = {
+  'price-drop': 'alerts.blurbs.priceDrop',
+  'premium-seat': 'alerts.blurbs.premiumSeat',
+  'adjacent-seats': 'alerts.blurbs.adjacentSeats',
+  'accessible-seat': 'alerts.blurbs.accessibleSeat',
+} as const satisfies Record<WatchKind, string>;
 
 export interface Watch {
   id: string;

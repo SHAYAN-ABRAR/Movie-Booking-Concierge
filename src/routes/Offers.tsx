@@ -5,16 +5,27 @@ import { Badge, DemoNote } from '@/components/ui/misc';
 import { OfferComposition } from '@/components/visual/OfferComposition';
 import { Reveal } from '@/motion';
 import { cinemaById, offers } from '@/data';
+import { useTranslation } from 'react-i18next';
 
-const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+/** Indexed by `Date#getDay()`, so Sunday is 0 — the order is not cosmetic. */
+const dayKeys = [
+  'offers.days.sunday',
+  'offers.days.monday',
+  'offers.days.tuesday',
+  'offers.days.wednesday',
+  'offers.days.thursday',
+  'offers.days.friday',
+  'offers.days.saturday',
+] as const;
 
 export function Offers() {
+  const { t } = useTranslation();
   return (
     <div className="shell">
       <PageHeader
-        eyebrow="Running now"
-        title="Offers"
-        lede="Five standing offers. None of them needs a code, and none of them is a partnership — every one is applied by the booking flow from what is already in your basket."
+        eyebrow={t('offers.eyebrow')}
+        title={t('offers.title')}
+        lede={t('offers.lede')}
       />
 
       <ul className="space-y-14 py-10">
@@ -27,7 +38,7 @@ export function Offers() {
                 <div className="flex items-baseline gap-4">
                   <span
                     aria-hidden="true"
-                    className="numeral font-display text-3xl leading-none text-ink/25"
+                    className="numeral font-display text-3xl leading-none text-content/25"
                   >
                     {String(index + 1).padStart(2, '0')}
                   </span>
@@ -35,7 +46,7 @@ export function Offers() {
                     <h2 className="font-display text-[1.75rem] leading-tight tracking-[-0.025em] sm:text-[2.25rem]">
                       {offer.title}
                     </h2>
-                    <p lang="bn" className="mt-1 text-base text-ink-muted">
+                    <p lang="bn" className="mt-1 text-base text-content-muted">
                       {offer.titleBn}
                     </p>
                   </div>
@@ -43,22 +54,22 @@ export function Offers() {
 
                 <p className="mt-5 max-w-prose font-display text-xl leading-[1.4]">{offer.summary}</p>
 
-                <p className="mt-4 max-w-prose text-[0.9375rem] leading-7 text-ink-muted">
+                <p className="mt-4 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
                   {offer.detail}
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-1.5">
                   {offer.days.length === 0 ? (
-                    <Badge tone="ink">Every day</Badge>
+                    <Badge tone="ink">{t('offers.everyDay')}</Badge>
                   ) : (
                     offer.days.map((day) => (
                       <Badge key={day} tone="ink">
-                        {dayNames[day]}
+                        {t(dayKeys[day]!)}
                       </Badge>
                     ))
                   )}
                   {offer.cinemaIds === 'all' ? (
-                    <Badge tone="outline">All cinemas</Badge>
+                    <Badge tone="outline">{t('offers.allCinemas')}</Badge>
                   ) : (
                     offer.cinemaIds.map((id) => (
                       <Badge key={id} tone="outline">
@@ -69,17 +80,17 @@ export function Offers() {
                 </div>
 
                 <div className="mt-6 border-t border-hairline pt-4">
-                  <h3 className="eyebrow mb-2.5">How it is applied</h3>
-                  <p className="max-w-prose text-[0.9375rem] leading-7 text-ink-muted">
+                  <h3 className="eyebrow mb-2.5">{t('offers.howApplied')}</h3>
+                  <p className="max-w-prose text-[0.9375rem] leading-7 text-content-muted">
                     {offer.mechanic}
                   </p>
                 </div>
 
                 <div className="mt-5 border-t border-hairline pt-4">
-                  <h3 className="eyebrow mb-2.5">Terms</h3>
+                  <h3 className="eyebrow mb-2.5">{t('offers.terms')}</h3>
                   <ul className="max-w-prose space-y-1.5">
                     {offer.terms.map((term) => (
-                      <li key={term} className="flex gap-2.5 text-[0.875rem] leading-6 text-ink-muted">
+                      <li key={term} className="flex gap-2.5 text-[0.875rem] leading-6 text-content-muted">
                         <span aria-hidden="true" className="mt-[0.6em] block size-1 shrink-0 bg-marigold" />
                         {term}
                       </li>
@@ -96,11 +107,11 @@ export function Offers() {
                           : `/showtimes?cinema=${offer.cinemaIds[0]}`
                       }
                     >
-                      Find a screening
+                      {t('offers.findScreening')}
                     </Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <Link to="/ticket-prices">How pricing works</Link>
+                    <Link to="/ticket-prices">{t('offers.howPricingWorks')}</Link>
                   </Button>
                 </div>
               </div>
@@ -121,9 +132,7 @@ export function Offers() {
       </ul>
 
       <DemoNote className="mb-10" tone="loud">
-        Sample promotional data written for this demonstration. These offers are not available at any
-        real cinema, there are no partner relationships behind them, and the discounts described are
-        illustrative only.
+        {t('offers.demoNote')}
       </DemoNote>
     </div>
   );

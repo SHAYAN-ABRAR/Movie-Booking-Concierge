@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { EyeOff, Mail, Phone, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/misc';
@@ -7,7 +8,6 @@ import {
   accessibilityLabels,
   cinemaById,
   concessionById,
-  formatLabels,
   movieById,
 } from '@/data';
 import { getShowtime, availabilityFor, screenFor } from '@/data/schedule';
@@ -16,7 +16,8 @@ import { dayLabel, displayTime, formatRuntime } from '@/lib/datetime';
 import { money, seatRanges } from '@/lib/format';
 import { telUrl } from '@/lib/external';
 import { useBookings } from '@/store/bookings';
-import { useWatches, watchKindLabels } from '@/store/watches';
+import { useWatches, watchKindKeys } from '@/store/watches';
+import { formatKeys } from '@/i18n/domain';
 import type { MaxBlock } from '@/max/types';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +30,7 @@ import { cn } from '@/lib/utils';
  */
 
 function ShowtimeLine({ id, showCinema }: { id: string; showCinema?: boolean }) {
+  const { t } = useTranslation();
   const showtime = getShowtime(id);
   if (!showtime) return null;
 
@@ -45,19 +47,21 @@ function ShowtimeLine({ id, showCinema }: { id: string; showCinema?: boolean }) 
           {displayTime(showtime.time)}
         </span>
         <span className="numeral shrink-0 text-[0.75rem] text-content-muted">
-          {soldOut ? 'Sold out' : `from ${money(price.min)}`}
+          {soldOut
+            ? t('showtime.availability.soldOut')
+            : t('showtime.fromPrice', { price: money(price.min) })}
         </span>
       </span>
       <span className="mt-1 block truncate text-[0.8125rem] text-content-muted">
         {movie?.title}
         {showCinema && cinema ? ` · ${cinema.shortName}` : ''}
-        {` · ${formatLabels[showtime.format]}`}
+        {` · ${t(formatKeys[showtime.format])}`}
       </span>
       <span className="mt-0.5 block text-[0.6875rem] text-content-faint">
         {dayLabel(showtime.date)}
         {' · '}
         {screenFor(showtime)?.name}
-        {!soldOut ? ` · ${availability.available} seats left` : ''}
+        {!soldOut ? ` · ${t('showtime.seatsLeft', { count: availability.available })}` : ''}
         {showtime.accessibility.length
           ? ` · ${showtime.accessibility.map((a) => accessibilityLabels[a]).join(', ')}`
           : ''}
@@ -82,6 +86,7 @@ function ShowtimeLine({ id, showCinema }: { id: string; showCinema?: boolean }) 
 }
 
 function Spoiler({ summary, detail }: { summary: string; detail: string }) {
+  const { t } = useTranslation();
   const [revealed, setRevealed] = useState(false);
 
   return (
@@ -97,11 +102,10 @@ function Spoiler({ summary, detail }: { summary: string; detail: string }) {
       ) : (
         <>
           <p className="mt-1 text-[0.75rem] leading-5 text-content-faint">
-            This describes what is on screen at those moments. Reveal only if you do not mind a
-            light spoiler.
+            {t('max.spoilerNote')}
           </p>
           <Button variant="outline" size="sm" className="mt-2" onClick={() => setRevealed(true)}>
-            Reveal
+            {t('max.reveal')}
           </Button>
         </>
       )}
@@ -110,6 +114,7 @@ function Spoiler({ summary, detail }: { summary: string; detail: string }) {
 }
 
 export function MaxBlocks({ blocks }: { blocks: MaxBlock[] }) {
+  const { t } = useTranslation();
   const bookings = useBookings((s) => s.bookings);
   const watches = useWatches((s) => s.watches);
   const removeWatch = useWatches((s) => s.removeWatch);
@@ -321,7 +326,7 @@ export function MaxBlocks({ blocks }: { blocks: MaxBlock[] }) {
                       className="flex items-start justify-between gap-2 border border-hairline-strong bg-surface-raised p-2.5"
                     >
                       <span className="min-w-0">
-                        <span className="eyebrow block">{watchKindLabels[watch.kind]}</span>
+                        <span className="eyebrow block">{t(watchKindKeys[watch.kind])}</span>
                         <span className="mt-0.5 block truncate text-[0.8125rem]">
                           {movie?.title} · {dayLabel(watch.date)} {displayTime(watch.time)}
                         </span>
@@ -329,7 +334,7 @@ export function MaxBlocks({ blocks }: { blocks: MaxBlock[] }) {
                       <Button
                         variant="ghost"
                         size="icon-sm"
-                        aria-label="Remove this alert"
+                        aria-label={t('max.removeAlert')}
                         onClick={() => removeWatch(id)}
                       >
                         <X aria-hidden="true" />

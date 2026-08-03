@@ -1,17 +1,20 @@
+import { useTranslation } from 'react-i18next';
 import { Accessibility, AudioLines, Captions, Ear, Sparkle, Subtitles } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/misc';
 import { InfoTip } from '@/components/ui/popover';
-import { accessibilityBlurbs, accessibilityLabels, formatLabels, languageLabels } from '@/data';
-import { certificates } from '@/data/pricing';
+import { accessibilityBlurbKeys, accessibilityKeys } from '@/i18n/domain';
+import { formatKeys, languageKeys } from '@/i18n/domain';
+import { certificateGuidance, certificateShort } from '@/i18n/domain';
 import type { CertificateCode, Format, Language, ScreeningAccessibility } from '@/data/types';
 import { cn } from '@/lib/utils';
 
 export function CertificateChip({ code, className }: { code: CertificateCode; className?: string }) {
-  const certificate = certificates[code];
-  const short = certificate.label.split('—')[0]?.trim() ?? code;
+  useTranslation();
+  const short = certificateShort(code);
+  const guidance = certificateGuidance(code);
   return (
-    <InfoTip label={certificate.guidance}>
+    <InfoTip label={guidance}>
       <span
         className={cn(
           'inline-flex cursor-help items-center border border-current px-1.5 py-0.5',
@@ -21,24 +24,26 @@ export function CertificateChip({ code, className }: { code: CertificateCode; cl
         )}
       >
         {short}
-        <span className="sr-only"> — {certificate.guidance}</span>
+        <span className="sr-only"> — {guidance}</span>
       </span>
     </InfoTip>
   );
 }
 
 export function FormatChip({ format, className }: { format: Format; className?: string }) {
+  const { t } = useTranslation();
   return (
     <Badge tone={format === 'standard' ? 'neutral' : 'accent'} className={className}>
-      {formatLabels[format]}
+      {t(formatKeys[format])}
     </Badge>
   );
 }
 
 export function LanguageChip({ language, className }: { language: Language; className?: string }) {
+  const { t } = useTranslation();
   return (
     <Badge tone="outline" className={className}>
-      {languageLabels[language]}
+      {t(languageKeys[language])}
     </Badge>
   );
 }
@@ -79,6 +84,7 @@ export function AccessibilityChips({
   className?: string;
   size?: 'sm' | 'md';
 }) {
+  const { t } = useTranslation();
   if (features.length === 0) return null;
 
   return (
@@ -87,7 +93,9 @@ export function AccessibilityChips({
         const Icon = accessibilityIcons[feature];
         return (
           <li key={feature}>
-            <InfoTip label={`${accessibilityLabels[feature]} — ${accessibilityBlurbs[feature]}`}>
+            <InfoTip
+              label={`${t(accessibilityKeys[feature])} — ${t(accessibilityBlurbKeys[feature])}`}
+            >
               <span
                 className={cn(
                   'inline-flex cursor-help items-center gap-1 border border-hairline-strong bg-surface-raised px-1 font-semibold text-content-muted',
@@ -96,7 +104,7 @@ export function AccessibilityChips({
               >
                 <Icon aria-hidden="true" className={size === 'sm' ? 'size-3' : 'size-3.5'} />
                 <span aria-hidden="true">{accessibilityCodes[feature]}</span>
-                <span className="sr-only">{accessibilityLabels[feature]}</span>
+                <span className="sr-only">{t(accessibilityKeys[feature])}</span>
               </span>
             </InfoTip>
           </li>
@@ -108,16 +116,17 @@ export function AccessibilityChips({
 
 /** The legend that explains the codes above. Shown once per page that uses them. */
 export function AccessibilityLegend({ className }: { className?: string }) {
+  const { t } = useTranslation();
   return (
     <div className={cn('text-[0.8125rem] leading-6 text-content-muted', className)}>
-      <h3 className="eyebrow mb-2">Screening markers</h3>
+      <h3 className="eyebrow mb-2">{t('markers.heading')}</h3>
       <dl className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
         {(Object.keys(accessibilityCodes) as ScreeningAccessibility[]).map((feature) => (
           <div key={feature} className="flex gap-2">
             <dt className="w-7 shrink-0 font-semibold text-content">{accessibilityCodes[feature]}</dt>
             <dd>
-              <span className="font-medium text-content">{accessibilityLabels[feature]}</span> —{' '}
-              {accessibilityBlurbs[feature]}
+              <span className="font-medium text-content">{t(accessibilityKeys[feature])}</span> —{' '}
+              {t(accessibilityBlurbKeys[feature])}
             </dd>
           </div>
         ))}

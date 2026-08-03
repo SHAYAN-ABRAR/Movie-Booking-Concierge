@@ -27,6 +27,7 @@ import { dateWindow, dayLabel, displayTime } from '@/lib/datetime';
 import { usePreferences } from '@/store/preferences';
 import { money } from '@/lib/format';
 import { adultPriceRange } from '@/lib/bookingMath';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Quick booking.
@@ -37,6 +38,7 @@ import { adultPriceRange } from '@/lib/bookingMath';
  * it is disabled instead of simply being dead.
  */
 export function QuickBook() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const motion = useMotionPreferences();
   const preferredCinema = usePreferences((s) => s.cinemaId);
@@ -102,9 +104,9 @@ export function QuickBook() {
     <section aria-labelledby="quick-book-heading">
       <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 id="quick-book-heading" className="font-display text-xl leading-none tracking-[-0.02em]">
-          Book in four steps
+          {t('quickBook.heading')}
         </h2>
-        <span className="eyebrow">No account needed · guest checkout</span>
+        <span className="eyebrow">{t('quickBook.noAccount')}</span>
       </div>
 
       {/* Four dependent fields on one line. Each completed field lights its
@@ -190,24 +192,24 @@ export function QuickBook() {
       </div>
 
       <div className="mt-5 flex flex-col gap-3 border-t border-hairline pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-ink-muted" aria-live="polite">
+        <p className="text-sm text-content-muted" aria-live="polite">
           {chosenShowtime ? (
             <>
               Tickets from{' '}
               <AnimatedNumber
                 value={adultPriceRange(chosenShowtime).min}
                 format={(n) => money(n)}
-                className="font-semibold text-ink"
+                className="font-semibold text-content"
               />{' '}
               ·{' '}
               <AnimatedNumber
                 value={availabilityFor(chosenShowtime).available}
-                className="font-semibold text-ink"
+                className="font-semibold text-content"
               />{' '}
               seats left
             </>
           ) : (
-            <span className="text-ink-muted">{disabledReason}</span>
+            <span className="text-content-muted">{disabledReason}</span>
           )}
         </p>
 
@@ -228,7 +230,7 @@ export function QuickBook() {
             size="lg"
             className="w-full sm:w-auto sm:min-w-44"
           >
-            Choose seats
+            {t('quickBook.chooseSeats')}
             <ArrowRight aria-hidden="true" />
           </Button>
         </m.div>

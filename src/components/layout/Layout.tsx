@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { TooltipProvider } from '@/components/ui/popover';
 import { SkipLink } from '@/components/common';
 import { Header } from './Header';
@@ -8,6 +9,9 @@ import { MaxDock } from '@/components/max/MaxDock';
 import { DemoAlertRunner } from '@/components/max/DemoAlertRunner';
 import { MotionProvider, PageTransition, RouteProgress } from '@/motion';
 import { AppErrorBoundary } from '@/components/common/AppErrorBoundary';
+import { usePreferenceEffects } from '@/components/preferences/usePreferenceEffects';
+import { PreferenceAnnouncer } from '@/components/preferences/PreferenceAnnouncer';
+import { useRouteTitle } from './useRouteTitle';
 
 /** Returns to the top on navigation, unless the browser is restoring a position. */
 function ScrollRestoration() {
@@ -36,6 +40,7 @@ function ScrollRestoration() {
  * user where they are without interrupting or relocating them.
  */
 function RouteAnnouncer() {
+  const { t } = useTranslation();
   const { pathname } = useLocation();
   const [message, setMessage] = useState('');
   const first = useRef(true);
@@ -49,10 +54,10 @@ function RouteAnnouncer() {
     const timer = window.setTimeout(() => {
       const heading = document.querySelector('main h1');
       const title = heading?.textContent?.trim();
-      setMessage(title ? `${title}. Page loaded.` : 'Page loaded.');
+      setMessage(title ? t('a11y.pageLoaded', { title }) : t('a11y.pageLoadedFallback'));
     }, 220);
     return () => window.clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, t]);
 
   return (
     <div aria-live="polite" aria-atomic="true" className="sr-only">
@@ -62,6 +67,25 @@ function RouteAnnouncer() {
 }
 
 export function Layout() {
+  // Keeps <html lang>, data-theme, color-scheme and the theme-colour meta in
+  // step with the store, and runs the short colour transition on an explicit
+  // toggle only.
+  usePreferenceEffects();
+
+  // `<title>`, per route, in the active language.
+  useRouteTitle();
+
+  /*
+   * Subscribing here is load-bearing beyond the strings in this file.
+   *
+   * The domain vocabularies in `@/i18n/domain` are read-through proxies rather
+   * than hooks, so the seventy-odd `genreLabels[g]`-style call sites keep
+   * working — but a proxy read is not a subscription. This `useTranslation()`
+   * is what re-renders the tree on a language change, and every route is a
+   * child of this component. `preferences.test.tsx` fails if it is removed.
+   */
+  useTranslation();
+
   const location = useLocation();
   const outlet = useOutlet();
 
@@ -75,6 +99,7 @@ export function Layout() {
       <TooltipProvider delayDuration={250} skipDelayDuration={400}>
         <ScrollRestoration />
         <RouteAnnouncer />
+        <PreferenceAnnouncer />
         <RouteProgress />
         <SkipLink />
         <div className="relative z-10 flex min-h-dvh flex-col">

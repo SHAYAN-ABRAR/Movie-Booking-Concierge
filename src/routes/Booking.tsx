@@ -38,15 +38,20 @@ import {
 } from '@/store/booking';
 import { useBookings, makeReference } from '@/store/bookings';
 import { usePreferences } from '@/store/preferences';
-import { getMovie, cinemaById, formatLabels, screenFor } from '@/data';
+import { getMovie, cinemaById, screenFor } from '@/data';
 import { getShowtime, seatMapFor } from '@/data/schedule';
 import { checkAgeCategories, quoteBooking, totalTickets } from '@/lib/bookingMath';
 import { displayTime, formatRuntime } from '@/lib/datetime';
 import { money, pluralise, seatRanges } from '@/lib/format';
 import { useAnnouncer } from '@/hooks';
 import { cn } from '@/lib/utils';
+import { Trans, useTranslation } from 'react-i18next';
+import { formatKeys } from '@/i18n/domain';
+import { useFormatters } from '@/i18n/useFormatters';
 
 export function Booking() {
+  const { t } = useTranslation();
+  const f = useFormatters();
   const { movieSlug } = useParams<{ movieSlug: string }>();
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -263,7 +268,7 @@ export function Booking() {
         </div>
         <Button variant="ghost" size="sm" onClick={() => setConfirmReset(true)}>
           <RotateCcw aria-hidden="true" />
-          Start over
+          {t('booking.startOver')}
         </Button>
       </div>
 
@@ -272,7 +277,7 @@ export function Booking() {
           per step, and a marker that travels rather than jumps. On small
           screens it collapses to a legible progress strip instead of a row of
           unreadable dots. */}
-      <nav aria-label="Booking steps" className="border-b border-hairline py-4">
+      <nav aria-label={t('booking.steps')} className="border-b border-hairline py-4">
         {/* Perforation rail */}
         <div aria-hidden="true" className="mb-2.5 flex gap-[7px]">
           {Array.from({ length: 28 }, (_, i) => (
@@ -386,11 +391,10 @@ export function Booking() {
                 {staleSeats.length === 1 ? 'is' : 'are'} no longer available
               </p>
               <p className="mt-1 text-[0.9375rem] leading-6 text-content-muted">
-                {seatRanges(staleSeats)} went while you were elsewhere in the flow. Go back to the
-                seat map and pick again.
+                {t('booking.staleSeats', { seats: seatRanges(staleSeats) })}
               </p>
               <Button size="sm" className="mt-3" onClick={() => goTo('seats')}>
-                Back to seats
+                {t('booking.backToSeats')}
               </Button>
             </div>
           ) : null}
@@ -470,10 +474,10 @@ export function Booking() {
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           <section
             aria-labelledby="booking-summary"
-            className="border-2 border-ink bg-paper-raised p-5"
+            className="border-2 border-content bg-surface-raised p-5"
           >
             <h2 id="booking-summary" className="font-display text-xl leading-none">
-              Your booking
+              {t('booking.summary')}
             </h2>
 
             {showtime && cinema ? (
@@ -483,50 +487,46 @@ export function Booking() {
                   {cinema.shortName} · {screenFor(showtime)?.name}
                 </p>
                 <p className="numeral text-content-muted">
-                  {new Date(showtime.date).toLocaleDateString('en-GB', {
-                    weekday: 'short',
-                    day: 'numeric',
-                    month: 'short',
-                  })}
+                  {f.date(showtime.date, 'weekdayDayMonth')}
                   {' · '}
                   {displayTime(showtime.time)}
                 </p>
                 <p className="text-content-muted">
-                  {formatLabels[showtime.format]} · {formatRuntime(movie.runtimeMinutes)}
+                  {t(formatKeys[showtime.format])} · {formatRuntime(movie.runtimeMinutes)}
                 </p>
               </div>
             ) : (
               <p className="mt-4 border-b border-hairline pb-4 text-[0.9375rem] text-content-muted">
-                No screening chosen yet.
+                {t('booking.noScreening')}
               </p>
             )}
 
             <dl className="mt-4">
               {ticketCount > 0 ? (
-                <DataRow label={pluralise(ticketCount, 'ticket')}>
+                <DataRow label={t('booking.tickets', { count: ticketCount })}>
                   {money(quote.ticketSubtotal)}
                 </DataRow>
               ) : null}
               {booking.seatIds.length > 0 ? (
-                <DataRow label="Seats">{seatRanges(booking.seatIds)}</DataRow>
+                <DataRow label={t('booking.seats')}>{seatRanges(booking.seatIds)}</DataRow>
               ) : null}
               {quote.concessionSubtotal > 0 ? (
-                <DataRow label="Add-ons">{money(quote.concessionSubtotal)}</DataRow>
+                <DataRow label={t('booking.addOns')}>{money(quote.concessionSubtotal)}</DataRow>
               ) : null}
               {quote.insuranceFee > 0 ? (
-                <DataRow label="Ticket Cover">{money(quote.insuranceFee)}</DataRow>
+                <DataRow label={t('booking.ticketCover')}>{money(quote.insuranceFee)}</DataRow>
               ) : null}
               {quote.bookingFee > 0 ? (
-                <DataRow label="Booking fee">{money(quote.bookingFee)}</DataRow>
+                <DataRow label={t('booking.bookingFee')}>{money(quote.bookingFee)}</DataRow>
               ) : null}
-              {method ? <DataRow label="Payment">{method.label}</DataRow> : null}
-              <DataRow label="Total" emphasis>
+              {method ? <DataRow label={t('booking.payment')}>{method.label}</DataRow> : null}
+              <DataRow label={t('booking.total')} emphasis>
                 <AnimatedNumber value={quote.total} format={(n) => money(n)} />
               </DataRow>
             </dl>
 
             <DemoNote className="mt-4">
-              Sample prices. Nothing is charged and no payment details are ever requested.
+              {t('booking.priceNote')}
             </DemoNote>
           </section>
         </aside>
@@ -535,7 +535,7 @@ export function Booking() {
       {/* ── Sticky mobile action bar ─────────────────────────────── */}
       <div
         data-print="hide"
-        className="fixed inset-x-0 bottom-0 z-30 border-t-2 border-ink bg-paper-raised/96 backdrop-blur-[6px] lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t-2 border-content bg-surface-raised/96 backdrop-blur-[6px] lg:hidden"
         style={{ paddingBottom: 'max(0.75rem, var(--safe-b))' }}
       >
         <div className="shell flex items-center gap-3 pt-3">
@@ -544,7 +544,7 @@ export function Booking() {
             size="icon"
             onClick={() => goTo(previousStep(booking.step))}
             disabled={index === 0}
-            aria-label="Back a step"
+            aria-label={t('booking.backAStep')}
           >
             <ArrowLeft aria-hidden="true" />
           </Button>
@@ -554,7 +554,12 @@ export function Booking() {
               <AnimatedNumber value={quote.total} format={(n) => money(n)} />
             </p>
             <p className="truncate text-[0.6875rem] text-content-muted">
-              {blocker ?? `${stepLabels[booking.step]} · step ${index + 1} of ${bookingSteps.length}`}
+              {blocker ??
+                t('booking.stepOf', {
+                  step: stepLabels[booking.step],
+                  index: index + 1,
+                  total: bookingSteps.length,
+                })}
             </p>
           </div>
 
@@ -565,7 +570,7 @@ export function Booking() {
               onClick={confirm}
               className="shrink-0"
             >
-              {isCompleting ? 'Saving…' : 'Confirm'}
+              {isCompleting ? t('booking.saving') : t('common.actions.confirm')}
             </Button>
           ) : (
             <Button
@@ -573,7 +578,7 @@ export function Booking() {
               onClick={() => goTo(nextStep(booking.step))}
               className="shrink-0"
             >
-              Continue
+              {t('common.actions.continue')}
               <ArrowRight aria-hidden="true" />
             </Button>
           )}
@@ -584,15 +589,14 @@ export function Booking() {
       <Dialog open={confirmReset} onOpenChange={setConfirmReset}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Start this booking again?</DialogTitle>
+            <DialogTitle>{t('booking.resetTitle')}</DialogTitle>
             <DialogDescription>
-              Your screening, tickets, seats and add-ons for {movie.title} will be cleared. Bookings
-              you have already completed are not affected.
+              {t('booking.resetBody', { title: movie.title })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmReset(false)}>
-              Keep going
+              {t('booking.keepGoing')}
             </Button>
             <Button
               variant="danger"
@@ -601,10 +605,10 @@ export function Booking() {
                 booking.startFor(movie.id);
                 setGuestValid(null);
                 setConfirmReset(false);
-                announce('Booking cleared. Back to the first step.');
+                announce(t('booking.cleared'));
               }}
             >
-              Start over
+              {t('booking.startOver')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -612,12 +616,12 @@ export function Booking() {
 
       <div className="mt-10">
         <DemoNote tone="loud">
-          A demonstration booking flow. Seat availability is generated locally and is not live, no
-          payment is taken, and your completed booking is written only to this browser. See{' '}
-          <Link to="/about" className="font-semibold underline underline-offset-4">
-            about this build
-          </Link>
-          .
+          <Trans
+            i18nKey="booking.demoNote"
+            components={{
+              about: <Link to="/about" className="font-semibold underline underline-offset-4" />,
+            }}
+          />
         </DemoNote>
       </div>
     </div>

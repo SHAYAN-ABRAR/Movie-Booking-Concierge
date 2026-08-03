@@ -12,6 +12,7 @@ import { useMotionPreferences, usePageVisible } from '@/motion';
 import { duration, ease, sceneTransition } from '@/motion';
 import type { Movie } from '@/data/types';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const ADVANCE_MS = 9000;
 
@@ -28,6 +29,7 @@ const ADVANCE_MS = 9000;
  * and there is an explicit pause control regardless.
  */
 export function FeaturedStage() {
+  const { t } = useTranslation();
   const motion = useMotionPreferences();
   const pageVisible = usePageVisible();
 
@@ -112,14 +114,14 @@ export function FeaturedStage() {
         {/* Paper reclaims only the left edge of the bed, so type never sits on
             a busy field but the artwork still reads as artwork. On mobile the
             bed sits behind the type, so it is dimmed much harder. */}
-        <div className="absolute inset-0 bg-gradient-to-r from-paper from-10% via-paper/45 via-38% to-transparent to-72% lg:via-paper/20 lg:via-30%" />
+        <div className="absolute inset-0 bg-gradient-to-r from-surface from-10% via-surface/45 via-38% to-transparent to-72% lg:via-surface/20 lg:via-30%" />
         {/* On small screens the artwork sits *behind* body copy rather than
             beside it, so it is held right back — atmosphere, not competition. */}
-        <div className="absolute inset-0 bg-paper/80 lg:hidden" />
+        <div className="absolute inset-0 bg-surface/80 lg:hidden" />
 
         {/* The projection edge. Defines the stage against the paper instead of
             letting a light-ground film dissolve into it. */}
-        <div className="absolute inset-y-0 left-0 hidden w-px bg-ink/25 lg:block" />
+        <div className="absolute inset-y-0 left-0 hidden w-px bg-content/25 lg:block" />
       </div>
 
       {/* ── Editorial column ─────────────────────────────────────────── */}
@@ -137,12 +139,12 @@ export function FeaturedStage() {
                 {movie.title}
               </h1>
               {movie.titleBn ? (
-                <p lang="bn" className="mt-2 font-display text-2xl text-ink-muted sm:text-3xl">
+                <p lang="bn" className="mt-2 font-display text-2xl text-content-muted sm:text-3xl">
                   {movie.titleBn}
                 </p>
               ) : null}
 
-              <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-muted">
+              <p className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-content-muted">
                 <CertificateChip code={movie.certificate} />
                 <span className="numeral">{formatRuntime(movie.runtimeMinutes)}</span>
                 <span aria-hidden="true">·</span>
@@ -199,11 +201,11 @@ export function FeaturedStage() {
                         <span className="numeral text-[0.6875rem] font-semibold tabular-nums">
                           {String(i + 1).padStart(2, '0')}
                         </span>
-                        <span className="relative block h-[3px] w-10 bg-ink/20">
+                        <span className="relative block h-[3px] w-10 bg-content/20">
                           {active ? (
                             <m.span
                               layoutId="stage-progress"
-                              className="absolute inset-0 bg-ink"
+                              className="absolute inset-0 bg-content"
                               transition={{ duration: motion.reduced ? 0 : 0.3, ease: ease.editorial }}
                             />
                           ) : null}
@@ -221,7 +223,7 @@ export function FeaturedStage() {
                     setUserPaused((paused) => !paused);
                     setInteracted(true);
                   }}
-                  className="ml-1 grid size-8 place-items-center border border-hairline-strong text-ink-muted transition-colors hover:border-ink hover:text-ink"
+                  className="ml-1 grid size-8 place-items-center border border-hairline-strong text-content-muted transition-colors hover:border-content hover:text-content"
                   aria-label={
                     userPaused || interacted
                       ? 'Resume the featured film sequence'
@@ -238,9 +240,8 @@ export function FeaturedStage() {
             </div>
           ) : null}
 
-          <p className="mt-6 max-w-md text-xs leading-5 text-ink-muted">
-            Nokshi Cinemas is a demonstration build — the films, schedules and prices are sample
-            data. You can complete a booking as a guest; no payment is taken.
+          <p className="mt-6 max-w-md text-xs leading-5 text-content-muted">
+            {t('featured.demoNote')}
           </p>
         </div>
 
