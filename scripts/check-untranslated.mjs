@@ -42,12 +42,15 @@ const listOnly = process.argv.includes('--list');
  *
  * Remaining, and why each is prose rather than chrome:
  *   src/components/booking/steps.tsx  56  wizard step copy and guidance
- *   src/components/max/MaxPanel.tsx   23  concierge panel chrome and disclosure
  *   src/routes/Contact.tsx            22  contact routes, forms, hours
  *   src/routes/About.tsx              15  the essay about the build
  *   src/routes/TicketPrices.tsx       11  the worked pricing example
+ *
+ * The Max panel chrome (23 strings) was translated during the GrandPlex pass,
+ * because a bilingual product with an English concierge panel in Bangla mode is
+ * a visible seam, not deferrable prose.
  */
-const BASELINE = 127;
+const BASELINE = 104;
 
 /**
  * Files exempt from the sweep, each for a stated reason. "It is hard" is not a

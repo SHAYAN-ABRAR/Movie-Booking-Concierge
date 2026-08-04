@@ -99,9 +99,11 @@ export async function confirmBooking(page: Page): Promise<string> {
   await expect(confirm).toBeEnabled();
   await confirm.click();
 
-  await expect(page).toHaveURL(/\/booking-confirmation\/NK-/);
+  // New bookings issue GP- since the GrandPlex rebrand. Historical NK- still
+  // opens, but nothing generates it any more — see docs/grandplex-migration.md.
+  await expect(page).toHaveURL(/\/booking-confirmation\/GP-/);
   const reference = new URL(page.url()).pathname.split('/').pop() ?? '';
-  expect(reference).toMatch(/^NK-[A-Z0-9]+$/);
+  expect(reference).toMatch(/^GP-[A-Z0-9]{6}$/);
   return reference;
 }
 

@@ -451,6 +451,38 @@ export const en = {
     selected: 'Selected: {{title}}.',
   },
 
+  maxPanel: {
+    role: 'Booking concierge · runs on this device',
+    you: 'You',
+    settings: 'About Max and settings',
+    close: 'Close Max',
+    privacy:
+      'Max reads the same local sample data the rest of this site uses. Your conversation is kept in this browser tab only and is never transmitted. It has no access to live cinema inventory, cannot contact staff, and will not complete a purchase for you.',
+    rewordLabel: 'Reword replies with Ollama ({{model}})',
+    ollamaOn:
+      "A local Ollama daemon was detected on this machine. With this on, the reply text — and nothing else — is sent to it to be reworded. Prices, showtimes, seats and actions are always computed here and are never changed by the model. A cloud model tag makes your local daemon relay the text onward to Ollama's servers.",
+    ollamaOff:
+      'No local Ollama daemon detected, so Max is answering entirely from its own deterministic engine. That is the default and needs nothing installed.',
+    clearConversation: 'Clear this conversation',
+    conversation: 'Conversation with Max',
+    conversationCleared: 'Conversation cleared.',
+    intro:
+      'I can find screenings, compare them, work out what a booking will cost and suggest seats. Ask in English or Bangla.',
+    introNote:
+      'Everything here is sample data for this demonstration — no live inventory, no payment, nothing sent anywhere.',
+    thinking: 'Working that out…',
+    canUndo: 'That can be undone.',
+    undone: 'Undone.',
+    suggestedQuestions: 'Suggested questions',
+    askLabel: 'Ask Max a question',
+    placeholder: 'Ask about films, times, seats or prices…',
+    send: 'Send to Max',
+    composerHint:
+      'Enter to send, Shift + Enter for a new line. Max never asks for passwords, card numbers, PINs or OTPs.',
+    rewordedNote:
+      'Reworded by your local Ollama model. The figures and actions came from this device.',
+  },
+
   filters: {
     heading: 'Filters',
     search: 'Search',

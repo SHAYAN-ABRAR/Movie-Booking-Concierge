@@ -75,6 +75,8 @@ test.describe('booking confirmation', () => {
   test('an unknown reference shows a recovery state, not a blank page', async ({ page }) => {
     const { pageErrors } = collectErrors(page);
 
+    // A legacy-prefixed reference that does not exist — the recovery state
+    // has to handle both prefixes, and an unknown one of either shape.
     await page.goto('/booking-confirmation/NK-NOSUCH');
 
     await expectRouteNotBlank(page);
@@ -99,14 +101,14 @@ test.describe('booking confirmation', () => {
     await confirm.click({ force: true });
     // Client-side navigation fires no `load`, so assert on the URL rather than
     // waiting for a navigation event that will never arrive.
-    await expect(page).toHaveURL(/\/booking-confirmation\/NK-/);
+    await expect(page).toHaveURL(/\/booking-confirmation\/GP-/);
 
     await page.goto('/bookings');
     await expectRouteNotBlank(page);
 
     // Exactly one booking was written.
     const references = await page.locator('main').innerText();
-    const found = references.match(/NK-[A-Z0-9]{6}/g) ?? [];
+    const found = references.match(/GP-[A-Z0-9]{6}/g) ?? [];
     expect(new Set(found).size, 'a single confirm produced more than one booking').toBe(1);
   });
 

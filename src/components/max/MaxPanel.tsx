@@ -21,6 +21,7 @@ import { LocalMaxAssistantProvider } from '@/max/localProvider';
 import { createOllamaProvider, detectOllama, OLLAMA_MODEL } from '@/max/ollamaProvider';
 import type { MaxAction, MaxMessage } from '@/max/types';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Max's conversation surface.
@@ -35,6 +36,7 @@ interface PendingConfirmation {
 }
 
 export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingId: string }) {
+  const { t } = useTranslation();
   const messages = useMax((s) => s.messages);
   const status = useMax((s) => s.status);
   const push = useMax((s) => s.push);
@@ -154,7 +156,7 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
               Max
             </h2>
             <p className="mt-1 text-[0.75rem] leading-4 text-content-muted">
-              Booking concierge · runs on this device
+              {t('maxPanel.role')}
             </p>
           </div>
           <Button
@@ -162,12 +164,12 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
             size="icon-sm"
             onClick={() => setShowSettings((value) => !value)}
             aria-expanded={showSettings}
-            aria-label="About Max and settings"
+            aria-label={t('maxPanel.settings')}
             className="text-[0.6875rem] font-semibold"
           >
             ?
           </Button>
-          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Close Max">
+          <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t('maxPanel.close')}>
             <X aria-hidden="true" />
           </Button>
         </header>
@@ -175,11 +177,7 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
         {/* ── Settings / privacy ────────────────────────────────── */}
         {showSettings ? (
           <div className="border-b border-hairline bg-surface-sunken/50 px-4 py-3 text-[0.8125rem] leading-5">
-            <p className="text-content-muted">
-              Max reads the same local sample data the rest of this site uses. Your conversation is
-              kept in this browser tab only and is never transmitted. It has no access to live cinema
-              inventory, cannot contact staff, and will not complete a purchase for you.
-            </p>
+            <p className="text-content-muted">{t('maxPanel.privacy')}</p>
 
             {ollamaAvailable ? (
               <div className="mt-3 border-t border-hairline pt-3">
@@ -192,22 +190,15 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
                   />
                   <span className="min-w-0">
                     <span className="block font-semibold text-content">
-                      Reword replies with Ollama ({OLLAMA_MODEL})
+                      {t('maxPanel.rewordLabel', { model: OLLAMA_MODEL })}
                     </span>
-                    <span className="mt-0.5 block text-content-muted">
-                      A local Ollama daemon was detected on this machine. With this on, the reply
-                      text — and nothing else — is sent to it to be reworded. Prices, showtimes,
-                      seats and actions are always computed here and are never changed by the model.
-                      A cloud model tag makes your local daemon relay the text onward to Ollama's
-                      servers.
-                    </span>
+                    <span className="mt-0.5 block text-content-muted">{t('maxPanel.ollamaOn')}</span>
                   </span>
                 </label>
               </div>
             ) : (
               <p className="mt-3 border-t border-hairline pt-3 text-content-faint">
-                No local Ollama daemon detected, so Max is answering entirely from its own
-                deterministic engine. That is the default and needs nothing installed.
+                {t('maxPanel.ollamaOff')}
               </p>
             )}
 
@@ -218,11 +209,11 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
               onClick={() => {
                 clearConversation();
                 setUndoOffer(null);
-                announce('Conversation cleared.');
+                announce(t('maxPanel.conversationCleared'));
               }}
             >
               <Trash2 aria-hidden="true" />
-              Clear this conversation
+              {t('maxPanel.clearConversation')}
             </Button>
           </div>
         ) : null}
@@ -232,17 +223,13 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
           ref={logRef}
           className="flex-1 overflow-y-auto overscroll-contain px-4 py-4"
           role="log"
-          aria-label="Conversation with Max"
+          aria-label={t('maxPanel.conversation')}
         >
           {messages.length === 0 ? (
             <div className="space-y-4">
-              <p className="text-[0.9375rem] leading-6 text-content">
-                I can find screenings, compare them, work out what a booking will cost and suggest
-                seats. Ask in English or Bangla.
-              </p>
+              <p className="text-[0.9375rem] leading-6 text-content">{t('maxPanel.intro')}</p>
               <p className="text-[0.75rem] leading-5 text-content-faint">
-                Everything here is sample data for this demonstration — no live inventory, no
-                payment, nothing sent anywhere.
+                {t('maxPanel.introNote')}
               </p>
             </div>
           ) : (
@@ -258,21 +245,21 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
           {status === 'thinking' ? (
             <p className="mt-4 flex items-center gap-2 text-[0.8125rem] text-content-muted">
               <Loader2 aria-hidden="true" className="size-4 animate-spin" />
-              Working that out…
+              {t('maxPanel.thinking')}
             </p>
           ) : null}
 
           {undoOffer ? (
             <div className="mt-4 flex items-center justify-between gap-3 border border-hairline-strong bg-surface-sunken/60 p-2.5">
-              <p className="text-[0.8125rem] text-content-muted">That can be undone.</p>
+              <p className="text-[0.8125rem] text-content-muted">{t('maxPanel.canUndo')}</p>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => {
                   undoOffer.run();
                   setUndoOffer(null);
-                  push({ role: 'assistant', text: 'Undone.', source: 'local' });
-                  announce('Undone.');
+                  push({ role: 'assistant', text: t('maxPanel.undone'), source: 'local' });
+                  announce(t('maxPanel.undone'));
                 }}
               >
                 {undoOffer.label}
@@ -284,7 +271,7 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
         {/* ── Quick prompts ─────────────────────────────────────── */}
         <div className="border-t border-hairline px-4 py-2.5">
           <p className="sr-only" id="max-prompts-label">
-            Suggested questions
+            {t('maxPanel.suggestedQuestions')}
           </p>
           <ul aria-labelledby="max-prompts-label" className="flex gap-1.5 overflow-x-auto pb-1">
             {prompts.map((prompt) => (
@@ -311,7 +298,7 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
           }}
         >
           <label htmlFor="max-composer" className="sr-only">
-            Ask Max a question
+            {t('maxPanel.askLabel')}
           </label>
           <div className="flex items-end gap-2">
             <Textarea
@@ -319,7 +306,7 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
               ref={composerRef}
               rows={1}
               value={draft}
-              placeholder="Ask about films, times, seats or prices…"
+              placeholder={t('maxPanel.placeholder')}
               className="max-h-28 min-h-11 resize-none py-2.5"
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
@@ -333,14 +320,13 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
               type="submit"
               size="icon"
               disabled={!draft.trim() || status === 'thinking'}
-              aria-label="Send to Max"
+              aria-label={t('maxPanel.send')}
             >
               <CornerDownLeft aria-hidden="true" />
             </Button>
           </div>
           <p className="mt-1.5 text-[0.6875rem] leading-4 text-content-faint">
-            Enter to send, Shift + Enter for a new line. Max never asks for passwords, card numbers,
-            PINs or OTPs.
+            {t('maxPanel.composerHint')}
           </p>
         </form>
 
@@ -390,11 +376,13 @@ function MessageBubble({
   onAction: (action: MaxAction) => void;
   onSend: (text: string) => void;
 }) {
+  const { t } = useTranslation();
   const isUser = message.role === 'user';
 
   return (
     <div className={cn(isUser ? 'pl-8' : '')}>
-      <p className="eyebrow mb-1.5">{isUser ? 'You' : 'Max'}</p>
+      {/* "Max" is the concierge's name and stays as-is; "You" is a role label. */}
+      <p className="eyebrow mb-1.5">{isUser ? t('maxPanel.you') : 'Max'}</p>
 
       <div
         className={cn(
@@ -444,7 +432,7 @@ function MessageBubble({
 
       {message.source === 'ollama' ? (
         <p className="mt-2 text-[0.6875rem] text-content-faint">
-          Reworded by your local Ollama model. The figures and actions came from this device.
+          {t('maxPanel.rewordedNote')}
         </p>
       ) : null}
     </div>
