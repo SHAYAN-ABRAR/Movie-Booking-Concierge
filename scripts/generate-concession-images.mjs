@@ -7,8 +7,15 @@
  * built site serves committed files from `public/media/concessions/`. This
  * script exists to *produce* those files, once, on a developer's machine.
  *
+ *   # bash / zsh
  *   OPENAI_API_KEY=sk-… node scripts/generate-concession-images.mjs
- *   OPENAI_API_KEY=sk-… node scripts/generate-concession-images.mjs con-nachos
+ *
+ *   # PowerShell — it has no inline VAR=value prefix, so set it first
+ *   $env:OPENAI_API_KEY = "sk-…"
+ *   node scripts/generate-concession-images.mjs
+ *
+ *   # one item, after rejecting a defective result
+ *   node scripts/generate-concession-images.mjs con-nachos
  *
  * The key is read from the environment and never written anywhere. Passing one
  * item id regenerates just that item, which is what you want after rejecting a
@@ -145,12 +152,21 @@ const ITEMS = {
 
 const key = process.env.OPENAI_API_KEY;
 if (!key) {
+  // Naming both shells matters: the POSIX `VAR=value command` form fails on
+  // PowerShell with a bewildering `CommandNotFoundException` that points at the
+  // assignment rather than at the missing variable.
+  const powershell = process.platform === 'win32';
   console.error(
     '\n  OPENAI_API_KEY is not set.\n\n' +
       '  This script is development-only and the key is never committed, never\n' +
       '  written to disk and never required at runtime — the application serves\n' +
       '  the committed files it produces.\n\n' +
-      '    OPENAI_API_KEY=sk-… node scripts/generate-concession-images.mjs\n',
+      (powershell
+        ? '    # PowerShell\n' +
+          '    $env:OPENAI_API_KEY = "sk-…"\n' +
+          '    node scripts/generate-concession-images.mjs\n' +
+          '    Remove-Item Env:\\OPENAI_API_KEY\n'
+        : '    OPENAI_API_KEY=sk-… node scripts/generate-concession-images.mjs\n'),
   );
   process.exit(1);
 }

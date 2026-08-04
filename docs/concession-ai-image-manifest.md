@@ -21,10 +21,23 @@ attribution intact, which is the honest state until replacements exist.
 
 ## Running it
 
+PowerShell (Windows):
+
+```powershell
+$env:OPENAI_API_KEY = "sk-…"
+node scripts/generate-concession-images.mjs             # all 16
+node scripts/generate-concession-images.mjs con-nachos  # one item
+Remove-Item Env:\OPENAI_API_KEY                         # clear it from the session
 ```
-OPENAI_API_KEY=sk-…  node scripts/generate-concession-images.mjs             # all 16
-OPENAI_API_KEY=sk-…  node scripts/generate-concession-images.mjs con-nachos  # one
+
+bash / zsh:
+
+```bash
+OPENAI_API_KEY=sk-… node scripts/generate-concession-images.mjs
 ```
+
+PowerShell has no inline `VAR=value command` prefix — that form is POSIX-only
+and fails with `CommandNotFoundException`. The variable has to be set first.
 
 Development-only. The key is read from the environment, never written to disk,
 never committed, and never required at runtime — the application serves
