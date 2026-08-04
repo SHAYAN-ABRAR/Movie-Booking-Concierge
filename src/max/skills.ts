@@ -337,6 +337,110 @@ function compareShowtimesSkill(parse: MaxParse, context: MaxContext): MaxReply {
   });
 }
 
+/**
+ * "What is this about?" — the short story, never the full synopsis by default.
+ *
+ * The synopsis is a paragraph written for browsing; someone asking Max mid-
+ * booking wants three sentences. If they want more, the panel links to the
+ * film page, where the full synopsis lives under its own heading.
+ */
+function movieStorySkill(parse: MaxParse, context: MaxContext): MaxReply {
+  const lang = parse.language;
+  const movie = focusMovie(parse, context);
+
+  if (!movie) {
+    return reply({
+      text: t(lang, 'Which film do you mean?', 'কোন ছবির কথা বলছেন?'),
+      clarify: {
+        question: t(lang, 'Which film?', 'কোন ছবি?'),
+        options: nowShowing
+          .slice(0, 4)
+          .map((m) => ({ label: m.title, reply: `What is ${m.title} about?` })),
+      },
+    });
+  }
+
+  return reply({
+    text: t(
+      lang,
+      `${movie.title}, without spoilers:`,
+      `${movie.title} — স্পয়লার ছাড়া:`,
+    ),
+    blocks: [{ kind: 'movie-story', movieId: movie.id }],
+    actions: [
+      ...(movie.trailer
+        ? [
+            {
+              type: 'watch_trailer' as const,
+              label: t(lang, 'Watch the trailer', 'ট্রেলার দেখুন'),
+              movieId: movie.id,
+            },
+          ]
+        : []),
+      {
+        type: 'open_movie_details' as const,
+        label: t(lang, 'Full details', 'বিস্তারিত'),
+        movieId: movie.id,
+      },
+    ],
+  });
+}
+
+/**
+ * "Show me the trailer."
+ *
+ * Offers the action; never plays anything on its own. The action carries the
+ * film id, so the player looks the trailer up from the catalogue — there is
+ * nowhere here for Max to put a video it invented.
+ */
+function watchTrailerSkill(parse: MaxParse, context: MaxContext): MaxReply {
+  const lang = parse.language;
+  const movie = focusMovie(parse, context);
+
+  if (!movie) {
+    return reply({
+      text: t(lang, 'Which film’s trailer?', 'কোন ছবির ট্রেলার?'),
+      clarify: {
+        question: t(lang, 'Which film?', 'কোন ছবি?'),
+        options: nowShowing
+          .filter((m) => m.trailer)
+          .slice(0, 4)
+          .map((m) => ({ label: m.title, reply: `Show me the trailer for ${m.title}` })),
+      },
+    });
+  }
+
+  if (!movie.trailer) {
+    return reply({
+      text: t(
+        lang,
+        `No official trailer has been released for ${movie.title} yet. I will not link you to an unofficial upload.`,
+        `${movie.title}-এর কোনো অফিসিয়াল ট্রেলার এখনও আসেনি। অনানুষ্ঠানিক কোনো আপলোডে আমি পাঠাব না।`,
+      ),
+    });
+  }
+
+  const credit =
+    movie.trailer.type === 'official-teaser'
+      ? t(lang, 'Official teaser', 'অফিসিয়াল টিজার')
+      : t(lang, 'Official trailer', 'অফিসিয়াল ট্রেলার');
+
+  return reply({
+    text: t(
+      lang,
+      `${credit} for ${movie.title}, from ${movie.trailer.officialChannel}.`,
+      `${movie.title}-এর ${credit}, ${movie.trailer.officialChannel} থেকে।`,
+    ),
+    actions: [
+      {
+        type: 'watch_trailer' as const,
+        label: t(lang, 'Play the trailer', 'ট্রেলার চালান'),
+        movieId: movie.id,
+      },
+    ],
+  });
+}
+
 function movieInfoSkill(parse: MaxParse, context: MaxContext): MaxReply {
   const lang = parse.language;
   const movie = focusMovie(parse, context);
@@ -1650,6 +1754,10 @@ export function runSkill(parse: MaxParse, context: MaxContext): MaxReply {
       return compareShowtimesSkill(parse, context);
     case 'movie_info':
       return movieInfoSkill(parse, context);
+    case 'movie_story':
+      return movieStorySkill(parse, context);
+    case 'watch_trailer':
+      return watchTrailerSkill(parse, context);
     case 'runtime_info':
       return runtimeSkill(parse, context);
     case 'price_explain':

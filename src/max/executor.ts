@@ -15,6 +15,7 @@ import { useMax } from '@/store/max';
 import { claimChecklistTemplate } from '@/store/reports';
 import type { MaxAction } from './types';
 import type { MovieFilter } from '@/data';
+import { useTrailerViewer } from '@/components/movie/trailerViewer';
 
 /**
  * The action executor.
@@ -330,6 +331,34 @@ export function useMaxExecutor() {
         case 'clear_conversation': {
           useMax.getState().clearConversation();
           return { ok: true, message: 'Conversation cleared.' };
+        }
+
+        case 'watch_trailer': {
+          /*
+           * Max hands over a film, not a video.
+           *
+           * The trailer is looked up from the same catalogue record every other
+           * surface reads, so Max cannot open a video it invented — there is
+           * nowhere in the action to put one. A film with no verified trailer
+           * says so rather than guessing.
+           */
+          const movie = movieById.get(action.movieId);
+          if (!movie) return { ok: false, message: 'I could not find that film.' };
+          if (!movie.trailer) {
+            return {
+              ok: false,
+              message: `No official trailer has been released for ${movie.title} yet.`,
+            };
+          }
+          useTrailerViewer.getState().open(movie.id);
+          return { ok: true, message: `Playing the official trailer for ${movie.title}.` };
+        }
+
+        case 'open_movie_details': {
+          const movie = movieById.get(action.movieId);
+          if (!movie) return { ok: false, message: 'I could not find that film.' };
+          navigate(`/movies/${movie.slug}`);
+          return { ok: true, message: `Opened ${movie.title}.` };
         }
 
         default: {

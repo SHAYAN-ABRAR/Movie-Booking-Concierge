@@ -12,6 +12,7 @@ import { AppErrorBoundary } from '@/components/common/AppErrorBoundary';
 import { usePreferenceEffects } from '@/components/preferences/usePreferenceEffects';
 import { PreferenceAnnouncer } from '@/components/preferences/PreferenceAnnouncer';
 import { useRouteTitle } from './useRouteTitle';
+import { TrailerViewer } from '@/components/movie/TrailerDialog';
 
 /** Returns to the top on navigation, unless the browser is restoring a position. */
 function ScrollRestoration() {
@@ -113,6 +114,9 @@ export function Layout() {
         </div>
         <MaxDock />
         <DemoAlertRunner />
+        {/* The one trailer player. Every trigger in the app drives it through
+            `useTrailerViewer`, so two can never be mounted at once. */}
+        <TrailerViewer />
       </TooltipProvider>
     </MotionProvider>
   );

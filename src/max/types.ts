@@ -29,6 +29,8 @@ export type MaxIntent =
   | 'find_showtimes'
   | 'compare_showtimes'
   | 'movie_info'
+  | 'watch_trailer'
+  | 'movie_story'
   | 'runtime_info'
   | 'apply_filters'
   | 'clear_filters'
@@ -149,7 +151,21 @@ export type MaxAction =
   | { type: 'open_mail'; label: string; to: string; subject: string; body: string }
   | { type: 'call'; label: string; phone: string }
   | { type: 'focus_field'; label: string; fieldId: string; confirm: MaxConfirmation }
-  | { type: 'clear_conversation'; label: string };
+  | { type: 'clear_conversation'; label: string }
+  /*
+   * Opens the film's verified trailer dialog.
+   *
+   * Carries the movie id, never a URL or a video id — Max hands over the film
+   * and the player looks up the trailer from the same catalogue record every
+   * other surface reads. That is what makes it impossible for Max to invent a
+   * trailer or open an unofficial one: there is nowhere in this action to put
+   * a video Max made up.
+   *
+   * Playback still requires the user to activate the action; Max never starts
+   * a video on its own.
+   */
+  | { type: 'watch_trailer'; label: string; movieId: string }
+  | { type: 'open_movie_details'; label: string; movieId: string };
 
 export interface MaxConfirmation {
   title: string;
@@ -203,7 +219,13 @@ export type MaxBlock =
   | { kind: 'checklist'; title: string; items: string[]; note?: string }
   | { kind: 'contact'; cinemaId?: string; email?: string; phone?: string; note?: string }
   | { kind: 'demo-note'; text: string }
-  | { kind: 'spoiler'; summary: string; detail: string };
+  | { kind: 'spoiler'; summary: string; detail: string }
+  /*
+   * The short, spoiler-free story for one film. Renders the same panel the
+   * booking surfaces use, so what Max shows and what the page shows cannot
+   * drift apart.
+   */
+  | { kind: 'movie-story'; movieId: string };
 
 /* ── Messages ──────────────────────────────────────────────────────── */
 

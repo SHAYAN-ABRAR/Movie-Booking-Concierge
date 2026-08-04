@@ -216,3 +216,39 @@ describe('intent detection', () => {
     expect(labels).toMatch(/Cinema/);
   });
 });
+
+describe('trailer and story intents', () => {
+  const parseText = (input: string) => parse(input, NOW);
+
+  it('routes an English trailer request to watch_trailer', () => {
+    expect(parseText('show me the trailer for The Odyssey').intent).toBe('watch_trailer');
+    expect(parseText('play the official trailer').intent).toBe('watch_trailer');
+  });
+
+  it('routes a Bangla trailer request to watch_trailer', () => {
+    expect(parseText('ট্রেলার দেখাও').intent).toBe('watch_trailer');
+    expect(parseText('এই সিনেমার অফিসিয়াল ট্রেলার চালাও').intent).toBe('watch_trailer');
+  });
+
+  it('routes a story request to movie_story, not the broader movie_info', () => {
+    // "tell me the story" also matches movie_info's "tell me about"; the more
+    // specific request has to win.
+    expect(parseText('tell me the story without spoilers').intent).toBe('movie_story');
+    expect(parseText('what is this movie about').intent).toBe('movie_story');
+  });
+
+  it('routes a Bangla story request to movie_story', () => {
+    expect(parseText('সিনেমাটার কাহিনি কী').intent).toBe('movie_story');
+    expect(parseText('স্পয়লার ছাড়া গল্পটা বলো').intent).toBe('movie_story');
+  });
+
+  it('still recognises both booking-reference prefixes', () => {
+    expect(extractEntities(normalise('what about GP-7F2K9Q'), NOW).bookingReference).toBe(
+      'GP-7F2K9Q',
+    );
+    // Issued before the rebrand, still printed on someone's ticket.
+    expect(extractEntities(normalise('what about NK-7F2K9Q'), NOW).bookingReference).toBe(
+      'NK-7F2K9Q',
+    );
+  });
+});

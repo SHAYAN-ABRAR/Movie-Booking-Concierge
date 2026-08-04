@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { MovieImage } from '@/components/visual/MovieImage';
 import { CertificateChip } from './Chips';
+import { TrailerButton } from './TrailerDialog';
 import { genreLabels, languageLabels } from '@/data';
 import { runtimeLabelShort, statusLabel } from '@/lib/movieMeta';
 import type { Movie } from '@/data/types';
@@ -142,6 +143,36 @@ export function MovieCard({
           </p>
         </div>
       </Link>
+
+      {/*
+       * A sibling of the Link, never a child of it.
+       *
+       * The whole card is one anchor, and an interactive control inside an
+       * anchor is invalid HTML — the browser resolves the nesting however it
+       * likes, and a keyboard user ends up with one focus stop that does two
+       * things. Positioning it over the poster keeps it where a pointer expects
+       * it while leaving it a separate tab stop.
+       *
+       * It stays visible on touch, where there is no hover to reveal it.
+       */}
+      {movie.trailer ? (
+        <div
+          className={cn(
+            'absolute right-2 top-2',
+            'opacity-0 transition-opacity duration-[--dur-fast]',
+            'group-hover:opacity-100 group-focus-within:opacity-100 focus-within:opacity-100',
+            '[@media(hover:none)]:opacity-100',
+          )}
+        >
+          <TrailerButton
+            movie={movie}
+            variant="ghost"
+            size="icon-sm"
+            iconOnly
+            className="bg-house/70 text-house-ink backdrop-blur-[2px] hover:bg-house/90 hover:text-house-ink"
+          />
+        </div>
+      ) : null}
     </article>
   );
 }

@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { MotionProvider } from '@/motion';
 import { TooltipProvider } from '@/components/ui/popover';
-import { TrailerButton } from './TrailerDialog';
+import { TrailerButton, TrailerViewer } from './TrailerDialog';
+import { useTrailerViewer } from './trailerViewer';
 import { SelectedMovieStory } from './SelectedMovieStory';
 import { movies, getMovie } from '@/data';
 import { usePreferences, DEFAULT_LOCALE } from '@/store/preferences';
@@ -19,7 +20,12 @@ function renderIn(ui: React.ReactNode) {
       <MotionProvider>
         {/* The certificate chip inside the panel is a tooltip trigger, and in
             the real tree `Layout` supplies this provider. */}
-        <TooltipProvider>{ui}</TooltipProvider>
+        <TooltipProvider>
+          {ui}
+          {/* The one player, mounted by `Layout` in the real tree. Triggers
+              only ask the store to show a film; this is what renders it. */}
+          <TrailerViewer />
+        </TooltipProvider>
       </MotionProvider>
     </MemoryRouter>,
   );
@@ -27,6 +33,7 @@ function renderIn(ui: React.ReactNode) {
 
 beforeEach(() => {
   usePreferences.setState({ locale: DEFAULT_LOCALE });
+  useTrailerViewer.setState({ movieId: null, returnFocusTo: null });
   void i18next.changeLanguage(DEFAULT_LOCALE);
 });
 
@@ -120,11 +127,35 @@ describe('the trailer player', () => {
     expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
   });
 
-  it('renders nothing at all for a film with no trailer', () => {
+  it('renders no control at all for a film with no trailer', () => {
     const movie = { ...getMovie('the-odyssey')!, trailer: undefined };
-    const { container } = renderIn(<TrailerButton movie={movie} />);
+    renderIn(<TrailerButton movie={movie} />);
     // A dead play button is worse than no button.
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('button', { name: /watch/i })).toBeNull();
+  });
+
+  it('keeps only one player in the tree, whichever trigger opened it', async () => {
+    const user = userEvent.setup();
+    renderIn(
+      <>
+        <TrailerButton movie={getMovie('the-odyssey')!} />
+        <TrailerButton movie={getMovie('backrooms')!} />
+      </>,
+    );
+
+    // Two triggers, one viewer. Opening the second must not leave the first
+    // mounted — a hidden iframe that is still playing is the failure mode.
+    const [first] = screen.getAllByRole('button', { name: /watch trailer/i });
+    await user.click(first!);
+    expect(document.querySelectorAll('iframe')).toHaveLength(1);
+
+    await user.keyboard('{Escape}');
+    const second = screen.getAllByRole('button', { name: /watch trailer/i })[1];
+    await user.click(second!);
+    expect(document.querySelectorAll('iframe')).toHaveLength(1);
+    expect(document.querySelector('iframe')?.getAttribute('src')).toContain(
+      getMovie('backrooms')!.trailer!.videoId,
+    );
   });
 });
 

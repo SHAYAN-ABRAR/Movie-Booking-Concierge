@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, Play } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/overlay';
 import { Button } from '@/components/ui/button';
 import { MovieImage } from '@/components/visual/MovieImage';
+import { movieById } from '@/data/movies';
+import { useTrailerViewer } from './trailerViewer';
 import type { Movie, MovieTrailer } from '@/data/types';
 import { cn } from '@/lib/utils';
 
@@ -157,17 +159,15 @@ export function TrailerDialog({
  */
 export function TrailerPreview({ movie, className }: { movie: Movie; className?: string }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const trigger = useRef<HTMLButtonElement>(null);
+  const open = useTrailerViewer((s) => s.open);
 
   if (!movie.trailer) return null;
 
   return (
     <figure className={cn('max-w-3xl', className)}>
       <button
-        ref={trigger}
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={(event) => open(movie.id, event.currentTarget)}
         aria-haspopup="dialog"
         className={cn(
           'group relative block w-full overflow-hidden border border-hairline-strong',
@@ -204,14 +204,6 @@ export function TrailerPreview({ movie, className }: { movie: Movie; className?:
         </span>
       </button>
 
-      <TrailerDialog
-        movie={movie}
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next) requestAnimationFrame(() => trigger.current?.focus());
-        }}
-      />
     </figure>
   );
 }
@@ -235,44 +227,41 @@ export function TrailerButton({
 }: {
   movie: Movie;
   variant?: 'primary' | 'outline' | 'ghost' | 'link';
-  size?: 'sm' | 'md' | 'lg' | 'icon';
+  size?: 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm';
   className?: string;
   iconOnly?: boolean;
 }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const trigger = useRef<HTMLButtonElement>(null);
+  const open = useTrailerViewer((s) => s.open);
 
   if (!movie.trailer) return null;
 
-  const label = t('trailer.watch');
-
   return (
-    <>
-      <Button
-        ref={trigger}
-        variant={variant}
-        size={size}
-        className={className}
-        onClick={() => setOpen(true)}
-        aria-haspopup="dialog"
-        {...(iconOnly ? { 'aria-label': t('trailer.watchFor', { movie: movie.title }) } : {})}
-      >
-        <Play aria-hidden="true" className={cn(iconOnly ? '' : 'shrink-0')} />
-        {iconOnly ? null : label}
-      </Button>
-
-      <TrailerDialog
-        movie={movie}
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          // Radix restores focus to the trigger on its own, but only if the
-          // trigger is still mounted. Cards unmount when a filter changes
-          // mid-trailer, so this is belt and braces.
-          if (!next) requestAnimationFrame(() => trigger.current?.focus());
-        }}
-      />
-    </>
+    <Button
+      variant={variant}
+      size={size}
+      className={className}
+      onClick={(event) => open(movie.id, event.currentTarget)}
+      aria-haspopup="dialog"
+      {...(iconOnly ? { 'aria-label': t('trailer.watchFor', { movie: movie.title }) } : {})}
+    >
+      <Play aria-hidden="true" className={cn(iconOnly ? '' : 'shrink-0')} />
+      {iconOnly ? null : t('trailer.watch')}
+    </Button>
   );
+}
+
+/**
+ * The one trailer player in the application. Mounted once by `Layout`.
+ *
+ * Everything else — cards, the film page, the story panel, Max — only asks the
+ * store to show a film. Nothing else mounts a `TrailerDialog`.
+ */
+export function TrailerViewer() {
+  const movieId = useTrailerViewer((s) => s.movieId);
+  const close = useTrailerViewer((s) => s.close);
+  const movie = movieId ? movieById.get(movieId) : undefined;
+
+  if (!movie) return null;
+  return <TrailerDialog movie={movie} open onOpenChange={(next) => !next && close()} />;
 }

@@ -18,6 +18,7 @@ import { telUrl } from '@/lib/external';
 import { useBookings } from '@/store/bookings';
 import { useWatches, watchKindKeys } from '@/store/watches';
 import { formatKeys } from '@/i18n/domain';
+import { SelectedMovieStory } from '@/components/movie/SelectedMovieStory';
 import type { MaxBlock } from '@/max/types';
 import { cn } from '@/lib/utils';
 
@@ -311,6 +312,13 @@ export function MaxBlocks({ blocks }: { blocks: MaxBlock[] }) {
                 </p>
               </Link>
             );
+          }
+
+          case 'movie-story': {
+            // The same panel the booking surfaces use, so what Max shows and
+            // what the page shows cannot drift apart.
+            const movie = movieById.get(block.movieId);
+            return movie ? <SelectedMovieStory key={index} movie={movie} /> : null;
           }
 
           case 'watches':

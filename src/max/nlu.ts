@@ -764,6 +764,26 @@ const intentRules: IntentRule[] = [
     weight: 0.85,
   },
   {
+    intent: 'watch_trailer',
+    patterns: [
+      /\btrailer\b|\bteaser\b|\bshow me the (?:trailer|preview)\b|\bplay the (?:official )?trailer\b/,
+      /ট্রেলার|টিজার/,
+    ],
+    // Above `movie_info`: "show me the trailer for X" also matches
+    // "tell me about", and the more specific request should win.
+    weight: 0.9,
+    boostOn: ['movieIds'],
+  },
+  {
+    intent: 'movie_story',
+    patterns: [
+      /\bstory\b|\bwhat(?:'s| is) (?:it|this movie|the movie) about\b|\bwithout spoilers?\b|\bno spoilers?\b|\bpremise\b/,
+      /কাহিনি|কাহিনী|গল্প|স্পয়লার/,
+    ],
+    weight: 0.85,
+    boostOn: ['movieIds'],
+  },
+  {
     intent: 'movie_info',
     patterns: [
       /\bwhat is it about|\btell me about|\bwho (?:directed|stars|is in)|\bsynopsis|\bcast\b|\bplot\b/,
