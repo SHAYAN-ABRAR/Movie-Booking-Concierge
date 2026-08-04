@@ -78,24 +78,28 @@ embed's own play control.
 | Updates on selection change | e2e verified; announced politely |
 | Film page hierarchy | Short story near metadata; "Full synopsis" section below |
 
-## Concessions — NOT DONE
+## Concessions — DONE
 
-The AI concession imagery is **blocked** and honestly incomplete. Higgsfield MCP
-is out of credits and Recraft requires a paid plan. Rather than take any of the
-forbidden shortcuts:
+| Check | Result |
+| --- | --- |
+| Unique AI image per item | 16 / 16, no reuse |
+| Counts correct | samosa 2, mishti 4, combo-two 1+2, family 2+4+1 — all verified |
+| Regular vs large distinct | popcorn and cola pairs read at different sizes |
+| Stored locally, optimised | AVIF/WebP/JPEG at 480/800/1200, no runtime URL |
+| Provenance recorded | `sourceType: 'ai-generated'`, model, date, prompt, `illustrative` |
+| Photographer credits removed | Enforced by `validate:content` and a unit test |
+| Disclosure shown | Concessions route, booking step, About — translated, once each |
+| Controls still work | add / increase / decrease / remove / filters — e2e verified |
+| Light + dark, en + bn | Verified in-browser |
+| No image request fails | 16/16 decode; no horizontal overflow on mobile |
 
-- No stock photos were relabelled as AI-generated.
-- No CSS drawings were substituted.
-- The existing licensed photographs remain, with their real photographer
-  attribution intact — the honest state until replacements exist.
-
-Ready to run the moment a credential is available:
-`scripts/generate-concession-images.mjs` (all 16 prompts, shared art direction,
-combo counts spelled out), the review checklist, and the manifest/attribution
-change — all in `concession-ai-image-manifest.md`.
-
-So: the card redesign, the AI-image disclosure copy (written but not yet shown),
-and the concession image tests remain **not done**.
+The API path was blocked twice (Higgsfield out of credits; a later OpenAI key
+hit its account billing hard limit), so the 16 were generated interactively in
+ChatGPT from the committed prompts, reviewed one at a time — all passed first
+generation — and processed by `scripts/build-concession-ai-media.mjs`. None of
+the forbidden shortcuts were taken: no stock photo relabelled, no CSS drawing
+substituted. Full record in
+[`concession-ai-image-manifest.md`](./concession-ai-image-manifest.md).
 
 ## Localization
 
@@ -148,22 +152,20 @@ Manually, on the production-adjacent dev preview:
 
 ## Screenshots
 
-`docs/screenshots/grandplex-upgrade/` — 11 of 14:
+`docs/screenshots/grandplex-upgrade/` — all 14:
 
 home light/dark · mobile header · movies-with-trailers · trailer dialog
 desktop/mobile · selected-movie story en/bn · booking session story · booking
-confirmation · Max in Bangla.
-
-Missing: `concessions-ai-light/dark/mobile.png` — deferred with the imagery.
-Capturing the current licensed photos under an "AI" filename would be false.
+confirmation · Max in Bangla · concessions AI light/dark/mobile.
 
 ## Honest remaining limitations
 
-1. **Concession AI imagery** — blocked on a credential. Everything downstream
-   (card redesign, disclosure display, concession tests, 3 screenshots) waits
-   on it.
-2. **104 English strings in 4 prose files** — the booking wizard's step copy,
+1. **105 English strings in 4 prose files** — the booking wizard's step copy,
    Contact, About, TicketPrices. Long-form prose, held by the `check:untranslated`
-   ratchet so no *new* English can be added.
-3. **8 lint warnings** — pre-existing `react-refresh` fast-refresh advisories,
+   ratchet so no *new* English can be added. The customer-facing labels and
+   disclosures around them are translated; this is the essay/form prose itself.
+2. **8 lint warnings** — pre-existing `react-refresh` fast-refresh advisories,
    not introduced here.
+3. **The raw PNG originals are gitignored** (35 MB). A committed 3.8 MB
+   full-resolution JPEG source rebuilds the derivatives without regenerating;
+   only a from-scratch regeneration needs the API again.
