@@ -2,7 +2,7 @@ import { Minus, Plus, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/misc';
 import { InfoTip } from '@/components/ui/popover';
-import { ConcessionPhoto } from '@/components/visual/ConcessionPhoto';
+import { ConcessionImage } from '@/components/visual/ConcessionImage';
 import { money } from '@/lib/format';
 import type { ConcessionItem } from '@/data/types';
 import { cn } from '@/lib/utils';
@@ -58,7 +58,7 @@ export function ConcessionCard({
       )}
     >
       <div className="relative">
-        <ConcessionPhoto
+        <ConcessionImage
           item={item}
           className="border-b border-hairline"
           imgClassName={cn(

@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import { concessionPhotoById } from '@/data/concessionMedia';
+import { concessionImageById } from '@/data/concessionMedia';
 import type { ConcessionItem } from '@/data/types';
 import { cn } from '@/lib/utils';
 
 /**
- * A real photograph of a real item on the counter.
+ * The counter item's generated image.
  *
- * Replaces the hand-drawn illustrations entirely — the drawings are gone from
- * the card, not layered behind a picture.
- *
- * Local files only, three widths, AVIF → WebP → JPEG. Intrinsic dimensions are
- * always set so the grid reserves the box before the bytes land and nothing
- * shifts as the counter loads.
+ * These are AI-generated illustrations, committed locally and served as three
+ * widths in AVIF → WebP → JPEG. Intrinsic dimensions are always set so the grid
+ * reserves the box before the bytes land and nothing shifts as the counter
+ * loads. The customer-facing disclosure that these are illustrations lives on
+ * the concessions route and the booking step, not on every card.
  */
-export function ConcessionPhoto({
+export function ConcessionImage({
   item,
   className,
   imgClassName,
@@ -26,13 +25,12 @@ export function ConcessionPhoto({
   sizes?: string;
   priority?: boolean;
 }) {
-  const photo = concessionPhotoById.get(item.id);
+  const image = concessionImageById.get(item.id);
   const [failed, setFailed] = useState(false);
 
-  // No photograph on file, or it failed to decode. A typeset panel naming the
-  // item is a better answer than a broken-image icon — and it is still not an
-  // illustration of the food.
-  if (!photo || failed) {
+  // No image on file, or it failed to decode. A typeset panel naming the item
+  // is a better answer than a broken-image icon.
+  if (!image || failed) {
     return (
       <div
         className={cn(
@@ -45,9 +43,9 @@ export function ConcessionPhoto({
     );
   }
 
-  const widest = photo.widths[photo.widths.length - 1]!;
+  const widest = image.widths[image.widths.length - 1]!;
   const srcSet = (ext: string) =>
-    photo.widths.map((w) => `${photo.basePath}-${w}.${ext} ${w}w`).join(', ');
+    image.widths.map((w) => `${image.basePath}-${w}.${ext} ${w}w`).join(', ');
 
   return (
     <div className={cn('relative aspect-[4/3] overflow-hidden bg-surface-sunken', className)}>
@@ -55,12 +53,12 @@ export function ConcessionPhoto({
         <source type="image/avif" srcSet={srcSet('avif')} sizes={sizes} />
         <source type="image/webp" srcSet={srcSet('webp')} sizes={sizes} />
         <img
-          src={`${photo.basePath}-${widest}.jpg`}
+          src={`${image.basePath}-${widest}.jpg`}
           srcSet={srcSet('jpg')}
           sizes={sizes}
           width={widest}
           height={Math.round((widest / 4) * 3)}
-          alt={photo.alt}
+          alt={image.alt}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
           onError={() => setFailed(true)}

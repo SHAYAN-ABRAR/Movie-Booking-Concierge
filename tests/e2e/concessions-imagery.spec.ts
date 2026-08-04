@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 import { collectErrors, expectRouteNotBlank } from './helpers';
 
 /**
- * The counter must use real photography, and the drawings must be gone.
+ * The counter uses AI-generated illustrations, and the drawings must be gone.
  *
  * "Gone" is asserted two ways: every card carries a decoded raster image, and
  * no card contains the inline SVG the illustrations were drawn as.
@@ -24,8 +24,8 @@ async function cardImages(page: Page) {
   );
 }
 
-test.describe('counter photography', () => {
-  test('every item shows a real, decoded photograph', async ({ page }) => {
+test.describe('counter imagery', () => {
+  test('every item shows a decoded image', async ({ page }) => {
     const { pageErrors, consoleErrors } = collectErrors(page);
     const failed: string[] = [];
     page.on('response', (r) => {
@@ -59,7 +59,7 @@ test.describe('counter photography', () => {
     expect(consoleErrors).toEqual([]);
   });
 
-  test('no two items share a photograph', async ({ page }) => {
+  test('no two items share an image', async ({ page }) => {
     await page.goto('/concessions');
     await page.evaluate(async () => {
       for (let y = 0; y < document.body.scrollHeight; y += 600) {
@@ -72,7 +72,7 @@ test.describe('counter photography', () => {
     const sources = (await cardImages(page))
       .map((c) => c.src?.replace(/-\d+\.(avif|webp|jpg)$/, ''))
       .filter(Boolean);
-    expect(new Set(sources).size, 'a photograph is reused across items').toBe(sources.length);
+    expect(new Set(sources).size, 'an image is reused across items').toBe(sources.length);
   });
 
   test('the drawn illustrations are gone from the cards', async ({ page }) => {
@@ -93,9 +93,18 @@ test.describe('counter photography', () => {
     );
 
     for (const slot of mediaSlots) {
-      expect(slot.hasImg, 'a card media slot is not a photograph').toBe(true);
+      expect(slot.hasImg, 'a card media slot is not an image').toBe(true);
       expect(slot.hasSvg, 'a card media slot still contains a drawing').toBe(false);
     }
+  });
+
+  test('shows the AI-generated-image disclosure', async ({ page }) => {
+    await page.goto('/concessions');
+    await expectRouteNotBlank(page);
+    // Once, under the header — the honest note that these are generated.
+    await expect(
+      page.getByText(/AI-generated illustrations\. Actual presentation may vary/i),
+    ).toBeVisible();
   });
 
   test('add, increase, decrease and remove all still work', async ({ page }) => {

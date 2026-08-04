@@ -209,27 +209,34 @@ const concessionsSource = readFileSync('src/data/concessions.ts', 'utf8');
 const mediaSource = readFileSync('src/data/concessionMedia.ts', 'utf8');
 
 const itemIds = [...concessionsSource.matchAll(/id: '(con-[^']+)'/g)].map((m) => m[1]);
-const photoIds = [...mediaSource.matchAll(/itemId: '(con-[^']+)'/g)].map((m) => m[1]);
+const imageIds = [...mediaSource.matchAll(/itemId: '(con-[^']+)'/g)].map((m) => m[1]);
 
 for (const id of itemIds) {
-  if (!photoIds.includes(id)) fail(`concession ${id} has no photograph`);
+  if (!imageIds.includes(id)) fail(`concession ${id} has no generated image`);
 }
 
-const photoBlocks = [...mediaSource.matchAll(/\{\s*\n\s*itemId: '(con-[^']+)',([\s\S]*?)\n  \},/g)];
-const photoPaths = [];
+const imageBlocks = [...mediaSource.matchAll(/\{\s*\n\s*itemId: '(con-[^']+)',([\s\S]*?)\n  \},/g)];
+const imagePaths = [];
 
-for (const [, id, block] of photoBlocks) {
+for (const [, id, block] of imageBlocks) {
   const base = field(block, 'basePath');
-  const licence = field(block, 'licence');
-  const sourcePage = field(block, 'sourcePage');
   const alt = field(block, 'alt');
+  const sourceType = field(block, 'sourceType');
+  const model = field(block, 'model');
+  const generatedAt = field(block, 'generatedAt');
 
   if (!base) { fail(`${id}: no basePath`); continue; }
-  if (/^https?:/.test(base)) fail(`${id}: photograph is a remote URL`);
-  if (!licence) fail(`${id}: no licence recorded`);
-  if (!sourcePage?.startsWith('http')) fail(`${id}: no source page recorded`);
+  if (/^https?:/.test(base)) fail(`${id}: image uses an external runtime URL`);
   if (!alt || alt.length < 8) fail(`${id}: alt text is missing or too short`);
-  photoPaths.push(base);
+
+  // AI provenance is required; a stray photographer credit is forbidden.
+  if (sourceType !== 'ai-generated') fail(`${id}: sourceType must be 'ai-generated'`);
+  if (!model) fail(`${id}: no generation model recorded`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(generatedAt ?? '')) fail(`${id}: no generation date recorded`);
+  if (/creator:|licence:|licenceUrl:|sourcePage:/.test(block)) {
+    fail(`${id}: still carries photographer attribution on a generated image`);
+  }
+  imagePaths.push(base);
 
   const widths = block.match(/widths: \[([^\]]+)\]/)?.[1]?.split(',').map((w) => Number(w.trim())) ?? [];
   if (widths.length === 0) fail(`${id}: no rendered widths`);
@@ -241,8 +248,8 @@ for (const [, id, block] of photoBlocks) {
   }
 }
 
-const photoDupes = photoPaths.filter((p, i) => photoPaths.indexOf(p) !== i);
-if (photoDupes.length) fail(`concession photographs reused: ${[...new Set(photoDupes)].join(', ')}`);
+const imageDupes = imagePaths.filter((p, i) => imagePaths.indexOf(p) !== i);
+if (imageDupes.length) fail(`concession images reused: ${[...new Set(imageDupes)].join(', ')}`);
 
 /* ── No illustration component may return to the counter ──────────────── */
 
@@ -266,5 +273,5 @@ if (problems.length) {
 
 console.log(
   `validate:content — ${movieBlocks.length} films (${nowShowing} now showing, ${comingSoon} coming soon), ` +
-    `${itemIds.length} counter items, all artwork local and attributed.`,
+    `${itemIds.length} counter items with local AI-generated imagery.`,
 );

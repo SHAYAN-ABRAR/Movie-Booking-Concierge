@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import { Announcer, DataRow, EmptyState, PageHeader } from '@/components/common';
 import { EmptyDrawing } from '@/components/visual/EmptyStates';
 import { Button } from '@/components/ui/button';
@@ -73,6 +74,12 @@ export function Concessions() {
             : 'What the counter serves across the circuit. Add anything here and it carries into your booking — a couple of items are only stocked at some houses.'
         }
       />
+
+      {/* Discrete, once, under the header — not stamped over every image. */}
+      <p className="flex items-center gap-2 border-b border-hairline py-3 text-[0.8125rem] text-content-muted">
+        <Sparkles aria-hidden="true" className="size-3.5 shrink-0 text-content-faint" />
+        {t('concessions.aiDisclosure')}
+      </p>
 
       <div className="flex flex-col gap-8 py-8 lg:flex-row lg:gap-12">
         <div className="min-w-0 flex-1">

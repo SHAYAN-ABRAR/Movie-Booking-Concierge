@@ -327,6 +327,8 @@ export const en = {
     clearFilters: 'Clear filters',
     demoNote:
       'Sample menu and sample prices in Bangladeshi taka, written for this demonstration. Allergen information is illustrative and must not be relied on — several items are deliberately marked as having an incomplete declaration.',
+    aiDisclosure:
+      'Concession images are AI-generated illustrations. Actual presentation may vary.',
     orderHeading: 'Your counter order',
     orderEmpty:
       'Nothing added yet. Anything you pick here waits for you at the add-ons step of your booking — you do not have to decide now.',

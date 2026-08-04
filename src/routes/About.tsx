@@ -91,6 +91,15 @@ export function About() {
               should have been there — the type <em>is</em> the picture.
             </p>
 
+            <h3 className="mt-8 font-display text-xl leading-tight">The one exception: the counter</h3>
+            <p className="mt-3 text-[1.0625rem] leading-8">
+              The concession items carry generated food photography, produced once with an AI image
+              model and committed to the repository as local files — the running site never contacts
+              an image service. They are illustrations, not photographs of real GrandPlex servings,
+              and every counter surface says so. Film posters and backdrops are never AI-generated:
+              inventing a face or a piece of studio artwork would be a different, dishonest thing.
+            </p>
+
             <h3 className="mt-8 font-display text-xl leading-tight">About Max</h3>
             <p className="mt-3 text-[1.0625rem] leading-8">
               Max is the booking concierge in the bottom-right corner. It runs entirely on this

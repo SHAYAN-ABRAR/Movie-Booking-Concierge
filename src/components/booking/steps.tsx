@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import {
   Banknote,
   CreditCard,
@@ -12,6 +13,7 @@ import {
   Plus,
   ShieldCheck,
   Smartphone,
+  Sparkles,
   TriangleAlert,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -446,6 +448,7 @@ export function SeatsStep({
    ══════════════════════════════════════════════════════════════════════ */
 
 export function ConcessionsStep({ quote }: { quote: Quote }) {
+  const { t } = useTranslation();
   const cinemaId = useBooking((s) => s.cinemaId);
   const concessions = useBooking((s) => s.concessions);
   const setConcession = useBooking((s) => s.setConcession);
@@ -467,9 +470,14 @@ export function ConcessionsStep({ quote }: { quote: Quote }) {
         <RuleHeading as="h2" className="mb-2">
           Anything from the counter
         </RuleHeading>
-        <p className="mb-5 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
+        <p className="mb-3 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
           Entirely optional — you can go straight on. Anything you add is paid for with your tickets
           and collected at the counter on the day.
+        </p>
+        {/* The generated-image disclosure, once, before the grid. */}
+        <p className="mb-5 flex items-center gap-2 text-[0.8125rem] text-content-muted">
+          <Sparkles aria-hidden="true" className="size-3.5 shrink-0 text-content-faint" />
+          {t('concessions.aiDisclosure')}
         </p>
 
         <div className="mb-5 flex flex-wrap gap-1.5">

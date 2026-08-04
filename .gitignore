@@ -18,7 +18,16 @@ skills-lock.json
 # Third-party design-reference material. Studied, never rendered, and not ours
 # to redistribute — see docs/asset-inventory.md. `npm run check:assets` runs
 # fine without it.
-reference-assets/
+# reference-assets is dev-only, EXCEPT the committed concession-image source,
+# which is kept so the shipped derivatives can be rebuilt without regenerating
+# from the API. Git can only re-include a nested path if every parent is
+# ignored by contents (/*) rather than as a whole directory.
+reference-assets/*
+!reference-assets/generated/
+reference-assets/generated/*
+!reference-assets/generated/concessions/
+reference-assets/generated/concessions/*
+!reference-assets/generated/concessions/source/
 
 # Playwright artefacts — generated, never committed
 test-results/

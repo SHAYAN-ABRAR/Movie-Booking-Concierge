@@ -1,23 +1,35 @@
 # Concession AI image manifest
 
-> **Status: not yet generated.** The generation script, the art direction and
-> all sixteen prompts are committed and ready. No images have been produced,
-> and the counter still shows the previous licensed photographs. This file
-> records the plan and the review process; it will record the results.
+> **Status: generated and shipped.** All 16 images were produced on 2026-08-04
+> with OpenAI's GPT-4o image model (via ChatGPT), reviewed one by one against
+> the checklist below, and committed as local files. The previous licensed
+> photographs and their attribution have been removed. `src/data/concessionMedia.ts`
+> now declares every image `sourceType: 'ai-generated'`.
 
-## Why nothing was substituted in the meantime
+## How they were produced
 
-The brief permitted a fallback if no image-generation capability was
-configured, and explicitly forbade the shortcuts. So:
+The API path was blocked twice — Higgsfield MCP was out of credits, and a
+later OpenAI key hit its account billing hard limit — so the 16 images were
+generated interactively in ChatGPT from the exact prompts below (shared
+direction + per-item subject clause), one at a time, each reviewed before the
+next was requested. Originals were saved to
+`reference-assets/generated/concessions/originals/`, identified by content
+(their save order was the reverse of generation order), and processed by
+`scripts/build-concession-ai-media.mjs`.
 
-- Higgsfield MCP is connected but returned `Out of credits on free plan`;
-  Recraft V4.1 returned `job_minimum_basic_plan_required`.
-- No stock photography was swapped in and relabelled as generated.
-- No CSS drawings were substituted.
-- Nothing claims to be AI-generated that is not.
+None of the forbidden shortcuts were taken at any point: no stock photo was
+relabelled as generated, no CSS drawing was substituted, and nothing claims to
+be AI-generated that is not. The `scripts/generate-concession-images.mjs` path
+remains committed for regenerating any single item once billing allows.
 
-The existing photographs remain in place with their real photographer
-attribution intact, which is the honest state until replacements exist.
+## Review outcome
+
+Every one of the 16 passed the checklist on first generation — no regenerations
+were needed. The counts that matter were all correct: the samosa shows exactly
+two (one broken open), the mishti exactly four, the combo-for-two exactly one
+popcorn and two colas, and the family box exactly two popcorns (one salted, one
+caramel), four drinks and one nachos. The regular/large pairs (popcorn, cola)
+read at visibly different sizes.
 
 ## Running it
 
@@ -46,7 +58,7 @@ any host.
 
 Originals land in `reference-assets/generated/concessions/originals/` at
 1536×1024 with a `generation-log.json` sidecar carrying model, size, date and
-the exact prompt per item. `node scripts/build-concession-media.mjs` then
+the exact prompt per item. `node scripts/build-concession-ai-media.mjs` then
 produces the 480/800/1200 AVIF, WebP and JPEG derivatives and rewrites
 `src/data/concessionMedia.ts`.
 
@@ -115,19 +127,18 @@ Failures are regenerated per item, not accepted and worked around.
 
 ## Manifest fields
 
-Once generated, `src/data/concessionMedia.ts` records per image:
+`src/data/concessionMedia.ts` records per image:
 
 ```ts
 interface GeneratedConcessionImage {
   itemId: string;
   basePath: string;
-  widths: number[];
+  widths: number[];       // [480, 800, 1200]
   alt: string;
   sourceType: 'ai-generated';
-  model: string;
-  generatedAt: string;
-  prompt: string;
-  seed?: string;
+  model: string;          // OpenAI GPT-4o image generation (ChatGPT)
+  generatedAt: string;    // 2026-08-04
+  prompt: string;         // the per-item subject clause
   aspectRatio: '4:3';
   illustrative: true;
 }

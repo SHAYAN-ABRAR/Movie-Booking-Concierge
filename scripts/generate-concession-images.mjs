@@ -24,7 +24,7 @@
  *
  * Originals land in `reference-assets/generated/concessions/originals/` at full
  * resolution so derivatives can be rebuilt without regenerating. Run
- * `node scripts/build-concession-media.mjs` afterwards to produce the AVIF,
+ * `node scripts/build-concession-ai-media.mjs` afterwards to produce the AVIF,
  * WebP and JPEG widths and rewrite the manifest.
  */
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -215,7 +215,7 @@ for (const id of targets) {
   record.push({ itemId: id, model: MODEL, size: SIZE, generatedAt, prompt });
 }
 
-// The provenance sidecar. `build-concession-media.mjs` reads this to write the
+// The provenance sidecar. `build-concession-ai-media.mjs` reads this to write the
 // manifest, so the model and prompt travel with the image rather than being
 // retyped into documentation by hand.
 await writeFile(
@@ -228,5 +228,5 @@ console.log(
   `\n  ${record.length} original(s) written to reference-assets/generated/concessions/originals/\n` +
     '  Review each one against the checklist in docs/concession-ai-image-manifest.md,\n' +
     '  regenerate any that fail, then run:\n\n' +
-    '    node scripts/build-concession-media.mjs\n',
+    '    node scripts/build-concession-ai-media.mjs\n',
 );

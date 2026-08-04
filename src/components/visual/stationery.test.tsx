@@ -5,8 +5,8 @@ import type { ReactElement } from 'react';
 
 import { MotionProvider } from '@/motion/MotionProvider';
 import { OfferComposition } from './OfferComposition';
-import { ConcessionPhoto } from './ConcessionPhoto';
-import { concessionPhotoById } from '@/data/concessionMedia';
+import { ConcessionImage } from './ConcessionImage';
+import { concessionImageById } from '@/data/concessionMedia';
 import { EmptyDrawing } from './EmptyStates';
 import type { EmptyVariant } from './EmptyStates';
 import { EmptyState } from '@/components/common';
@@ -88,32 +88,46 @@ describe('offer compositions', () => {
 });
 
 /* ══════════════════════════════════════════════════════════════════════
-   COUNTER PHOTOGRAPHY
+   COUNTER IMAGERY — AI-generated
    ══════════════════════════════════════════════════════════════════════ */
 
-describe('counter photography', () => {
-  it('gives every item on the counter its own real photograph', () => {
+describe('counter imagery', () => {
+  it('gives every item on the counter its own generated image', () => {
     for (const item of concessions) {
-      const photo = concessionPhotoById.get(item.id);
-      expect(photo, `no photograph for ${item.id}`).toBeDefined();
-      expect(photo!.basePath).toMatch(/^\/media\/concessions\//);
-      expect(photo!.widths.length).toBeGreaterThan(0);
-      expect(photo!.alt.length).toBeGreaterThan(8);
-      // Attribution is not optional.
-      expect(photo!.licence).toBeTruthy();
-      expect(photo!.sourcePage).toMatch(/^https?:/);
+      const image = concessionImageById.get(item.id);
+      expect(image, `no image for ${item.id}`).toBeDefined();
+      expect(image!.basePath).toMatch(/^\/media\/concessions\//);
+      expect(image!.widths.length).toBeGreaterThan(0);
+      expect(image!.alt.length).toBeGreaterThan(8);
     }
   });
 
-  it('never reuses one photograph for two items', () => {
+  it('records honest AI provenance, not a photographer credit', () => {
+    for (const item of concessions) {
+      const image = concessionImageById.get(item.id)!;
+      // Declared generated, with model and date — and flagged illustrative so
+      // nothing downstream can present it as a real serving.
+      expect(image.sourceType, item.id).toBe('ai-generated');
+      expect(image.model, item.id).toBeTruthy();
+      expect(image.generatedAt, item.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(image.prompt.length, item.id).toBeGreaterThan(20);
+      expect(image.illustrative, item.id).toBe(true);
+      // The old photographer-attribution fields must be gone — leaving one on a
+      // generated image would be a false credit.
+      expect('licence' in image, `${item.id} still carries a licence field`).toBe(false);
+      expect('creator' in image, `${item.id} still carries a creator field`).toBe(false);
+    }
+  });
+
+  it('never reuses one image for two items', () => {
     const paths = concessions
-      .map((item) => concessionPhotoById.get(item.id)?.basePath)
+      .map((item) => concessionImageById.get(item.id)?.basePath)
       .filter(Boolean);
     expect(new Set(paths).size).toBe(paths.length);
   });
 
-  it('renders a local photograph, never a remote URL', () => {
-    const { container } = render(<ConcessionPhoto item={concessions[0]!} />);
+  it('renders a local image, never a remote URL', () => {
+    const { container } = render(<ConcessionImage item={concessions[0]!} />);
     const img = container.querySelector('img');
     expect(img).not.toBeNull();
     expect(img!.getAttribute('src')).toMatch(/^\/media\/concessions\//);
@@ -124,14 +138,14 @@ describe('counter photography', () => {
   });
 
   it('reserves the box before the bytes arrive', () => {
-    const { container } = render(<ConcessionPhoto item={concessions[0]!} />);
+    const { container } = render(<ConcessionImage item={concessions[0]!} />);
     const img = container.querySelector('img')!;
     expect(img).toHaveAttribute('width');
     expect(img).toHaveAttribute('height');
   });
 
   it('describes the food rather than naming a file', () => {
-    const { container } = render(<ConcessionPhoto item={concessions[0]!} />);
+    const { container } = render(<ConcessionImage item={concessions[0]!} />);
     const alt = container.querySelector('img')!.getAttribute('alt') ?? '';
     expect(alt).not.toMatch(/\.(jpg|png|webp|avif)/i);
     expect(alt.split(' ').length).toBeGreaterThan(2);
