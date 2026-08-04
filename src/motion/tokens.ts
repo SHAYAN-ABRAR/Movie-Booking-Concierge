@@ -97,3 +97,24 @@ export function staggerFor(count: number, step: number = stagger.base, maxTotal 
 
 /** Standard viewport config for scroll reveals: once only, and early enough to feel natural. */
 export const revealViewport = { once: true, amount: 0.18, margin: '0px 0px -8% 0px' } as const;
+
+/**
+ * The same scale, as CSS custom-property references.
+ *
+ * A component doing a plain CSS transition writes `duration-[--dur-fast]`;
+ * one animating with Framer Motion writes `duration.fast`. They must resolve
+ * to the same number, or a card's hover and its layout animation run at
+ * different speeds and the interface stops feeling like one thing.
+ *
+ * `motion.test.ts` asserts the two scales agree.
+ */
+export const cssDuration = {
+  '--dur-instant': 'instant',
+  '--dur-fast': 'fast',
+  '--dur-base': 'base',
+  // `--dur-slow` is the poster drift and the card sheen: the same length as a
+  // section arriving on scroll, which is what `reveal` is for. There is no
+  // separate JS `slow`, and adding one would be an eighth value on a scale
+  // whose shortness is the point.
+  '--dur-slow': 'reveal',
+} as const satisfies Record<string, keyof typeof duration>;

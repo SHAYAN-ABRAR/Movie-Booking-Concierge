@@ -50,7 +50,7 @@ export function ConcessionCard({
     <article
       className={cn(
         'group flex h-full flex-col border border-hairline-strong bg-surface-raised',
-        'transition-[border-color,box-shadow] duration-200 ease-out',
+        'transition-[border-color,box-shadow] duration-[--dur-base] ease-[--ease-out]',
         quantity > 0
           ? 'border-content shadow-[0_10px_24px_-18px_rgb(20_22_31_/_0.45)]'
           : 'hover:border-content/50',

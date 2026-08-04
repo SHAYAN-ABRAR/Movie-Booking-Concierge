@@ -138,7 +138,7 @@ export function ShowtimeButton({
           'hover:-translate-y-0.5 hover:border-content hover:bg-content/[0.04]',
           'hover:shadow-[0_10px_20px_-14px_rgb(20_22_31_/_0.5)]',
           'focus-visible:-translate-y-0.5 focus-visible:border-content',
-          'active:translate-y-0 active:duration-[90ms]',
+          'active:translate-y-0 active:duration-[--dur-fast]',
         ),
     imminent !== null && !soldOut ? 'border-marigold/50' : '',
     className,

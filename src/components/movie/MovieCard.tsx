@@ -75,7 +75,7 @@ export function MovieCard({
             className={cn(
               'pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12',
               'bg-gradient-to-r from-transparent via-white/12 to-transparent',
-              'opacity-0 transition-all duration-[--dur-slow] ease-[--ease-out]',
+              'opacity-0 transition-[left,opacity] duration-[--dur-slow] ease-[--ease-out]',
               'group-hover:left-[110%] group-hover:opacity-100',
               'group-focus-within:left-[110%] group-focus-within:opacity-100',
               'motion-reduce:hidden',

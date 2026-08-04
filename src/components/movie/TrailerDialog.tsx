@@ -178,7 +178,7 @@ export function TrailerPreview({ movie, className }: { movie: Movie; className?:
           movie={movie}
           role="backdrop"
           sizes="(max-width: 48rem) 100vw, 48rem"
-          imgClassName="transition-transform duration-500 ease-out group-hover:scale-[1.03] group-focus-visible:scale-[1.03] motion-reduce:transform-none"
+          imgClassName="transition-transform duration-[--dur-slow] ease-[--ease-out] group-hover:scale-[1.03] group-focus-visible:scale-[1.03] motion-reduce:transform-none"
         />
         <span
           aria-hidden="true"

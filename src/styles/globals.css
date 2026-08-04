@@ -76,12 +76,25 @@
   --accent-contrast: #ffffff;
   --focus: var(--marigold);
 
-  /* Motion */
+  /* ── Motion ───────────────────────────────────────────────────────────
+   * The same scale as `src/motion/tokens.ts`, in milliseconds.
+   *
+   * These were previously a *second*, unrelated scale — `--dur-fast` was 120ms
+   * while the JS `fast` token was 190ms — so a CSS hover and a Framer Motion
+   * animation on the same card ran at visibly different speeds. Anything that
+   * changes here changes there, and the two must be read together.
+   *
+   *   --dur-instant  press feedback, same-frame acknowledgement
+   *   --dur-fast     hover, focus, colour and border
+   *   --dur-base     cards, panels, summaries — the workhorse
+   *   --dur-slow     poster drift, sheen, atmosphere
+   * ─────────────────────────────────────────────────────────────────── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-fast: 120ms;
-  --dur-base: 200ms;
-  --dur-slow: 340ms;
+  --dur-instant: 110ms;
+  --dur-fast: 190ms;
+  --dur-base: 280ms;
+  --dur-slow: 460ms;
 
   /* Layout */
   --header-h: 4rem;

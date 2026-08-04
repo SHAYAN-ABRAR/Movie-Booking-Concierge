@@ -245,7 +245,7 @@ export function Home() {
                 className="group block border border-hairline-strong transition-colors hover:border-content focus-visible:border-content"
               >
                 <div className="overflow-hidden">
-                  <div className="transition-transform duration-500 ease-out group-hover:scale-[1.02] group-focus-visible:scale-[1.02] motion-reduce:transform-none">
+                  <div className="transition-transform duration-[--dur-slow] ease-[--ease-out] group-hover:scale-[1.02] group-focus-visible:scale-[1.02] motion-reduce:transform-none">
                     <OfferComposition offer={offer} variant="tile" />
                   </div>
                 </div>
