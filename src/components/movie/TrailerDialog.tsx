@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, Play } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/overlay';
@@ -32,13 +32,24 @@ import { cn } from '@/lib/utils';
 const YOUTUBE_HOST = 'https://www.youtube-nocookie.com';
 
 /**
- * `autoplay=1` is safe *here* and would not be on page load: the dialog only
- * exists because someone pressed a button, which is exactly the user gesture
- * browsers require. `playsinline` keeps iOS from taking over the screen.
+ * No `autoplay`. Deliberately.
+ *
+ * Autoplay works, and the brief permits it after an explicit click — but only
+ * "if browser behavior and accessibility remain reliable", and it does not.
+ * When the video starts, Chrome moves focus *into* the cross-origin iframe, and
+ * a browser does not bubble keystrokes out of a cross-origin frame to its
+ * parent. So the moment autoplay begins, Escape can no longer reach the dialog
+ * and a keyboard user is trapped until they find the mouse.
+ *
+ * Without autoplay the iframe never takes focus on its own: focus stays on the
+ * dialog's Close control, Escape closes it, and the customer presses the
+ * embed's own play button — one deliberate click — when they are ready. The
+ * accessibility guarantee is worth that click.
+ *
+ * `playsinline` keeps iOS from throwing the video fullscreen once it does play.
  */
 function embedUrl(trailer: MovieTrailer): string {
   const params = new URLSearchParams({
-    autoplay: '1',
     playsinline: '1',
     rel: '0',
     modestbranding: '1',
@@ -59,6 +70,7 @@ export function TrailerDialog({
   const { t } = useTranslation();
   const trailer = movie.trailer;
   const [ready, setReady] = useState(false);
+  const closeButton = useRef<HTMLButtonElement>(null);
 
   // A fresh mount per opening. Without this the iframe would be reused across
   // openings and resume mid-trailer.
@@ -75,6 +87,14 @@ export function TrailerDialog({
         // The player is the content. A pale dialog surface would flash white
         // around a 16:9 black frame every time it opens.
         style={{ background: 'var(--house)' }}
+        // Focus the Close button, not the iframe. Radix would otherwise autofocus
+        // the first tabbable element, which is the player — and focus inside a
+        // cross-origin frame swallows Escape. Landing on Close keeps the keyboard
+        // path (Escape, Tab) working until the customer clicks into the video.
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          closeButton.current?.focus();
+        }}
       >
         <div className="flex items-start justify-between gap-4 px-5 py-3.5">
           <div className="min-w-0">
@@ -136,6 +156,7 @@ export function TrailerDialog({
             <ExternalLink aria-hidden="true" className="size-3.5" />
           </a>
           <Button
+            ref={closeButton}
             variant="outline"
             size="sm"
             onClick={() => onOpenChange(false)}

@@ -11,6 +11,7 @@ import { DateStrip } from '@/components/showtime/DateStrip';
 import { ShowtimeButton } from '@/components/showtime/ShowtimeButton';
 import { ActiveFilters, FilterPanel } from '@/components/movie/FilterPanel';
 import { AccessibilityLegend, CertificateChip } from '@/components/movie/Chips';
+import { TrailerButton } from '@/components/movie/TrailerDialog';
 import { useMovieFilters } from '@/hooks/useMovieFilters';
 import { cinemaById, filterShowtimes, genreLabels, groupShowtimesByMovie, languageLabels } from '@/data';
 import { dateWindow, formatRuntime, timeOfDay, timeOfDayKeys } from '@/lib/datetime';
@@ -206,20 +207,29 @@ export function Showtimes() {
             <div className="space-y-10">
               {byMovie.map(({ movie, showtimes }) => (
                 <section key={movie.id} aria-labelledby={`film-${movie.id}`}>
-                  <div className="mb-4 border-b-2 border-content pb-2.5">
-                    <h2 id={`film-${movie.id}`} className="font-display text-2xl leading-tight tracking-[-0.02em]">
-                      <Link to={`/movies/${movie.slug}`} className="underline-offset-4 hover:underline">
-                        {movie.title}
-                      </Link>
-                    </h2>
-                    <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-content-muted">
-                      <CertificateChip code={movie.certificate} />
-                      <span className="numeral">{formatRuntime(movie.runtimeMinutes)}</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{languageLabels[movie.language]}</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{movie.genres.map((g) => genreLabels[g]).join(' / ')}</span>
-                    </p>
+                  {/* A listing, not a selector. Each film gets a discrete
+                      trailer action in its header — the full story panel would
+                      be wallpaper repeated under every film. */}
+                  <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b-2 border-content pb-2.5">
+                    <div className="min-w-0">
+                      <h2
+                        id={`film-${movie.id}`}
+                        className="font-display text-2xl leading-tight tracking-[-0.02em]"
+                      >
+                        <Link to={`/movies/${movie.slug}`} className="underline-offset-4 hover:underline">
+                          {movie.title}
+                        </Link>
+                      </h2>
+                      <p className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-content-muted">
+                        <CertificateChip code={movie.certificate} />
+                        <span className="numeral">{formatRuntime(movie.runtimeMinutes)}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{languageLabels[movie.language]}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{movie.genres.map((g) => genreLabels[g]).join(' / ')}</span>
+                      </p>
+                    </div>
+                    <TrailerButton movie={movie} variant="ghost" size="sm" className="shrink-0" />
                   </div>
 
                   {bands

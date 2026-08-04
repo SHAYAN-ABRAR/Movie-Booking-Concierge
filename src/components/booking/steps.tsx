@@ -32,6 +32,7 @@ import { DateStrip } from '@/components/showtime/DateStrip';
 import { SeatMap } from '@/components/booking/SeatMap';
 import { ConcessionCard } from '@/components/concessions/ConcessionCard';
 import { AccessibilityChips } from '@/components/movie/Chips';
+import { SelectedMovieStory } from '@/components/movie/SelectedMovieStory';
 import { DataRow, EmptyState } from '@/components/common';
 import {
   availabilityFor,
@@ -79,6 +80,9 @@ export function SessionStep({ movie, showtime }: { movie: Movie; showtime: Showt
 
   return (
     <div className="space-y-8">
+      {/* What you're booking, before the mechanics of where and when. */}
+      <SelectedMovieStory movie={movie} showDetailsLink={false} />
+
       <div>
         <RuleHeading as="h2" className="mb-4">
           Which cinema
