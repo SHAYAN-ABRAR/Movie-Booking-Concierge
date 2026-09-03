@@ -248,7 +248,7 @@ export function TicketPrices() {
 
         {/* ── Sidebar ──────────────────────────────────────────────── */}
         <aside className="lg:sticky lg:top-24 lg:h-fit">
-          <section aria-labelledby="cover" className="border border-hairline-strong p-5">
+          <section aria-labelledby="cover" className="border-2 border-hairline-strong p-5">
             <h2 id="cover" className="eyebrow mb-3">
               {insurancePolicy.name}
             </h2>
@@ -279,7 +279,7 @@ export function TicketPrices() {
             </ul>
           </section>
 
-          <section aria-labelledby="refunds" className="mt-6 border border-hairline-strong p-5">
+          <section aria-labelledby="refunds" className="mt-6 border-2 border-hairline-strong p-5">
             <h2 id="refunds" className="eyebrow mb-3">
               Refunds and exchanges
             </h2>

@@ -180,7 +180,7 @@ export function MaxDock() {
                 transition={{ duration: motion.reduced ? 0 : 0.24, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   'relative max-w-[min(20rem,calc(100vw-2rem))] border-2 border-content bg-surface-raised p-3.5 pr-9',
-                  'shadow-[0_16px_40px_-16px_rgb(20_22_31_/_0.4)]',
+                  'shadow-[4px_4px_0_0_var(--content)]',
                 )}
               >
                 <p className="text-[0.9375rem] font-semibold leading-snug text-content">
@@ -218,7 +218,7 @@ export function MaxDock() {
                 className={cn(
                   'flex h-[min(38rem,calc(100dvh-8rem))] w-[26rem] max-w-[calc(100vw-2rem)] flex-col',
                   'border-2 border-content bg-surface',
-                  'shadow-[0_24px_64px_-24px_rgb(20_22_31_/_0.45)]',
+                  'shadow-[6px_6px_0_0_var(--content)]',
                 )}
               >
                 <Suspense fallback={<PanelFallback />}>
@@ -239,7 +239,7 @@ export function MaxDock() {
             onClick={() => setOpen(!open)}
             aria-expanded={open}
             aria-label={
-              unread > 0 ? `Ask Max — ${unread} new ${unread === 1 ? 'reply' : 'replies'}` : 'Ask Max'
+              unread > 0 ? t('maxPanel.askUnread', { count: unread }) : t('maxPanel.ask')
             }
             layout={motion.reduced ? false : 'position'}
             transition={motion.reduced ? { duration: 0 } : spring.marker}
@@ -250,8 +250,8 @@ export function MaxDock() {
               'font-sans text-sm font-semibold',
               'transition-[background-color,color,box-shadow] duration-[--dur-fast]',
               open
-                ? 'bg-content text-surface shadow-[0_6px_18px_-10px_rgb(20_22_31_/_0.5)]'
-                : 'bg-surface-raised text-content shadow-[0_10px_30px_-12px_rgb(20_22_31_/_0.45)] hover:bg-content hover:text-surface hover:shadow-[0_16px_34px_-14px_rgb(20_22_31_/_0.55)]',
+                ? 'bg-content text-surface'
+                : 'bg-surface-raised text-content shadow-[4px_4px_0_0_var(--content)] hover:bg-accent hover:text-accent-contrast',
             )}
           >
             {/* A single projected sweep when something new has arrived. */}
@@ -262,19 +262,21 @@ export function MaxDock() {
                 initial={{ x: '-120%' }}
                 animate={{ x: '120%' }}
                 transition={{ duration: 0.9, ease: ease.projection }}
-                className="pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-marigold/35 to-transparent"
+                className="pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-accent/35 to-transparent"
               />
             ) : null}
 
             <MaxMark className="relative size-6 text-[0.875rem]" tone={open ? 'inverse' : 'default'} />
-            <span className="relative">{open ? 'Close Max' : 'Ask Max'}</span>
+            <span className="relative text-[0.6875rem] font-bold uppercase tracking-[0.12em] [&:lang(bn)]:text-[0.8125rem] [&:lang(bn)]:tracking-normal">
+              {open ? t('maxPanel.close') : t('maxPanel.ask')}
+            </span>
             {unread > 0 && !open ? (
               <m.span
                 aria-hidden="true"
                 initial={motion.reduced ? false : { scale: 0.6, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={motion.reduced ? { duration: 0 } : spring.press}
-                className="numeral relative grid min-w-[1.15rem] place-items-center bg-marigold px-1 text-[0.6875rem] font-bold leading-[1.15rem] text-surface"
+                className="numeral relative grid min-w-[1.15rem] place-items-center bg-accent px-1 text-[0.6875rem] font-bold leading-[1.15rem] text-accent-contrast"
               >
                 {unread}
               </m.span>

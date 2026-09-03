@@ -454,7 +454,7 @@ export function OfferComposition({
       >
         <m.p
           className="numeral font-display text-[2rem] leading-[0.9] tracking-[-0.02em] sm:text-[2.6rem]"
-          style={{ color: art.figureTone, fontVariationSettings: "'SOFT' 0, 'WONK' 0" }}
+          style={{ color: art.figureTone }}
           initial={motion.reduced ? false : { opacity: 0, y: 6 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.4 }}

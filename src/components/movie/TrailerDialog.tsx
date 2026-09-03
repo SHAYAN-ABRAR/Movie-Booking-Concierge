@@ -206,7 +206,7 @@ export function TrailerPreview({ movie, className }: { movie: Movie; className?:
           className="absolute inset-0 bg-gradient-to-t from-house/85 via-house/25 to-transparent"
         />
         <span className="absolute inset-x-0 bottom-0 flex items-center gap-3 p-4 sm:p-5">
-          <span className="grid size-12 shrink-0 place-items-center rounded-full border border-house-ink/40 bg-house/70 backdrop-blur-[2px] transition-colors group-hover:bg-marigold group-hover:text-house">
+          <span className="grid size-12 shrink-0 place-items-center rounded-full border border-house-ink/40 bg-house/70 backdrop-blur-[2px] transition-colors group-hover:bg-signal group-hover:text-house">
             <Play aria-hidden="true" className="size-5 translate-x-[1px] text-house-ink group-hover:text-house" />
           </span>
           <span className="min-w-0 text-left">

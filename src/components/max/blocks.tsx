@@ -222,7 +222,7 @@ export function MaxBlocks({ blocks }: { blocks: MaxBlock[] }) {
                 <ul className="mt-2.5 space-y-1 border-t border-hairline pt-2.5">
                   {block.reasons.map((reason) => (
                     <li key={reason} className="flex gap-2 text-[0.8125rem] leading-5 text-content-muted">
-                      <span aria-hidden="true" className="mt-[0.55em] block size-1 shrink-0 bg-marigold" />
+                      <span aria-hidden="true" className="mt-[0.55em] block size-1 shrink-0 bg-signal" />
                       {reason}
                     </li>
                   ))}
@@ -431,7 +431,7 @@ export function MaxBlocks({ blocks }: { blocks: MaxBlock[] }) {
                 key={index}
                 className="flex items-start gap-2 border-t border-hairline pt-2 text-[0.75rem] leading-5 text-content-faint"
               >
-                <span aria-hidden="true" className="mt-[0.45em] block size-1 shrink-0 bg-marigold" />
+                <span aria-hidden="true" className="mt-[0.45em] block size-1 shrink-0 bg-signal" />
                 <span>{block.text}</span>
               </p>
             );

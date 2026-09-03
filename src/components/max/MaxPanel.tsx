@@ -149,10 +149,10 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
     <>
       <div className="flex h-full flex-col bg-surface">
         {/* ── Header ────────────────────────────────────────────── */}
-        <header className="flex items-start gap-3 border-b border-hairline px-4 py-3">
+        <header className="flex items-start gap-3 border-b-2 border-content px-4 py-3">
           <MaxMark className="mt-0.5 size-7 text-base" />
           <div className="min-w-0 flex-1">
-            <h2 id={headingId} className="font-display text-lg leading-none">
+            <h2 id={headingId} className="font-display text-[1.375rem] uppercase leading-none">
               Max
             </h2>
             <p className="mt-1 text-[0.75rem] leading-4 text-content-muted">
@@ -176,7 +176,7 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
 
         {/* ── Settings / privacy ────────────────────────────────── */}
         {showSettings ? (
-          <div className="border-b border-hairline bg-surface-sunken/50 px-4 py-3 text-[0.8125rem] leading-5">
+          <div className="border-b border-hairline bg-surface-sunken/60 px-4 py-3 text-[0.8125rem] leading-5">
             <p className="text-content-muted">{t('maxPanel.privacy')}</p>
 
             {ollamaAvailable ? (

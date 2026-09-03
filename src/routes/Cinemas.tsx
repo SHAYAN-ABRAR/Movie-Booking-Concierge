@@ -54,7 +54,7 @@ export function Cinemas() {
                         {cinema.description}
                       </p>
 
-                      <p className="mt-4 border-l-2 border-marigold pl-4 font-display text-lg leading-snug">
+                      <p className="mt-4 border-l-2 border-accent pl-4 font-display text-lg leading-snug">
                         {cinema.signature}
                       </p>
 
@@ -112,12 +112,12 @@ export function Cinemas() {
                     </div>
 
                     <div className="lg:pt-3">
-                      <div className="border border-hairline-strong p-5">
+                      <div className="border-2 border-hairline-strong p-5">
                         <h4 className="eyebrow mb-4">The houses</h4>
                         <HouseDiagram screens={cinema.screens} />
                       </div>
 
-                      <div className="mt-5 border border-hairline-strong p-5">
+                      <div className="mt-5 border-2 border-hairline-strong p-5">
                         <h4 className="eyebrow mb-3">On today</h4>
                         {showing[cinema.id]?.length ? (
                           <ul className="space-y-1.5">

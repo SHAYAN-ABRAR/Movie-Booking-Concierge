@@ -152,16 +152,24 @@ export function Concessions() {
               }
             />
           ) : (
+            /* Deliberately not a uniform grid. Every fifth plate runs the
+               full width of the two-column half of the shelf, which breaks the
+               catalogue rhythm without changing the order of anything or
+               hiding a single control. */
             <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {items.map((item) => (
-                <li key={item.id}>
-                  <ConcessionCard
-                    item={item}
-                    quantity={concessions[item.id] ?? 0}
-                    onQuantityChange={(quantity) => change(item.id, quantity, item.name)}
-                  />
-                </li>
-              ))}
+              {items.map((item, i) => {
+                const wide = i % 5 === 0;
+                return (
+                  <li key={item.id} className={wide ? 'sm:col-span-2 xl:col-span-2' : undefined}>
+                    <ConcessionCard
+                      item={item}
+                      layout={wide ? 'wide' : 'stacked'}
+                      quantity={concessions[item.id] ?? 0}
+                      onQuantityChange={(quantity) => change(item.id, quantity, item.name)}
+                    />
+                  </li>
+                );
+              })}
             </ul>
           )}
 
@@ -172,7 +180,7 @@ export function Concessions() {
 
         {/* ── Order summary ─────────────────────────────────────────── */}
         <aside className="lg:w-80 lg:shrink-0">
-          <div className="lg:sticky lg:top-24">
+          <div className="lg:sticky lg:top-28">
             <section
               aria-labelledby="counter-summary"
               className="border-2 border-content bg-surface-raised p-5"

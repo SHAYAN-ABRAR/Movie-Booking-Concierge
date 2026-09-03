@@ -128,7 +128,10 @@ export function MovieDetails() {
 
           <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
             <div>
-              <h1 className="font-display text-[2.5rem] leading-[0.94] tracking-[-0.035em] sm:text-[3.75rem] lg:text-[4.5rem]">
+              <h1
+                className="font-display uppercase leading-[0.86] tracking-[-0.035em] [overflow-wrap:anywhere]"
+                style={{ fontSize: 'clamp(2.5rem, 7vw, 5.5rem)' }}
+              >
                 {movie.title}
               </h1>
               {movie.titleBn ? (
@@ -137,7 +140,7 @@ export function MovieDetails() {
                 </p>
               ) : null}
 
-              <p className="mt-6 max-w-2xl font-display text-[1.25rem] leading-[1.45] text-content sm:text-[1.5rem]">
+              <p className="mt-5 max-w-2xl border-l-2 border-accent pl-4 text-[1.0625rem] font-medium leading-[1.5] text-content sm:text-[1.1875rem]">
                 {movie.tagline}
               </p>
 
@@ -181,11 +184,11 @@ export function MovieDetails() {
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 {movie.status === 'now-showing' ? (
-                  <Button asChild size="lg">
+                  <Button asChild variant="accent" size="lg">
                     <a href="#showtimes">{t('movieDetails.chooseShowtime')}</a>
                   </Button>
                 ) : (
-                  <Badge tone="marigold" className="px-3 py-1.5 text-xs">
+                  <Badge tone="signal" className="px-3 py-1.5 text-xs">
                     {t('movieDetails.opens', { date: releaseLabel(movie) })}
                   </Badge>
                 )}
@@ -206,8 +209,8 @@ export function MovieDetails() {
               </div>
 
               {restricted ? (
-                <div className="mt-7 flex max-w-2xl gap-3 border-l-2 border-marigold bg-marigold-wash/50 px-4 py-3.5">
-                  <TriangleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-marigold" />
+                <div className="mt-7 flex max-w-2xl gap-3 border-l-2 border-accent bg-signal-wash/50 px-4 py-3.5">
+                  <TriangleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-accent" />
                   <div>
                     <p className="text-sm font-semibold text-content">
                       {certificateLabel(movie.certificate)}
@@ -226,6 +229,9 @@ export function MovieDetails() {
                 whatever the film's artwork happens to be doing and become
                 unreadable — which is exactly what the backdrop must never cost. */}
             <div className="lg:pt-3">
+              <div className="mx-auto mb-5 w-40 border-2 border-content sm:w-48 lg:mx-0">
+                <MovieImage movie={movie} role="poster" sizes="192px" />
+              </div>
               <dl className="border-t-2 border-content bg-surface/92 px-4 py-1 text-sm backdrop-blur-[2px] lg:px-5">
                 <div className="border-b border-hairline py-3">
                   <dt className="eyebrow mb-1">{t('movieDetails.credits.director')}</dt>
@@ -273,20 +279,20 @@ export function MovieDetails() {
       <div className="shell grid gap-12 py-12 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
         <div className="min-w-0">
           <section aria-labelledby="synopsis-heading">
-            <RuleHeading id="synopsis-heading" className="mb-5">
+            <RuleHeading id="synopsis-heading" index="01" className="mb-5">
               {t('story.fullSynopsis')}
             </RuleHeading>
             <p className="max-w-prose text-[1.0625rem] leading-8">{movie.synopsis}</p>
 
-            <blockquote className="mt-8 max-w-prose border-l-2 border-hairline-strong pl-5">
-              <p className="font-display text-[1.1875rem] leading-[1.5]">{movie.programmeNote}</p>
+            <blockquote className="mt-8 max-w-prose border-l-2 border-accent pl-5">
+              <p className="text-[1.0625rem] font-medium leading-[1.6]">{movie.programmeNote}</p>
               <footer className="eyebrow mt-3">{t('movieDetails.programmeNotes')}</footer>
             </blockquote>
           </section>
 
           {/* ── Trailer: an honest unavailable state ──────────────────── */}
           <section aria-labelledby="trailer-heading" className="mt-12">
-            <RuleHeading id="trailer-heading" className="mb-5">
+            <RuleHeading id="trailer-heading" index="02" className="mb-5">
               {t('movieDetails.trailer')}
             </RuleHeading>
             {movie.trailer ? (
@@ -302,7 +308,7 @@ export function MovieDetails() {
                     className="absolute inset-0"
                     style={{
                       background:
-                        'radial-gradient(120% 80% at 50% 0%, rgb(147 178 243 / 0.10) 0%, transparent 68%)',
+                        'radial-gradient(120% 80% at 50% 0%, rgb(154 163 180 / 0.12) 0%, transparent 68%)',
                     }}
                   />
                   {/* Leader perforations down both edges. */}
@@ -340,8 +346,8 @@ export function MovieDetails() {
           </section>
 
           {/* ── Showtimes ─────────────────────────────────────────────── */}
-          <section aria-labelledby="showtimes-heading" id="showtimes" className="mt-14 scroll-mt-24">
-            <RuleHeading id="showtimes-heading" className="mb-5">
+          <section aria-labelledby="showtimes-heading" id="showtimes" className="mt-14 scroll-mt-28">
+            <RuleHeading id="showtimes-heading" index="03" className="mb-5">
               {t('movieDetails.showtimes')}
             </RuleHeading>
 
@@ -368,7 +374,8 @@ export function MovieDetails() {
                     type="button"
                     onClick={() => setCinemaId(null)}
                     className={cn(
-                      'border px-3 py-1.5 text-[0.8125rem] font-medium transition-colors',
+                      'border px-3 py-2 text-[0.6875rem] font-bold uppercase tracking-[0.1em] transition-colors',
+                      '[&:lang(bn)]:text-[0.8125rem] [&:lang(bn)]:tracking-normal',
                       cinemaId === null
                         ? 'border-content bg-content text-surface'
                         : 'border-hairline-strong hover:bg-content/[0.06]',
@@ -382,7 +389,8 @@ export function MovieDetails() {
                       type="button"
                       onClick={() => setCinemaId(cinema.id)}
                       className={cn(
-                        'border px-3 py-1.5 text-[0.8125rem] font-medium transition-colors',
+                        'border px-3 py-2 text-[0.6875rem] font-bold uppercase tracking-[0.1em] transition-colors',
+                      '[&:lang(bn)]:text-[0.8125rem] [&:lang(bn)]:tracking-normal',
                         cinemaId === cinema.id
                           ? 'border-content bg-content text-surface'
                           : 'border-hairline-strong hover:bg-content/[0.06]',
@@ -415,8 +423,8 @@ export function MovieDetails() {
                   <div className="space-y-8">
                     {byCinema.map(({ cinema, showtimes }) => (
                       <div key={cinema.id}>
-                        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 border-b border-hairline pb-2">
-                          <h3 className="font-display text-xl leading-tight">
+                        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2 border-b-2 border-content pb-2">
+                          <h3 className="font-display text-[1.375rem] uppercase leading-none">
                             <Link to={`/cinemas/${cinema.slug}`} className="underline-offset-4 hover:underline">
                               {cinema.name}
                             </Link>
@@ -459,13 +467,13 @@ export function MovieDetails() {
         </div>
 
         {/* ── Sidebar ───────────────────────────────────────────────── */}
-        <aside className="lg:sticky lg:top-24 lg:h-fit">
-          <section aria-labelledby="pricing-heading" className="border border-hairline-strong p-5">
+        <aside className="lg:sticky lg:top-28 lg:h-fit">
+          <section aria-labelledby="pricing-heading" className="edge p-5">
             <h2 id="pricing-heading" className="eyebrow mb-4">
               {t('movieDetails.pricingHeading')}
             </h2>
             {priceRange ? (
-              <p className="numeral mb-4 font-display text-3xl leading-none">
+              <p className="index-mark mb-4 text-[2.5rem]">
                 {moneyRange(priceRange.min, priceRange.max)}
               </p>
             ) : null}
@@ -504,7 +512,7 @@ export function MovieDetails() {
             </Button>
           </section>
 
-          <section aria-labelledby="formats-heading" className="mt-6 border border-hairline-strong p-5">
+          <section aria-labelledby="formats-heading" className="edge mt-6 p-5">
             <h2 id="formats-heading" className="eyebrow mb-4">
               {t('movieDetails.presentedIn')}
             </h2>
@@ -521,7 +529,7 @@ export function MovieDetails() {
           </section>
 
           {movie.breakWindows?.length ? (
-            <section aria-labelledby="break-heading" className="mt-6 border border-hairline-strong p-5">
+            <section aria-labelledby="break-heading" className="edge mt-6 p-5">
               <h2 id="break-heading" className="eyebrow mb-3">
                 {t('movieDetails.stepOutHeading')}
               </h2>
@@ -545,7 +553,7 @@ export function MovieDetails() {
         >
           <div className="shell flex items-center justify-between gap-4 py-3">
             <div className="min-w-0">
-              <p className="truncate font-display text-base leading-tight">{movie.title}</p>
+              <p className="truncate font-display text-[1.125rem] uppercase leading-none">{movie.title}</p>
               {priceRange ? (
                 <p className="numeral text-xs text-content-muted">
                   {t('movieDetails.fromPrice', { price: money(priceRange.min) })} ·{' '}
@@ -553,7 +561,7 @@ export function MovieDetails() {
                 </p>
               ) : null}
             </div>
-            <Button asChild className="shrink-0">
+            <Button asChild variant="accent" className="shrink-0">
               <a href="#showtimes">{t('movieDetails.showtimes')}</a>
             </Button>
           </div>

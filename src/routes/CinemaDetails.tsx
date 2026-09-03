@@ -61,7 +61,7 @@ export function CinemaDetails() {
 
               <p className="mt-6 max-w-prose text-[1.0625rem] leading-8">{cinema.description}</p>
 
-              <p className="mt-5 border-l-2 border-marigold pl-5 font-display text-xl leading-snug">
+              <p className="mt-5 border-l-2 border-accent pl-5 font-display text-xl leading-snug">
                 {cinema.signature}
               </p>
 
@@ -199,7 +199,7 @@ export function CinemaDetails() {
             <ul className="space-y-2.5">
               {cinema.accessibility.map((feature) => (
                 <li key={feature} className="flex gap-3 text-[0.9375rem] leading-7">
-                  <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-marigold" />
+                  <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-signal" />
                   {accessLabels[feature] ?? feature}
                 </li>
               ))}
@@ -276,7 +276,7 @@ export function CinemaDetails() {
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:h-fit">
-          <section aria-labelledby="cin-houses" className="border border-hairline-strong p-5">
+          <section aria-labelledby="cin-houses" className="border-2 border-hairline-strong p-5">
             <h2 id="cin-houses" className="eyebrow mb-4">
               {t('cinemaDetails.theHouses')}
             </h2>
@@ -294,7 +294,7 @@ export function CinemaDetails() {
             </ul>
           </section>
 
-          <section aria-labelledby="cin-amenities" className="mt-6 border border-hairline-strong p-5">
+          <section aria-labelledby="cin-amenities" className="mt-6 border-2 border-hairline-strong p-5">
             <h2 id="cin-amenities" className="eyebrow mb-3">
               {t('cinemaDetails.amenities')}
             </h2>

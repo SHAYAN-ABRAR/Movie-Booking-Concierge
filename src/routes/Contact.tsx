@@ -256,7 +256,7 @@ export function Contact() {
         </div>
 
         <aside className="space-y-6">
-          <section aria-labelledby="direct" className="border border-hairline-strong p-5">
+          <section aria-labelledby="direct" className="border-2 border-hairline-strong p-5">
             <h2 id="direct" className="eyebrow mb-4">
               Head office
             </h2>
@@ -280,7 +280,7 @@ export function Contact() {
             <p className="numeral mt-2 text-[0.8125rem] text-content-muted">{COMPANY.supportHours}</p>
           </section>
 
-          <section id="access" aria-labelledby="access-heading" className="scroll-mt-24 border border-hairline-strong p-5">
+          <section id="access" aria-labelledby="access-heading" className="scroll-mt-24 border-2 border-hairline-strong p-5">
             <h2 id="access-heading" className="eyebrow mb-3">
               Accessibility
             </h2>
@@ -297,7 +297,7 @@ export function Contact() {
             </a>
           </section>
 
-          <section id="lost" aria-labelledby="lost-heading" className="scroll-mt-24 border border-hairline-strong p-5">
+          <section id="lost" aria-labelledby="lost-heading" className="scroll-mt-24 border-2 border-hairline-strong p-5">
             <h2 id="lost-heading" className="eyebrow mb-3">
               Lost property
             </h2>
@@ -331,7 +331,7 @@ export function Contact() {
             </ul>
           </section>
 
-          <section aria-labelledby="houses-contact" className="border border-hairline-strong p-5">
+          <section aria-labelledby="houses-contact" className="border-2 border-hairline-strong p-5">
             <h2 id="houses-contact" className="eyebrow mb-3">
               The houses
             </h2>

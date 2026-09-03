@@ -79,7 +79,7 @@ export function Movies() {
             </div>
           ) : null}
 
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-y border-hairline py-3">
+          <div className="slab mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-b-hairline py-3">
             <p className="text-sm text-content-muted" aria-live="polite" role="status">
               {/* The numeral animates, so the count cannot simply be interpolated
                   into the sentence — `<n>` marks where the ticker belongs and
@@ -107,18 +107,20 @@ export function Movies() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="bottom" className="max-h-[85dvh]">
-                <div className="flex items-center justify-between border-b border-hairline px-5 pb-3 pt-2">
-                  <SheetTitle className="text-lg">{t('filters.heading')}</SheetTitle>
+                <div className="flex items-center justify-between border-b-2 border-content px-5 pb-3 pt-2">
+                  <SheetTitle className="eyebrow text-content">{t('filters.heading')}</SheetTitle>
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-5">
                   <FilterPanel controls={controls} showAccessibility={status === 'now-showing'} />
                 </div>
-                <div className="flex gap-3 border-t border-hairline px-5 py-4">
+                <div className="flex gap-3 border-t-2 border-content px-5 py-4 pb-[max(1rem,var(--safe-b))]">
                   <Button variant="outline" block onClick={clear}>
                     {t('filters.clearAll')}
                   </Button>
                   <SheetClose asChild>
-                    <Button block>{t('filters.showCount', { count: results.length })}</Button>
+                    <Button block variant="accent">
+                      {t('filters.showCount', { count: results.length })}
+                    </Button>
                   </SheetClose>
                 </div>
               </SheetContent>
@@ -162,7 +164,7 @@ export function Movies() {
                that these are the same films being narrowed down. */
             <m.ul layout className="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 xl:grid-cols-4">
               <AnimatePresence mode="popLayout" initial={false}>
-                {results.map((movie) => (
+                {results.map((movie, i) => (
                   <m.li
                     key={movie.id}
                     layout={motionPrefs.reduced ? false : 'position'}
@@ -175,7 +177,7 @@ export function Movies() {
                         : { duration: duration.layout, ease: ease.editorial }
                     }
                   >
-                    <MovieCard movie={movie} showSynopsis />
+                    <MovieCard movie={movie} showSynopsis index={i + 1} />
                   </m.li>
                 ))}
               </AnimatePresence>
@@ -183,7 +185,7 @@ export function Movies() {
           )}
 
           {status === 'now-showing' ? (
-            <div className="mt-14 border-t border-hairline pt-6">
+            <div className="slab mt-16 pt-6">
               <AccessibilityLegend />
             </div>
           ) : null}

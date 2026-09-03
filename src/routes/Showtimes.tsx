@@ -81,14 +81,14 @@ export function Showtimes() {
         }
       />
 
-      <div className="border-b border-hairline py-6">
+      <div className="pb-6 pt-6">
         <p className="eyebrow mb-2.5">{t('showtimes.date')}</p>
         <DateStrip value={date} onChange={(next) => setFilter({ date: next })} />
       </div>
 
       <div className="flex flex-col gap-6 py-6 lg:flex-row lg:gap-12 lg:py-8">
         <aside className="hidden w-64 shrink-0 lg:block" aria-label={t('filters.heading')}>
-          <div className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto pb-6 pr-2">
+          <div className="sticky top-28 max-h-[calc(100dvh-9rem)] overflow-y-auto pb-6 pr-2">
             <div className="mb-7">
               <RuleHeading as="h3" className="mb-3">
                 {t('showtimes.timeOfDayHeading')}
@@ -110,7 +110,7 @@ export function Showtimes() {
         </aside>
 
         <div className="min-w-0 flex-1">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-hairline pb-3">
+          <div className="slab mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-b-hairline py-3">
             <p className="text-sm text-content-muted" role="status" aria-live="polite">
               {/* The count is the part worth emphasising, so it is rendered as
                   its own element rather than baked into the sentence. */}
@@ -145,8 +145,8 @@ export function Showtimes() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="bottom" className="max-h-[85dvh]">
-                  <div className="border-b border-hairline px-5 pb-3 pt-2">
-                    <SheetTitle className="text-lg">{t('filters.heading')}</SheetTitle>
+                  <div className="border-b-2 border-content px-5 pb-3 pt-2">
+                    <SheetTitle className="eyebrow text-content">{t('filters.heading')}</SheetTitle>
                   </div>
                   <div className="flex-1 overflow-y-auto px-5 py-5">
                     <div className="mb-7">
@@ -167,12 +167,14 @@ export function Showtimes() {
                     </div>
                     <FilterPanel controls={controls} />
                   </div>
-                  <div className="flex gap-3 border-t border-hairline px-5 py-4">
+                  <div className="flex gap-3 border-t-2 border-content px-5 py-4 pb-[max(1rem,var(--safe-b))]">
                     <Button variant="outline" block onClick={clear}>
                       {t('filters.clearAll')}
                     </Button>
                     <SheetClose asChild>
-                      <Button block>{t('filters.showCount', { count: results.length })}</Button>
+                      <Button block variant="accent">
+                        {t('filters.showCount', { count: results.length })}
+                      </Button>
                     </SheetClose>
                   </div>
                 </SheetContent>
@@ -214,9 +216,9 @@ export function Showtimes() {
                     <div className="min-w-0">
                       <h2
                         id={`film-${movie.id}`}
-                        className="font-display text-2xl leading-tight tracking-[-0.02em]"
+                        className="font-display text-[1.75rem] uppercase leading-none [overflow-wrap:anywhere]"
                       >
-                        <Link to={`/movies/${movie.slug}`} className="underline-offset-4 hover:underline">
+                        <Link to={`/movies/${movie.slug}`} className="transition-colors hover:text-accent">
                           {movie.title}
                         </Link>
                       </h2>
@@ -241,20 +243,18 @@ export function Showtimes() {
                     .map((group) => (
                       <div key={group.band} className="mb-5 last:mb-0">
                         <p className="eyebrow mb-2.5">{t(timeOfDayKeys[group.band])}</p>
-                        <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr))]">
-                          {group.list.map((showtime) => {
-                            const cinema = cinemaById.get(showtime.cinemaId);
-                            return (
-                              <li key={showtime.id}>
-                                {!filter.cinemaIds?.length && cinema ? (
-                                  <p className="mb-1 truncate text-[0.6875rem] uppercase tracking-[0.1em] text-content-faint">
-                                    {cinema.shortName}
-                                  </p>
-                                ) : null}
-                                <ShowtimeButton showtime={showtime} showCinema={!filter.cinemaIds?.length} />
-                              </li>
-                            );
-                          })}
+                        {/* A timetable: one screening per line, all times on the
+                            same left edge, so the column can be read down
+                            rather than hunted through. */}
+                        <ul className="border-t border-hairline">
+                          {group.list.map((showtime) => (
+                            <li key={showtime.id}>
+                              <ShowtimeButton
+                                showtime={showtime}
+                                showCinema={!filter.cinemaIds?.length}
+                              />
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     ))}
@@ -267,7 +267,7 @@ export function Showtimes() {
             {t('showtimes.demoNote')}
           </DemoNote>
 
-          <div className="mt-8 border-t border-hairline pt-6">
+          <div className="slab mt-10 pt-6">
             <AccessibilityLegend />
           </div>
         </div>

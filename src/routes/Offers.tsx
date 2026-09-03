@@ -91,7 +91,7 @@ export function Offers() {
                   <ul className="max-w-prose space-y-1.5">
                     {offer.terms.map((term) => (
                       <li key={term} className="flex gap-2.5 text-[0.875rem] leading-6 text-content-muted">
-                        <span aria-hidden="true" className="mt-[0.6em] block size-1 shrink-0 bg-marigold" />
+                        <span aria-hidden="true" className="mt-[0.6em] block size-1 shrink-0 bg-signal" />
                         {term}
                       </li>
                     ))}
