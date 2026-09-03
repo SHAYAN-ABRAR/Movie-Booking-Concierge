@@ -1,12 +1,9 @@
 import { useMemo } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
-import { m } from 'framer-motion';
 import { CalendarPlus, Home, MessageSquare, Printer, Ticket } from 'lucide-react';
-import { useMotionPreferences } from '@/motion';
-import { ease } from '@/motion/tokens';
 import { Button } from '@/components/ui/button';
-import { Badge, DemoNote } from '@/components/ui/misc';
+import { DemoNote } from '@/components/ui/misc';
 import { DataRow } from '@/components/common';
 import { useBookings } from '@/store/bookings';
 import { cinemaById, formatLabels, movieById } from '@/data';
@@ -24,12 +21,13 @@ import { money, seatRanges } from '@/lib/format';
 import { buildIcs, downloadUrl, mapUrl } from '@/lib/external';
 import { Trans, useTranslation } from 'react-i18next';
 import { brand } from '@/config/brand';
+import { Logo } from '@/components/brand/Logo';
+import { ReceiptPrinter, useReceiptPrinterStage } from '@/components/receipt';
 
 export function BookingConfirmation() {
   const { t } = useTranslation();
   const { bookingId } = useParams<{ bookingId: string }>();
   const [, setParams] = useSearchParams();
-  const motionPrefs = useMotionPreferences();
   const bookings = useBookings((s) => s.bookings);
   const booking = bookings.find((b) => b.reference === bookingId);
 
@@ -41,6 +39,22 @@ export function BookingConfirmation() {
     if (!showtime) return null;
     return timeFromMinutes(screeningEndMinutes(showtime));
   }, [showtime]);
+
+  /*
+   * The printer runs once, for the customer who has just paid.
+   *
+   * Opening the same reference again from My Bookings, or reloading the page a
+   * minute later, is not a purchase — reprinting the ticket every time would be
+   * a toy rather than a confirmation. The booking's own `createdAt` is the
+   * honest signal, and it survives a reload without needing router state.
+   */
+  const justBooked = useMemo(() => {
+    if (!booking) return false;
+    const age = Date.now() - new Date(booking.createdAt).getTime();
+    return Number.isFinite(age) && age >= 0 && age < 15_000;
+  }, [booking]);
+
+  const stage = useReceiptPrinterStage(justBooked);
 
   if (!booking) {
     return (
@@ -130,162 +144,170 @@ export function BookingConfirmation() {
         </p>
       </div>
 
-      {/* ── The ticket ─────────────────────────────────────────────
-          A reveal rather than an appearance: the stock settles, a projection
-          light passes once across it, and the QR fades in only after the
-          surface is stable. Under reduced motion the finished ticket is
-          simply there, and the print layout is unaffected either way. */}
-      <m.div
-        data-print="page"
-        className="mt-8 max-w-3xl"
-        initial={motionPrefs.reduced ? false : { opacity: 0, y: 18, scale: 0.985 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={motionPrefs.reduced ? { duration: 0 } : { duration: 0.55, ease: ease.entrance }}
-      >
-        <div className="auditorium relative overflow-hidden border-2 border-content">
-          {/* One pass of projected light across the stock. */}
-          {!motionPrefs.reduced ? (
-            <m.span
-              aria-hidden="true"
-              data-print="hide"
-              className="pointer-events-none absolute inset-y-0 z-20 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-steel-lit/20 to-transparent"
-              initial={{ left: '-40%' }}
-              animate={{ left: '130%' }}
-              transition={{ duration: 1.15, ease: ease.projection, delay: 0.45 }}
-            />
-          ) : null}
+      {/* ── The printer ────────────────────────────────────────────
+          The ticket is printed rather than revealed. It is in the DOM,
+          complete, from the first frame — the machine only moves it — so
+          nothing here is gated behind an animation, and a customer who
+          arrives from their bookings, reloads, or asks for reduced motion
+          simply finds the paper already out. */}
+      {/* The printer holds a fixed measure, so everything that follows a
+          booking sits beside it rather than under it. Stacked below `lg`,
+          where there is no room to put anything next to a receipt. */}
+      <div className="mt-9 grid items-start gap-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-14">
+        <div className="flex justify-center lg:block">
+        <ReceiptPrinter.Root stage={stage}>
+          <ReceiptPrinter.Machine aria-label={t('receipt.machineLabel')}>
+            <ReceiptPrinter.Header>
+              <Logo size="sm" />
+              <p className="eyebrow">{t('receipt.machineLabel')}</p>
+            </ReceiptPrinter.Header>
 
-          {/* Perforated top edge */}
-          <div aria-hidden="true" className="sprocket-t h-3 bg-content" />
-
-          <div className="grid gap-0 sm:grid-cols-[minmax(0,1fr)_15rem]">
-            <div className="p-6 sm:p-8">
-              <p className="eyebrow mb-3 text-house-muted">
-                {t('confirmation.admit', { brand: brand.name, count: booking.seats.length })}
+            <ReceiptPrinter.Screen>
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="truncate font-display text-[1.125rem] uppercase leading-none text-house-ink">
+                  {booking.movieTitle}
+                </p>
+                <p className="numeral shrink-0 text-[0.9375rem] font-bold text-house-ink">
+                  {money(booking.total)}
+                </p>
+              </div>
+              <p className="numeral mt-1.5 truncate text-[0.75rem] text-house-muted">
+                {booking.cinemaName} · {displayTime(booking.time)}
               </p>
+              <div className="mt-3 border-t border-house-rule pt-3">
+                <ReceiptPrinter.Status />
+              </div>
+            </ReceiptPrinter.Screen>
+          </ReceiptPrinter.Machine>
 
-              <h2 className="font-display text-[2.25rem] uppercase leading-[0.9] text-house-ink [overflow-wrap:anywhere]">
+          <ReceiptPrinter.Output>
+            <ReceiptPrinter.Paper>
+              <header className="text-center">
+                <p className="font-display text-[1.5rem] uppercase leading-none tracking-[-0.02em]">
+                  {brand.name}
+                </p>
+                <p className="mt-1.5 text-[0.625rem] uppercase tracking-[0.18em] text-ink/60">
+                  {t('confirmation.admit', { brand: '', count: booking.seats.length })
+                    .replace(/^\s*·\s*/, '')}
+                </p>
+              </header>
+
+              <div aria-hidden="true" className="my-4 h-px bg-ink/25" />
+
+              <h2 className="font-display text-[1.625rem] uppercase leading-[0.95] [overflow-wrap:anywhere]">
                 {booking.movieTitle}
               </h2>
               {movie?.titleBn ? (
-                <p lang="bn" className="mt-1 text-lg text-house-muted">
+                <p lang="bn" className="mt-1 font-sans text-[0.9375rem] text-ink/70">
                   {movie.titleBn}
                 </p>
               ) : null}
 
-              <dl className="mt-6 grid gap-x-8 gap-y-0 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-                <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.cinema')}</dt>
-                  <dd className="text-house-ink">{booking.cinemaName}</dd>
-                </div>
-                <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.screen')}</dt>
-                  <dd className="text-house-ink">
-                    {booking.screenName} · {formatLabels[booking.format]}
-                  </dd>
-                </div>
-                <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.date')}</dt>
-                  <dd className="text-house-ink">{longDayLabel(booking.date)}</dd>
-                </div>
-                <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.time')}</dt>
-                  <dd className="numeral text-house-ink">
-                    {displayTime(booking.time)}
-                    {endTime ? (
-                      <span className="text-house-muted">
-                        {' — '}
-                        {t('confirmation.endsAbout', { time: displayTime(endTime) })}
-                      </span>
-                    ) : null}
-                  </dd>
-                </div>
-                <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.seats')}</dt>
-                  <dd className="numeral text-house-ink">
-                    {seatRanges(booking.seats.map((s) => s.seatId))}
-                  </dd>
-                </div>
-                <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.tickets')}</dt>
-                  <dd className="text-house-ink">
-                    {Object.entries(categoryTally)
+              <div aria-hidden="true" className="my-4 h-px bg-ink/25" />
+
+              <dl className="space-y-2 text-[0.8125rem] leading-5">
+                {[
+                  { label: t('confirmation.field.cinema'), value: booking.cinemaName },
+                  {
+                    label: t('confirmation.field.screen'),
+                    value: `${booking.screenName} · ${formatLabels[booking.format]}`,
+                  },
+                  { label: t('confirmation.field.date'), value: longDayLabel(booking.date) },
+                  {
+                    label: t('confirmation.field.time'),
+                    value: endTime
+                      ? `${displayTime(booking.time)} — ${t('confirmation.endsAbout', { time: displayTime(endTime) })}`
+                      : displayTime(booking.time),
+                  },
+                  {
+                    label: t('confirmation.field.seats'),
+                    value: seatRanges(booking.seats.map((s) => s.seatId)),
+                  },
+                  {
+                    label: t('confirmation.field.tickets'),
+                    value: Object.entries(categoryTally)
                       .map(([category, count]) => {
                         const rule = ticketCategories.find((c) => c.id === category);
                         return `${count} × ${rule?.label ?? category}`;
                       })
-                      .join(', ')}
-                  </dd>
-                </div>
-                <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.bookedFor')}</dt>
-                  <dd className="text-house-ink">{booking.guestName}</dd>
-                </div>
-                <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.paid')}</dt>
-                  <dd className="numeral text-house-ink">{money(booking.total)}</dd>
-                </div>
+                      .join(', '),
+                  },
+                  { label: t('confirmation.field.bookedFor'), value: booking.guestName },
+                ].map((row) => (
+                  <div key={row.label} className="flex items-baseline justify-between gap-4">
+                    <dt className="shrink-0 text-[0.625rem] uppercase tracking-[0.14em] text-ink/55">
+                      {row.label}
+                    </dt>
+                    <dd className="min-w-0 text-right font-semibold [overflow-wrap:anywhere]">
+                      {row.value}
+                    </dd>
+                  </div>
+                ))}
               </dl>
 
               {booking.insurance ? (
-                <Badge tone="ok" className="mt-4">
+                <p className="mt-3 border border-ink/25 px-2 py-1 text-center text-[0.625rem] uppercase tracking-[0.12em]">
                   {t('confirmation.coverIncluded', { name: insurancePolicy.name })}
-                </Badge>
+                </p>
               ) : null}
 
-              <p className="mt-6 text-[0.8125rem] leading-6 text-house-muted">
-                {t('confirmation.doorBy', { time: displayTime(arriveBy) })}
-                {cinema
-                  ? ` ${t('confirmation.trailersRun', { count: cinema.trailerMinutes })}`
-                  : ''}
-              </p>
-            </div>
+              <div aria-hidden="true" className="my-4 h-px bg-ink/25" />
 
-            {/* Stub */}
-            <div className="min-w-0 border-t border-dashed border-house-rule p-6 sm:border-l sm:border-t-0 sm:p-6">
-              <m.div
-                className="flex flex-col items-center"
-                initial={motionPrefs.reduced ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={
-                  motionPrefs.reduced ? { duration: 0 } : { duration: 0.4, delay: 0.62 }
-                }
-              >
-                {/* Raw `paper`, deliberately, in both themes and in print: a QR
-                    code is only scannable as dark modules on a light field. The
-                    `bgColor`/`fgColor` below are fixed for the same reason. */}
-                <div className="bg-paper p-2.5">
-                  <QRCodeSVG
-                    value={booking.reference}
-                    size={128}
-                    level="M"
-                    bgColor="#f4f1ea"
-                    fgColor="#14161f"
-                    title={t('confirmation.reference', { reference: booking.reference })}
-                  />
-                </div>
-                <p className="numeral mt-3 font-mono text-lg font-semibold tracking-[0.08em] text-house-ink">
+              <div className="flex items-baseline justify-between gap-4">
+                <p className="text-[0.625rem] uppercase tracking-[0.14em] text-ink/55">
+                  {t('confirmation.field.paid')}
+                </p>
+                <p className="text-[1.25rem] font-bold">{money(booking.total)}</p>
+              </div>
+
+              <div aria-hidden="true" className="my-4 h-px bg-ink/25" />
+
+              {/* The code. Raw paper and ink, deliberately: a QR is only
+                  scannable as dark modules on a light field. */}
+              <div className="flex flex-col items-center">
+                <QRCodeSVG
+                  value={booking.reference}
+                  size={132}
+                  level="M"
+                  bgColor="#F4F1EB"
+                  fgColor="#111113"
+                  title={t('confirmation.reference', { reference: booking.reference })}
+                />
+                <p className="mt-3 text-[1.0625rem] font-bold tracking-[0.14em]">
                   {booking.reference}
                 </p>
-                <p className="mt-2 max-w-[11rem] text-center text-[0.6875rem] leading-4 text-house-faint">
+                <p className="mt-2 max-w-[14rem] text-center text-[0.625rem] leading-4 text-ink/55">
                   {t('confirmation.qrNote')}
                 </p>
-                <p className="mt-4 border border-accent px-2 py-1 text-center text-[0.625rem] font-bold uppercase tracking-[0.1em] text-accent">
-                  {t('confirmation.demoTicket')}
-                  <span className="block font-normal normal-case tracking-normal">
-                    {t('confirmation.notValid')}
-                  </span>
-                </p>
-              </m.div>
-            </div>
-          </div>
+              </div>
 
-          <div aria-hidden="true" className="sprocket-b h-3 bg-content" />
+              <p className="mt-4 border-2 border-signal px-2 py-1.5 text-center text-[0.625rem] font-bold uppercase tracking-[0.12em] text-signal">
+                {t('confirmation.demoTicket')}
+                <span className="block font-normal tracking-normal">
+                  {t('confirmation.notValid')}
+                </span>
+              </p>
+
+              <p className="mt-4 text-[0.6875rem] leading-5 text-ink/70">
+                {t('confirmation.doorBy', { time: displayTime(arriveBy) })}
+                {cinema ? ` ${t('confirmation.trailersRun', { count: cinema.trailerMinutes })}` : ''}
+              </p>
+
+              <p
+                aria-hidden="true"
+                className="mt-5 text-center text-[0.5625rem] uppercase tracking-[0.2em] text-ink/45"
+              >
+                {t('receipt.tearOff')}
+              </p>
+            </ReceiptPrinter.Paper>
+          </ReceiptPrinter.Output>
+        </ReceiptPrinter.Root>
         </div>
-      </m.div>
 
+        {/* ── Everything a customer does next ─────────────────────── */}
+        <div className="min-w-0">
       {/* ── Actions ──────────────────────────────────────────────── */}
-      <div data-print="hide" className="mt-8 flex max-w-3xl flex-wrap gap-3">
+      <div data-print="hide" className="flex flex-wrap gap-3">
         <Button variant="accent" onClick={() => window.print()}>
           <Printer aria-hidden="true" />
           {t('confirmation.print')}
@@ -301,7 +323,7 @@ export function BookingConfirmation() {
       </div>
 
       {/* ── What next ────────────────────────────────────────────── */}
-      <div data-print="hide" className="mt-12 grid max-w-4xl gap-8 sm:grid-cols-2">
+      <div data-print="hide" className="mt-10 grid gap-8 sm:grid-cols-2">
         <section aria-labelledby="next-heading">
           <h2 id="next-heading" className="eyebrow mb-4 border-b-2 border-content pb-2 text-content">
             {t('confirmation.onTheDay')}
@@ -370,7 +392,7 @@ export function BookingConfirmation() {
         </section>
       </div>
 
-      <div data-print="hide" className="mt-10 flex max-w-3xl flex-wrap gap-3 border-t border-hairline pt-6">
+      <div data-print="hide" className="slab mt-10 flex flex-wrap gap-3 pt-6">
         <Button asChild variant="outline">
           <Link to="/bookings">
             <Ticket aria-hidden="true" />
@@ -388,9 +410,11 @@ export function BookingConfirmation() {
         </Button>
       </div>
 
-      <DemoNote className="mt-8 max-w-3xl" tone="loud">
+      <DemoNote className="mt-8" tone="loud">
         {t('confirmation.demoNote')}
       </DemoNote>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1033,6 +1033,44 @@ html.theme-transition *::after {
     break-inside: avoid;
   }
 
+  /*
+   * The receipt.
+   *
+   * On paper there is no machine to feed it out of, so the printed ticket has
+   * to stop behaving like something emerging from a slot: the negative offset
+   * that tucks it under the printer's lip goes, the clip that draws its torn
+   * edge goes (it would cut the last line off), and the feed transform is
+   * reset in case the sheet is sent to print mid-animation.
+   *
+   * It also stops being bone-on-warm-grey. A receipt printed on a real printer
+   * is black on white, and a page that depends on a background colour reaching
+   * the paper is a page that prints wrong on every device set to drop them.
+   */
+  [data-receipt='paper'] {
+    clip-path: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+    max-width: 24rem;
+  }
+
+  [data-receipt='paper'] * {
+    color: #000 !important;
+    border-color: #666 !important;
+  }
+
+  [data-receipt='output'] {
+    margin-top: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  [data-receipt='output'] > * {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
   a[href^='http']::after {
     content: ' (' attr(href) ')';
     font-size: 0.75em;

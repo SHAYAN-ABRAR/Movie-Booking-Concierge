@@ -575,6 +575,14 @@ export const en = {
       'A demonstration booking flow. Seat availability is generated locally and is not live, no payment is taken, and your completed booking is written only to this browser. See <about>about this build</about>.',
   },
 
+  receipt: {
+    processing: 'Processing your booking',
+    printing: 'Printing your ticket',
+    complete: 'Booking complete',
+    machineLabel: 'Box office printer',
+    tearOff: 'Tear along the perforation',
+  },
+
   confirmation: {
     complete: 'Booking complete',
     bookedFor: "You're booked for {{title}}.",

@@ -45,9 +45,44 @@ totalling 828 KB across every subset, with no new dependency added.
 | Booking wizard | Numbered transport with a perforation rail; step labels in the signage voice; summary panel slabbed |
 | Seat map | 2px house edge, warm vermilion screen wash replacing the old periwinkle |
 | Counter | Every fifth plate runs wide with the picture beside the copy, so sixteen items are not sixteen identical cards |
-| Ticket | Perforated stub, mono reference, QR — and a column-starvation bug fixed (below) |
+| Ticket | **Printed, not revealed.** A box-office thermal printer feeds the ticket out of a slot line by line on the one visit that is the moment of purchase; the receipt itself is the ticket |
 | Max | `MAX / Booking concierge`, hard-edged, stamped offset shadow. No orb, no gradient, no glass |
 | Footer | Closes with the wordmark set full measure as a colophon |
+
+---
+
+## The box-office printer
+
+`src/components/receipt/` — a compound component (`Root · Machine · Header ·
+Screen · Status · Output · Paper`) that feeds a ticket out of a slot the way
+the machine at a counter does: ten advance-and-hold steps, because a thermal
+head prints a band and the stepper motor advances the paper between bands. It
+is the only skeuomorphic object in a system that is otherwise flat and
+typographic, and that is deliberate — the reward at the end of a transaction is
+allowed to be a physical thing.
+
+Three rules keep it from being a toy:
+
+1. **It never gates content.** The ticket is in the DOM, complete and readable,
+   from the first frame. The animation moves it; it does not reveal it. Under
+   reduced motion the paper is simply already out.
+2. **It runs once.** The stage machine is driven by the booking's own
+   `createdAt`. Opening the same reference from My Bookings, or reloading a
+   minute later, is not a purchase — so it does not reprint.
+3. **It is not the ticket.** The machine is chrome and is `data-print="hide"`.
+   The paper is the deliverable: it drops its slot offset, its torn-edge clip
+   and its feed transform in print, and goes black on white rather than
+   depending on a background colour reaching the paper.
+
+The screen reuses `.auditorium` rather than a bespoke dark panel — a lit
+display in a dark housing is the same material the seat map is made of, and it
+is dark in both themes for the same reason. The paper takes the *raised* bone
+stock so the roll reads as a separate object in light mode instead of
+dissolving into the page.
+
+The compound namespace lives in `index.ts` rather than beside the components: a
+module exporting both components and a plain object is not hot-reloadable, and
+every component in it gets flagged.
 
 ---
 
@@ -71,11 +106,12 @@ is how they surfaced.
    drawn with type" — written before the TMDB film artwork and the generated
    counter imagery shipped. Rewritten to describe what the product actually
    serves, with each manifest named.
-4. **The confirmation ticket's detail column was starved.** The stub was an
+4. **The confirmation ticket's detail column was starved.** The QR stub was an
    `auto` grid track, so its width was decided by the max-content of a
-   *sentence-long* QR caption — about 400px — squeezing the `1fr` detail column
-   to ~150px and breaking the film title mid-word. The stub is now a fixed
-   measure and the caption is held to it.
+   *sentence-long* caption — about 400px — squeezing the `1fr` detail column to
+   ~150px and breaking the film title mid-word. Fixed by pinning the stub to a
+   measure; the two-column ticket has since been replaced by the printed
+   receipt, which is single-column and cannot reproduce the failure.
 5. **The review step's date was pinned to English.** It called
    `toLocaleDateString('en-GB')` directly rather than the shared formatter, so
    the date stayed English however the rest of the page was set.
