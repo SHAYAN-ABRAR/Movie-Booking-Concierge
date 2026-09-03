@@ -22,15 +22,27 @@ export const Separator = React.forwardRef<
   );
 });
 
+/**
+ * A stamped label.
+ *
+ * Square, tracked out, uppercase — a certificate mark or a format stamp on a
+ * printed programme. Every tone pairs a ground with an ink that is guaranteed
+ * to hold contrast in *both* themes, which is why the washes and their inks
+ * are semantic tokens rather than fixed colours.
+ */
 const badgeVariants = cva(
-  'inline-flex items-center gap-1 whitespace-nowrap rounded-xs px-1.5 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em]',
+  [
+    'inline-flex items-center gap-1 whitespace-nowrap px-1.5 py-[0.15rem]',
+    'font-sans text-[0.625rem] font-bold uppercase leading-[1.4] tracking-[0.12em]',
+    '[&:lang(bn)]:tracking-[0.04em]',
+  ].join(' '),
   {
     variants: {
       tone: {
         neutral: 'bg-content/[0.08] text-content-muted',
         ink: 'bg-content text-surface',
-        accent: 'bg-projector-wash text-projector-deep',
-        marigold: 'bg-marigold-wash text-marigold',
+        accent: 'bg-steel-wash text-steel-deep',
+        signal: 'bg-signal-wash text-accent',
         ok: 'bg-ok-wash text-ok',
         warn: 'bg-warn-wash text-warn',
         danger: 'bg-danger-wash text-danger',
@@ -51,32 +63,44 @@ export function Badge({ className, tone, ...props }: BadgeProps) {
 
 export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      aria-hidden="true"
-      className={cn('animate-pulse bg-content/[0.07]', className)}
-      {...props}
-    />
+    <div aria-hidden="true" className={cn('animate-pulse bg-content/[0.07]', className)} {...props} />
   );
 }
 
-/** A hairline rule with an optional label set into it — the programme's divider. */
+/**
+ * A section mark: an optional index number, a label, and a rule running out to
+ * the end of the measure.
+ *
+ * This is the smallest unit of the Swiss half of the system — a numbered entry
+ * in a programme — and it is used for every subdivision inside a page, so that
+ * the numbering the customer meets on the home page continues all the way into
+ * the booking flow.
+ */
 export function RuleHeading({
   children,
   className,
   as: Tag = 'h2',
   id,
+  index,
 }: {
   children: React.ReactNode;
   className?: string;
   as?: 'h2' | 'h3' | 'h4' | 'div';
   id?: string;
+  /** The entry's number, already formatted — e.g. `03`. */
+  index?: string;
 }) {
   return (
-    <div className={cn('flex items-center gap-4', className)}>
-      <Tag id={id} className="eyebrow shrink-0">
+    <div className={cn('flex items-center gap-3', className)}>
+      {index ? (
+        <span aria-hidden="true" className="numeral text-[0.6875rem] font-bold text-accent">
+          {index}
+        </span>
+      ) : null}
+      <Tag id={id} className="eyebrow shrink-0 text-content">
         {children}
       </Tag>
-      <span aria-hidden="true" className="stitch-x h-[1.5px] flex-1" />
+      <span aria-hidden="true" className="h-px flex-1 bg-hairline-strong" />
     </div>
   );
 }
@@ -99,13 +123,47 @@ export function DemoNote({
       className={cn(
         'flex items-start gap-2 text-[0.75rem] leading-5',
         tone === 'loud'
-          ? 'border border-hairline-strong bg-surface-sunken px-3 py-2 text-content-muted'
+          ? 'border-l-2 border-accent bg-surface-sunken px-3 py-2 text-content-muted'
           : 'text-content-faint',
         className,
       )}
     >
-      <span aria-hidden="true" className="mt-[0.45em] block size-1 shrink-0 bg-marigold" />
+      <span aria-hidden="true" className="mt-[0.45em] block size-1 shrink-0 bg-accent" />
       <span>{children}</span>
     </p>
+  );
+}
+
+/**
+ * The oversized index numeral — `01`, `02`, `03`.
+ *
+ * The single most characteristic mark in the system. It sits beside a film, a
+ * section or a booking step and does the job a rule would otherwise have to do:
+ * it says *where you are in a sequence* before you have read a word.
+ */
+export function IndexMark({
+  n,
+  total,
+  className,
+  size = 'md',
+}: {
+  n: number;
+  total?: number;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+}) {
+  const scale = {
+    sm: 'text-[0.75rem]',
+    md: 'text-[1.375rem]',
+    lg: 'text-[2.5rem] sm:text-[3.25rem]',
+  }[size];
+
+  return (
+    <span aria-hidden="true" className={cn('index-mark inline-flex items-baseline gap-1', scale, className)}>
+      <span className="text-accent">{String(n).padStart(2, '0')}</span>
+      {total ? (
+        <span className="text-[0.5em] text-content-faint">/ {String(total).padStart(2, '0')}</span>
+      ) : null}
+    </span>
   );
 }

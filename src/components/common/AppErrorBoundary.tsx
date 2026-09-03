@@ -99,7 +99,7 @@ function ErrorPanel({ error }: { error: Error }) {
             </a>
             <a
               href="/"
-              className="inline-flex h-11 items-center border border-hairline-strong px-5 text-sm font-semibold text-content transition-colors hover:bg-surface-sunken"
+              className="inline-flex h-11 items-center border-2 border-hairline-strong px-5 text-sm font-semibold text-content transition-colors hover:bg-surface-sunken"
             >
               {t('errors.home')}
             </a>

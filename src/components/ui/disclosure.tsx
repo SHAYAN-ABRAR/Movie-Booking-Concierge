@@ -23,7 +23,7 @@ export const AccordionTrigger = React.forwardRef<
         ref={ref}
         className={cn(
           'group flex flex-1 items-start justify-between gap-4 py-4 text-left',
-          'font-sans text-base font-semibold text-content transition-colors hover:text-content/70',
+          'font-sans text-base font-semibold text-content transition-colors hover:text-accent',
           className,
         )}
         {...props}
@@ -66,7 +66,7 @@ export const TabsList = React.forwardRef<
   return (
     <TabsPrimitive.List
       ref={ref}
-      className={cn('flex items-stretch gap-6 border-b border-hairline', className)}
+      className={cn('flex items-stretch gap-6 border-b-2 border-content', className)}
       {...props}
     />
   );
@@ -80,10 +80,11 @@ export const TabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        'relative -mb-px border-b-2 border-transparent pb-3 pt-1',
-        'font-sans text-[0.9375rem] font-semibold text-content-faint',
+        'relative -mb-0.5 border-b-[3px] border-transparent pb-3 pt-1',
+        'font-sans text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-content-faint',
+        '[&:lang(bn)]:text-[0.875rem] [&:lang(bn)]:tracking-normal',
         'transition-colors duration-[--dur-fast] hover:text-content',
-        'data-[state=active]:border-content data-[state=active]:text-content',
+        'data-[state=active]:border-accent data-[state=active]:text-content',
         'disabled:pointer-events-none disabled:opacity-40',
         className,
       )}

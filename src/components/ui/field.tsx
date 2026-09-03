@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export const Label = React.forwardRef<
@@ -10,7 +11,11 @@ export const Label = React.forwardRef<
     <LabelPrimitive.Root
       ref={ref}
       className={cn(
-        'block font-sans text-sm font-semibold text-content',
+        // Every label in the product speaks in the same small, tracked voice as
+        // the section eyebrows, so a form reads as part of the programme rather
+        // than as a web form dropped into it.
+        'block font-sans text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-content',
+        '[&:lang(bn)]:text-[0.8125rem] [&:lang(bn)]:tracking-normal',
         'peer-disabled:opacity-50',
         className,
       )}
@@ -20,10 +25,10 @@ export const Label = React.forwardRef<
 });
 
 const controlBase = [
-  'w-full rounded-sm border border-hairline-strong bg-surface-raised px-3',
+  'w-full border-2 border-hairline-strong bg-surface-raised px-3',
   'font-sans text-[0.9375rem] text-content placeholder:text-content-faint',
   'transition-colors duration-[--dur-fast]',
-  'hover:border-content/40',
+  'hover:border-content focus:border-content',
   'disabled:cursor-not-allowed disabled:opacity-50',
   'aria-[invalid=true]:border-danger aria-[invalid=true]:bg-danger-wash/40',
 ].join(' ');
@@ -78,11 +83,16 @@ interface FieldProps {
 
 /** Label, control, hint and error wired together with the right aria plumbing. */
 export function Field({ label, htmlFor, hint, error, optional, children, className }: FieldProps) {
+  const { t } = useTranslation();
   return (
     <div className={cn('space-y-1.5', className)}>
       <div className="flex items-baseline justify-between gap-3">
         <Label htmlFor={htmlFor}>{label}</Label>
-        {optional ? <span className="text-xs text-content-faint">Optional</span> : null}
+        {optional ? (
+          <span className="text-[0.6875rem] uppercase tracking-[0.1em] text-content-faint">
+            {t('common.labels.optional')}
+          </span>
+        ) : null}
       </div>
       {children}
       {hint && !error ? <FieldHint id={`${htmlFor}-hint`}>{hint}</FieldHint> : null}

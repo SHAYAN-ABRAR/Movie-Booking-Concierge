@@ -64,7 +64,7 @@ export function AlertBell() {
           {unread > 0 ? (
             <span
               aria-hidden="true"
-              className="numeral absolute right-1.5 top-1.5 grid min-w-[1.1rem] place-items-center bg-marigold px-1 text-[0.625rem] font-bold leading-[1.1rem] text-surface"
+              className="numeral absolute right-1.5 top-1.5 grid min-w-[1.1rem] place-items-center bg-signal px-1 text-[0.625rem] font-bold leading-[1.1rem] text-surface"
             >
               {unread}
             </span>
@@ -100,7 +100,7 @@ export function AlertBell() {
                   watches.find((w) => w.id === alert.watchId)?.movieId ?? '',
                 );
                 return (
-                  <li key={alert.id} className={cn('px-4 py-3', !alert.read ? 'bg-marigold-wash/40' : '')}>
+                  <li key={alert.id} className={cn('px-4 py-3', !alert.read ? 'bg-signal-wash/40' : '')}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="eyebrow mb-1">{t(watchKindKeys[alert.kind])}</p>
