@@ -38,6 +38,10 @@ const ALLOWED_FILES = new Map([
   ['docs/limitations.md', 'Historical note on the demonstration build.'],
   ['docs/reference-audit.md', 'Pre-rebrand design reference audit.'],
   ['docs/design-directions.md', 'Pre-rebrand design exploration.'],
+  [
+    'docs/cinematic-monolith-qa.md',
+    'Reports the defect where the Bangla name was never migrated, and has to quote both spellings to explain how the check missed it.',
+  ],
 ]);
 
 /**
