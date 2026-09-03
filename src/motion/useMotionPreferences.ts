@@ -52,7 +52,7 @@ export function useMotionPreferences() {
 /**
  * True while the tab is actually visible.
  *
- * Every ambient animation — the hero sequence, the projector drift, the
+ * Every ambient animation — the hero sequence, the steel drift, the
  * showtimes clock — gates on this, so a backgrounded tab does no work.
  */
 export function usePageVisible(): boolean {

@@ -42,23 +42,25 @@ export interface OfferArt {
 
 /** Grounds and tones are the documented palette — no new hues. */
 const ground = {
-  ink: '#14161F',
-  house: '#101322',
-  indigo: '#22346B',
-  bone: '#E9E4D9',
-  clay: '#5E2712',
+  ink: '#111113',
+  house: '#0B0B0D',
+  /* Was an indigo. A second chromatic ground competed with the vermilion, so
+     it is now the achromatic steel — the offer set reads as one series. */
+  slate: '#2B303B',
+  bone: '#EAE6DE',
+  clay: '#5A1A0B',
 } as const;
 
 const tone = {
-  paper: '#F4F1EA',
-  bone: '#E9E4D9',
-  ink: '#14161F',
-  inkMuted: '#4C505E',
-  marigold: '#C2491A',
-  marigoldLit: '#F0913C',
-  projector: '#35509C',
-  projectorLit: '#93B2F3',
-  projectorWash: '#DFE6F8',
+  paper: '#F4F1EB',
+  bone: '#EAE6DE',
+  ink: '#111113',
+  inkMuted: '#494A4F',
+  signal: '#BE2A10',
+  signalLit: '#FF5C36',
+  steel: '#4A5160',
+  steelLit: '#9AA3B4',
+  steelWash: '#E3E4E8',
 } as const;
 
 /**
@@ -73,7 +75,7 @@ const directions: Record<string, OfferArt> = {
     composition: 'stub',
     ground: ground.bone,
     ink: tone.ink,
-    accent: tone.marigold,
+    accent: tone.signal,
     figureTone: tone.ink,
     figure: '৳60',
     figureNote: 'off each seat',
@@ -83,9 +85,9 @@ const directions: Record<string, OfferArt> = {
   // single perforated strip.
   'off-family-four': {
     composition: 'pass',
-    ground: ground.indigo,
-    ink: tone.projectorWash,
-    accent: tone.marigoldLit,
+    ground: ground.slate,
+    ink: tone.steelWash,
+    accent: tone.signalLit,
     figureTone: tone.paper,
     figure: '৳200',
     figureNote: 'off the Family box',
@@ -95,8 +97,8 @@ const directions: Record<string, OfferArt> = {
   'off-late-repertory': {
     composition: 'leader',
     ground: ground.house,
-    ink: tone.projectorLit,
-    accent: tone.marigoldLit,
+    ink: tone.steelLit,
+    accent: tone.signalLit,
     figureTone: tone.paper,
     figure: '22:00',
     figureNote: 'Thursdays, Dhanmondi',
@@ -108,7 +110,7 @@ const directions: Record<string, OfferArt> = {
     composition: 'insert',
     ground: ground.bone,
     ink: tone.inkMuted,
-    accent: tone.projector,
+    accent: tone.steel,
     figureTone: tone.ink,
     figure: '1st',
     figureNote: 'Saturday of the month',
@@ -119,7 +121,7 @@ const directions: Record<string, OfferArt> = {
     composition: 'card',
     ground: ground.clay,
     ink: tone.bone,
-    accent: tone.marigoldLit,
+    accent: tone.signalLit,
     figureTone: tone.paper,
     figure: '15%',
     figureNote: 'off the seat price',
@@ -135,7 +137,7 @@ const fallback: OfferArt = {
   composition: 'insert',
   ground: ground.bone,
   ink: tone.inkMuted,
-  accent: tone.projector,
+  accent: tone.steel,
   figureTone: tone.ink,
   figure: '—',
   figureNote: 'see the terms',

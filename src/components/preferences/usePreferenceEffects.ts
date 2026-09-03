@@ -14,8 +14,8 @@ import type { AppTheme } from '@/store/preferences';
  */
 
 const THEME_COLOR: Record<AppTheme, string> = {
-  light: '#F4F1EA',
-  dark: '#0B0E1A',
+  light: '#EAE6DE',
+  dark: '#0E0E10',
 };
 
 /** How long the colour-transition class stays on. Matches globals.css. */

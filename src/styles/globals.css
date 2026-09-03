@@ -1,69 +1,108 @@
 @import 'tailwindcss';
 
-/* Self-hosted variable fonts. Display = Fraunces (editorial, high contrast),
-   Text = Archivo (grotesque with true tabular figures for timetables),
-   Bangla = Anek Bangla (matched Indic superfamily), Mono = JetBrains Mono (references, seat IDs). */
-/* Fraunces is loaded with its full axis set — the design uses its optical-size,
-   SOFT and WONK axes. The others are weight-only, which is all they are asked
-   for. Each stylesheet declares unicode-range per subset, so a browser only
-   downloads the scripts a page actually renders. */
-@import '@fontsource-variable/fraunces/full.css';
-@import '@fontsource-variable/archivo/wght.css';
-@import '@fontsource-variable/anek-bangla/wght.css';
+/* ═══════════════════════════════════════════════════════════════════════
+   GRANDPLEX — CINEMATIC MONOLITH
+   Type system.
+
+   Two families do all the work, and both carry a width axis, so the
+   "display face" and the "interface face" are the *same* typeface at two
+   different widths. That is what makes the page read as one voice rather
+   than as a pairing:
+
+     Display  Archivo @ wdth 62 · weight 700–800 · uppercase
+              A cinematic condensed grotesque. Film titles, section marks,
+              the big numbers. Set tight and set large.
+     Text     Archivo @ wdth 100 · weight 400–600
+              Navigation, timetables, forms, prices. True tabular figures.
+     Bangla   Anek Bangla, the matched Indic superfamily, on the same two
+              settings (its width axis floors at 75%).
+     Mono     JetBrains Mono — booking references and seat IDs only.
+
+   `wdth.css` carries the full weight range *and* the width axis in one
+   face, so this is one download per subset, not two.
+
+   The previous system's editorial serif (Fraunces) is gone: a high-contrast
+   old-style face is the opposite of the monolith, and dropping it removes
+   the heaviest font payload in the project.
+   ═══════════════════════════════════════════════════════════════════════ */
+@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource-variable/anek-bangla/wdth.css';
 @import '@fontsource-variable/jetbrains-mono/wght.css';
 
 /* ═══════════════════════════════════════════════════════════════════════
-   RAW PALETTE — derived by sampling the supplied reference assets.
-   See docs/design-system.md §Colour for the sampled source values.
+   RAW PALETTE
+
+   Three grounds and one signal. Everything else is a rule or a shade.
+
+     BONE    the gallery — a printed festival programme, warm off-white
+     PITCH   the auditorium — near-black, never pure black, warm-leaning
+     SIGNAL  vermilion — the only chromatic colour in the system
+
+   Colour is not decoration here. If something is vermilion it is because it
+   is the thing you are meant to act on, the thing that is selected, or the
+   thing that is live. Nothing else is allowed to take it.
    ═══════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Programme paper (light world) — sampled #EEEEF5/#F1F4FA, warmed toward bone */
-  --paper: #f4f1ea;
-  --paper-raised: #fbf9f5;
-  --paper-sunken: #e9e4d9;
-  --paper-edge: #ded7c9;
+  /* ── Bone: the light world ─────────────────────────────────────────── */
+  --paper: #eae6de;
+  --paper-raised: #f4f1eb;
+  --paper-sunken: #ddd8ce;
+  --paper-edge: #cec7ba;
 
-  /* Ink — sampled #12131A / #191E29 / #1E1F24 */
-  --ink: #14161f;
-  --ink-muted: #4c505e;
-  --ink-faint: #7b7f8c;
-  --rule: #d6cfc1;
-  --rule-strong: #b3aa98;
+  /* ── Carbon: ink on bone ───────────────────────────────────────────── */
+  --ink: #111113;
+  --ink-muted: #494a4f;
+  --ink-faint: #74767c;
+  --rule: #cbc5b8;
+  --rule-strong: #a49d8e;
 
-  /* Auditorium (dark world) — sampled #0A101D / #060913 / #191D2A */
-  --house: #101322;
-  --house-raised: #1a1e2e;
-  --house-sunken: #080a13;
-  --house-ink: #f0ece3;
-  --house-muted: #a0a4b2;
-  /* Lifted from the originally authored #6f7484, which measured 3.96:1 on the
-     auditorium ground — under AA for the small print it carries (row letters,
-     the per-seat pricing note, the ticket's field labels). This is 4.71:1 and
-     still sits clearly below --house-muted in the hierarchy. */
-  --house-faint: #7c8092;
-  --house-rule: #2a2f40;
+  /* ── Pitch: the auditorium, dark in both themes ────────────────────── */
+  --house: #0b0b0d;
+  --house-raised: #17171a;
+  --house-sunken: #050506;
+  --house-ink: #efebe3;
+  --house-muted: #a5a49f;
+  /* 5.9:1 on --house. Small print — row letters, seat pricing, ticket
+     field labels — has to clear AA at 11px. */
+  --house-faint: #7e7d79;
+  --house-rule: #26262a;
 
-  /* Projector blue — sampled periwinkle #93B2F3 / #7F9CD8, deepened for ink-on-paper contrast */
-  --projector: #35509c;
-  --projector-deep: #22346b;
-  --projector-lit: #93b2f3;
-  --projector-wash: #dfe6f8;
+  /* ── Signal: vermilion ─────────────────────────────────────────────────
+   * Three values, and which one you use is decided by contrast, not taste.
+   *
+   *   --signal      4.8:1 on bone. Text, hairlines, small marks on light.
+   *   --signal-hot  3.2:1 on bone. Large display type and solid fills only.
+   *   --signal-lit  6.4:1 on pitch. The dark world's signal.
+   *
+   * White on --signal is 5.9:1, so a filled vermilion button is legitimate.
+   * ─────────────────────────────────────────────────────────────────── */
+  --signal: #be2a10;
+  --signal-hot: #e8401c;
+  --signal-lit: #ff5c36;
+  --signal-wash: #f6e3dc;
 
-  /* Marigold — the sparing vermilion accent in the references, read through
-     the nakshi kantha craft palette. Signal colour only. */
-  --marigold: #c2491a;
-  --marigold-lit: #f0913c;
-  --marigold-wash: #f8e6da;
+  /* ── Steel: the achromatic cool, for diagrams and reserved states ────
+   * Deliberately desaturated. The old system had a second chromatic accent
+   * (projector blue) competing with the signal; a monolith gets one accent,
+   * and everything structural falls back to grey. */
+  --steel: #4a5160;
+  --steel-deep: #2b303b;
+  --steel-lit: #9aa3b4;
+  --steel-wash: #e3e4e8;
 
-  /* Status */
+  /* ── Status ─────────────────────────────────────────────────────────
+   * Danger sits deliberately deeper and browner than the signal, because
+   * both are red. Nothing in this product communicates a failure state by
+   * hue alone — every one of them carries a word, and most carry a
+   * disabled state or an icon as well. */
   --ok: #2c6349;
   --ok-wash: #dcebe3;
-  --warn: #97640b;
-  --warn-wash: #f7ecd4;
-  --danger: #9b2c1e;
-  --danger-wash: #f6dfda;
+  --warn: #8a5c07;
+  --warn-wash: #f5ead0;
+  --danger: #8e1c10;
+  --danger-wash: #f4dcd8;
 
-  /* ── Semantic surface mapping (flipped by .auditorium) ── */
+  /* ── Semantic mapping. Re-pointed by the dark theme and the auditorium ─ */
   --surface: var(--paper);
   --surface-raised: var(--paper-raised);
   --surface-sunken: var(--paper-sunken);
@@ -72,22 +111,20 @@
   --content-faint: var(--ink-faint);
   --hairline: var(--rule);
   --hairline-strong: var(--rule-strong);
-  --accent: var(--projector);
+  --accent: var(--signal);
+  --accent-hot: var(--signal-hot);
   --accent-contrast: #ffffff;
-  --focus: var(--marigold);
+  --focus: var(--signal);
 
   /* ── Motion ───────────────────────────────────────────────────────────
-   * The same scale as `src/motion/tokens.ts`, in milliseconds.
-   *
-   * These were previously a *second*, unrelated scale — `--dur-fast` was 120ms
-   * while the JS `fast` token was 190ms — so a CSS hover and a Framer Motion
-   * animation on the same card ran at visibly different speeds. Anything that
-   * changes here changes there, and the two must be read together.
+   * The same scale as `src/motion/tokens.ts`, in milliseconds. Anything
+   * that changes here changes there, and the two are read together by
+   * `src/motion/tokens.test.ts`.
    *
    *   --dur-instant  press feedback, same-frame acknowledgement
    *   --dur-fast     hover, focus, colour and border
    *   --dur-base     cards, panels, summaries — the workhorse
-   *   --dur-slow     poster drift, sheen, atmosphere
+   *   --dur-slow     poster drift, reveals, atmosphere
    * ─────────────────────────────────────────────────────────────────── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
@@ -96,47 +133,59 @@
   --dur-base: 280ms;
   --dur-slow: 460ms;
 
-  /* Layout */
+  /* ── Structure ────────────────────────────────────────────────────────
+   * The monolith's rules come in exactly three weights, and they mean
+   * different things:
+   *   hairline  1px  a boundary inside a block
+   *   edge      2px  the boundary of a block
+   *   slab      3px  the top of a section — the heaviest mark on the page
+   * ─────────────────────────────────────────────────────────────────── */
+  --w-edge: 2px;
+  --w-slab: 3px;
+
   --header-h: 4rem;
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-r: env(safe-area-inset-right, 0px);
   --safe-l: env(safe-area-inset-left, 0px);
 }
 
+@media (min-width: 64rem) {
+  :root {
+    --header-h: 4.5rem;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
-   DARK APPEARANCE — "after lights-down"
+   DARK — "the house lights are down"
 
-   Not an inversion, and not the auditorium palette reused. The auditorium is
-   a *room*; this is the programme printed on dark stock. It stays warm — the
-   text is off-white bone, never sterile #FFF — and the ground is blue-black,
-   never pure black, so the projector blue still reads as blue against it.
+   Not an inversion of the gallery, and not a second palette. It is the same
+   room seen with the lights off: the ground drops to pitch, the type warms
+   to bone, and the signal lifts because vermilion at 4.8:1 on bone is far
+   too dark to read on near-black.
 
-   Only the semantic layer is re-pointed. The raw palette above is untouched,
-   so anything deliberately representing a fixed material (the printed ticket,
-   the QR field, the auditorium) keeps its own colours in both themes.
+   Only the semantic layer moves. Anything representing a fixed material —
+   the printed ticket, the auditorium itself — keeps its own colours in both
+   themes, which is why those raw tokens exist.
    ═══════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Night stock. Slightly lighter than --house, so the auditorium can still
-     go deeper than the page around it. */
-  --night: #12151f;
-  --night-raised: #1a1e2b;
-  --night-sunken: #0c0f18;
-  --night-ink: #f2eee6;
-  --night-muted: #a8acb8;
-  /* 5.2:1 on --night. The obvious #6F7484 measures 3.9:1 and fails AA on the
-     small print it would carry. */
-  --night-faint: #838799;
-  --night-rule: #2c3142;
-  --night-rule-strong: #3e4457;
+  --night: #0e0e10;
+  --night-raised: #17171b;
+  --night-sunken: #08080a;
+  --night-ink: #f0ece4;
+  --night-muted: #a7a6a1;
+  /* 5.6:1 on --night. */
+  --night-faint: #807f7c;
+  --night-rule: #26262b;
+  --night-rule-strong: #3b3b42;
 
-  /* Status, lifted to read on a dark ground. The light-mode values are far too
-     dark to sit on #12151F. */
+  /* Status, lifted to read on a dark ground. The light values are far too
+     dark to sit on #0E0E10. */
   --ok-dark: #6fbf95;
-  --ok-wash-dark: #16301f;
+  --ok-wash-dark: #12291b;
   --warn-dark: #e0a63a;
-  --warn-wash-dark: #34260a;
-  --danger-dark: #f0907e;
-  --danger-wash-dark: #3a1712;
+  --warn-wash-dark: #2e2208;
+  --danger-dark: #f08a75;
+  --danger-wash-dark: #33130d;
 }
 
 html[data-theme='dark'] {
@@ -148,12 +197,17 @@ html[data-theme='dark'] {
   --content-faint: var(--night-faint);
   --hairline: var(--night-rule);
   --hairline-strong: var(--night-rule-strong);
-  /* Projector blue has to invert its role: the deep ink-on-paper blue vanishes
-     on night stock, so the lit periwinkle becomes the accent and the contrast
-     colour becomes dark. */
-  --accent: var(--projector-lit);
-  --accent-contrast: #0d1020;
-  --focus: var(--marigold-lit);
+  --accent: var(--signal-lit);
+  --accent-hot: var(--signal-lit);
+  --accent-contrast: #140602;
+  --focus: var(--signal-lit);
+
+  --steel-wash: #1c1e24;
+  /* Steel has to flip like every other ink token, or `text-steel-deep` — the
+     readable end of the scale on bone — becomes charcoal-on-charcoal here. */
+  --steel: #99a1b1;
+  --steel-deep: #b9c0ce;
+  --steel-lit: #6d7484;
 
   --ok: var(--ok-dark);
   --ok-wash: var(--ok-wash-dark);
@@ -161,23 +215,18 @@ html[data-theme='dark'] {
   --warn-wash: var(--warn-wash-dark);
   --danger: var(--danger-dark);
   --danger-wash: var(--danger-wash-dark);
+  --signal-wash: #2c1109;
 
   color-scheme: dark;
 }
 
 /* The auditorium is a room, and it is dark in both themes. In dark mode it
-   drops *below* the surrounding page rather than contrasting against it, so
-   entering the seat map still reads as going somewhere darker. */
+   drops *below* the surrounding page, so walking into the seat map still
+   reads as going somewhere darker than where you were. */
 html[data-theme='dark'] .auditorium {
-  --surface: #0a0d16;
-  --surface-raised: #141826;
-  --surface-sunken: #06080f;
-}
-
-/* Selection and scrollbars follow the theme rather than staying light. */
-::selection {
-  background: color-mix(in oklab, var(--focus) 28%, transparent);
-  color: var(--content);
+  --surface: #060607;
+  --surface-raised: #121215;
+  --surface-sunken: #030304;
 }
 
 html[data-theme='dark'] {
@@ -188,10 +237,10 @@ html[data-theme='dark'] {
  * Theme-change transition.
  *
  * Applied to <html> only for the length of an explicit toggle, then removed.
- * A permanent `transition: all` on the whole document would make every
- * unrelated state change mushy and would fight the motion system.
+ * A permanent `transition: all` on the document would make every unrelated
+ * state change mushy and would fight the motion system.
  *
- * Only colour properties transition — never layout, never images.
+ * Colour only — never layout, never images.
  */
 html.theme-transition,
 html.theme-transition *,
@@ -216,8 +265,8 @@ html.theme-transition *::after {
   }
 }
 
-/* The auditorium: lights down. Applied to the seat map, the booking wizard's
-   screening surfaces and the confirmation ticket — never to the whole app. */
+/* Lights down. Applied to the seat map, the booking wizard's screening
+   surfaces and the confirmation ticket — never to the whole app. */
 .auditorium {
   --surface: var(--house);
   --surface-raised: var(--house-raised);
@@ -226,10 +275,15 @@ html.theme-transition *::after {
   --content-muted: var(--house-muted);
   --content-faint: var(--house-faint);
   --hairline: var(--house-rule);
-  --hairline-strong: #3b4257;
-  --accent: var(--projector-lit);
-  --accent-contrast: #0d1020;
-  --focus: var(--marigold-lit);
+  --hairline-strong: #3a3a42;
+  --accent: var(--signal-lit);
+  --accent-hot: var(--signal-lit);
+  --accent-contrast: #140602;
+  --focus: var(--signal-lit);
+  --signal-wash: #2c1109;
+  --steel-wash: #1c1e24;
+  --steel: #99a1b1;
+  --steel-deep: #b9c0ce;
   color: var(--content);
   background-color: var(--surface);
 }
@@ -244,33 +298,32 @@ html.theme-transition *::after {
   --color-hairline: var(--hairline);
   --color-hairline-strong: var(--hairline-strong);
   --color-accent: var(--accent);
+  --color-accent-hot: var(--accent-hot);
   --color-accent-contrast: var(--accent-contrast);
   --color-focus: var(--focus);
 
   --color-paper: var(--paper);
   --color-paper-raised: var(--paper-raised);
   --color-paper-sunken: var(--paper-sunken);
+  --color-paper-edge: var(--paper-edge);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-house: var(--house);
   --color-house-raised: var(--house-raised);
   --color-house-sunken: var(--house-sunken);
   --color-house-ink: var(--house-ink);
-  /* These three were used in the auditorium from the start but never registered
-     here, so `text-house-muted`, `text-house-faint` and `border-house-rule`
-     emitted no CSS and silently fell back to currentColor — which is why the
-     seat map and the ticket read flat and over-bright. */
   --color-house-muted: var(--house-muted);
   --color-house-faint: var(--house-faint);
   --color-house-rule: var(--house-rule);
 
-  --color-projector: var(--projector);
-  --color-projector-deep: var(--projector-deep);
-  --color-projector-lit: var(--projector-lit);
-  --color-projector-wash: var(--projector-wash);
-  --color-marigold: var(--marigold);
-  --color-marigold-lit: var(--marigold-lit);
-  --color-marigold-wash: var(--marigold-wash);
+  --color-signal: var(--signal);
+  --color-signal-hot: var(--signal-hot);
+  --color-signal-lit: var(--signal-lit);
+  --color-signal-wash: var(--signal-wash);
+  --color-steel: var(--steel);
+  --color-steel-deep: var(--steel-deep);
+  --color-steel-lit: var(--steel-lit);
+  --color-steel-wash: var(--steel-wash);
   --color-ok: var(--ok);
   --color-ok-wash: var(--ok-wash);
   --color-warn: var(--warn);
@@ -278,17 +331,17 @@ html.theme-transition *::after {
   --color-danger: var(--danger);
   --color-danger-wash: var(--danger-wash);
 
-  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-display: 'Archivo Variable', 'Anek Bangla Variable', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Archivo Variable', 'Anek Bangla Variable', ui-sans-serif, system-ui, sans-serif;
   --font-bangla: 'Anek Bangla Variable', 'Archivo Variable', sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-  /* Radius policy: printed matter does not float and rarely curves.
-     Default is square; xs for seats/chips, sm for controls, stub only for
-     perforation notches. Nothing else is allowed to round. */
+  /* Radius policy: a monolith does not curve. Zero is the default and the
+     only exceptions are the seat (which needs a touchable shape) and the
+     ticket's perforation notches. */
   --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
   --radius-stub: 999px;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -308,6 +361,7 @@ html.theme-transition *::after {
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
   }
 
   /* A backstop against horizontal scroll from a bleeding artwork bed or a
@@ -326,51 +380,108 @@ html.theme-transition *::after {
     color: var(--content);
     font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;
-    font-synthesis-weight: none;
+    font-synthesis: none;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
-  /* The grain of the paper stock. One repeating SVG, no image asset. */
+  /**
+   * Grain.
+   *
+   * In the gallery it is the tooth of uncoated stock; in the auditorium it
+   * is projected film. Same single repeating SVG, no image asset, and it is
+   * pushed harder in the dark because that is where grain actually lives.
+   */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.035;
+    opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
+  html[data-theme='dark'] body::before {
+    opacity: 0.055;
+  }
+
+  /**
+   * Display type.
+   *
+   * Condensed, heavy, tight and — critically — `text-wrap: balance` off for
+   * the big sizes, because balancing a two-word film title produces worse
+   * line breaks than simply letting it run.
+   */
   h1,
   h2,
   h3,
   h4 {
     font-family: var(--font-display);
-    font-optical-sizing: auto;
-    font-variation-settings: 'SOFT' 0, 'WONK' 1;
-    letter-spacing: -0.015em;
-    text-wrap: balance;
+    font-stretch: 62%;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+    text-transform: uppercase;
+  }
+
+  h3,
+  h4 {
+    letter-spacing: -0.01em;
+    line-height: 1.08;
   }
 
   p {
     text-wrap: pretty;
   }
 
+  /**
+   * Bangla.
+   *
+   * Anek Bangla's width axis floors at 75%, so Bangla display type is
+   * condensed as far as the face allows and no further — and Bengali script
+   * is never uppercased, because it has no case. Both of those are handled
+   * here rather than at three hundred call sites.
+   */
+  /*
+   * Bengali.
+   *
+   * Anek Bangla's width axis floors at 75%, so Bangla display type is
+   * condensed as far as the face allows and no further. Wide tracking is the
+   * real hazard — it pulls conjuncts apart — so that is what is corrected
+   * here. `text-transform` deliberately is *not*: Bengali has no case, so
+   * uppercase does nothing to it, and leaving the rule in place keeps Latin
+   * words inside a Bangla page (the wordmark, city names, format codes) set
+   * in the same caps as everywhere else.
+   */
   :lang(bn) {
     font-family: var(--font-bangla);
-    line-height: 1.75;
+    line-height: 1.7;
+  }
+
+  :lang(bn) h1,
+  :lang(bn) h2,
+  :lang(bn) h3,
+  :lang(bn) h4 {
+    font-stretch: 75%;
+    letter-spacing: 0;
+    line-height: 1.25;
   }
 
   :focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
-    border-radius: 1px;
+    border-radius: 0;
   }
 
   ::selection {
-    background: var(--marigold);
+    background: var(--signal);
     color: #fff;
+  }
+
+  html[data-theme='dark'] ::selection {
+    background: var(--signal-lit);
+    color: #140602;
   }
 
   [hidden] {
@@ -378,17 +489,63 @@ html.theme-transition *::after {
   }
 }
 
+/**
+ * The display class carries the width and weight; the theme token only
+ * carries the family. Unlayered, so it augments Tailwind's own
+ * `.font-display` (which sets `font-family` and nothing else) rather than
+ * fighting it.
+ */
+.font-display {
+  font-stretch: 62%;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+:lang(bn) .font-display {
+  font-stretch: 75%;
+  letter-spacing: 0;
+}
+
+/* Opts a display element back out of the condensed setting — used where a
+   single word has to sit at text width, such as inside a running sentence. */
+.font-display-wide {
+  font-stretch: 100%;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
-   SIGNATURE MOTIF — the running stitch
-   Nakshi kantha embroidery and 35mm film perforation are the same rhythm:
-   an interrupted line. It is the only ornament in the system, and it is
-   drawn, never imaged.
+   THE MONOLITH — structural marks
+
+   The whole ornament vocabulary is four things: a slab, an edge, a
+   perforation and a numeral. Nothing glows, nothing floats, nothing curves.
    ═══════════════════════════════════════════════════════════════════════ */
+
+/** The heaviest mark on the page. Opens a section. */
+@utility slab {
+  border-top: var(--w-slab) solid var(--content);
+}
+
+/** The boundary of a block that is meant to read as an object. */
+@utility edge {
+  border: var(--w-edge) solid var(--content);
+}
+
+@utility edge-t {
+  border-top: var(--w-edge) solid var(--content);
+}
+
+@utility edge-b {
+  border-bottom: var(--w-edge) solid var(--content);
+}
+
+/**
+ * Film perforation. Both the ticket's torn edge and the quiet divider that
+ * replaces a plain rule where the page wants a little rhythm.
+ */
 @utility stitch-x {
   background-image: repeating-linear-gradient(
     to right,
-    var(--hairline-strong) 0 6px,
-    transparent 6px 12px
+    var(--hairline-strong) 0 4px,
+    transparent 4px 10px
   );
   background-repeat: no-repeat;
   background-size: 100% 1.5px;
@@ -398,15 +555,15 @@ html.theme-transition *::after {
 @utility stitch-y {
   background-image: repeating-linear-gradient(
     to bottom,
-    var(--hairline-strong) 0 6px,
-    transparent 6px 12px
+    var(--hairline-strong) 0 4px,
+    transparent 4px 10px
   );
   background-repeat: no-repeat;
   background-size: 1.5px 100%;
   background-position: 50% 0;
 }
 
-/* Sprocket edge — a ticket stub's torn perforation. Used on ticket surfaces. */
+/* Sprocket edge — a ticket stub's torn perforation. */
 @utility sprocket-t {
   --sprocket-bg: var(--surface);
   mask-image: radial-gradient(circle 5px at 5px 0, transparent 98%, #000 100%);
@@ -422,24 +579,33 @@ html.theme-transition *::after {
   mask-position: 0 100%;
 }
 
-/* Editorial rules */
 @utility rule-hair {
   border-top: 1px solid var(--hairline);
 }
 
 @utility rule-heavy {
-  border-top: 2px solid var(--content);
+  border-top: var(--w-edge) solid var(--content);
 }
 
-/* Eyebrow / small-caps metadata label — the programme's voice */
+/**
+ * The programme's small voice: an all-caps, wide-tracked label. Every piece
+ * of metadata in the product is set in it, which is what holds a brutalist
+ * grid together — the big type shouts, and everything else whispers in
+ * exactly the same tone.
+ */
 @utility eyebrow {
   font-family: var(--font-sans);
+  font-stretch: 100%;
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--content-faint);
   font-variant-numeric: tabular-nums;
+}
+
+:lang(bn) .eyebrow {
+  letter-spacing: 0.06em;
 }
 
 @utility numeral {
@@ -448,12 +614,32 @@ html.theme-transition *::after {
   letter-spacing: -0.02em;
 }
 
-/* Container with editorial gutters */
+/**
+ * The index mark — `01 / 06`. The single most characteristic piece of the
+ * system: every film, every section and every booking step is numbered, the
+ * way a festival programme numbers its entries.
+ */
+@utility index-mark {
+  font-family: var(--font-display);
+  font-stretch: 62%;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 0.8;
+}
+
+/**
+ * Container.
+ *
+ * Wider than a reading measure on purpose — the grid is meant to reach for
+ * the edges of the screen. Running text inside it is constrained separately
+ * by `max-w-prose`, so the two concerns never fight.
+ */
 @utility shell {
   width: 100%;
-  max-width: 82rem;
+  max-width: 88rem;
   margin-inline: auto;
-  padding-inline: max(1rem, var(--safe-l));
+  padding-inline: max(1.125rem, var(--safe-l));
 }
 
 @media (min-width: 48rem) {
@@ -464,11 +650,11 @@ html.theme-transition *::after {
 
 @media (min-width: 80rem) {
   .shell {
-    padding-inline: 3rem;
+    padding-inline: 3.5rem;
   }
 }
 
-/* Screen-reader only */
+/** Screen-reader only */
 @utility sr-only-focusable {
   position: absolute;
   width: 1px;
@@ -486,7 +672,7 @@ html.theme-transition *::after {
   }
 }
 
-/* Hides scrollbars on deliberate horizontal rails while keeping them scrollable */
+/** Hides scrollbars on deliberate horizontal rails while keeping them scrollable */
 @utility rail {
   overflow-x: auto;
   scrollbar-width: thin;
@@ -495,9 +681,20 @@ html.theme-transition *::after {
   -webkit-overflow-scrolling: touch;
 }
 
+/**
+ * A hairline grid: children separated by exactly one rule, with no double
+ * borders at the joins and no border on the outside. `gap-px` over a
+ * hairline ground does this in two declarations where border collapsing
+ * takes a dozen.
+ */
+@utility grid-rules {
+  background-color: var(--hairline);
+  gap: 1px;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    OVERLAY MOTION
-   Radix drives `data-state`; these four utilities are the whole vocabulary.
+   Radix drives `data-state`; these utilities are the whole vocabulary.
    No animation library is involved, and reduced-motion neutralises them all.
    ═══════════════════════════════════════════════════════════════════════ */
 @keyframes o-fade-in {
@@ -611,6 +808,44 @@ html.theme-transition *::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   CINEMATIC REVEALS
+
+   Two effects, both CSS, both cheap. They exist because the brief for this
+   system is a *title sequence*, and a title sequence reveals type from
+   behind an edge rather than fading it in.
+   ═══════════════════════════════════════════════════════════════════════ */
+@keyframes curtain-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(0.35em);
+  }
+  to {
+    clip-path: inset(-0.25em 0 -0.25em 0);
+    transform: translateY(0);
+  }
+}
+
+/** A line of type rising from behind its own baseline. */
+@utility curtain {
+  animation: curtain-up 620ms var(--ease-out) both;
+  animation-delay: calc(var(--line, 0) * 70ms);
+}
+
+@keyframes wipe-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 -1px 0 0);
+  }
+}
+
+/** An image or a rule drawn on from the left, like a projector opening. */
+@utility wipe {
+  animation: wipe-in 720ms var(--ease-out) both;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    AUDITORIUM
    Arriving at the seat map should feel like the lights going down. These are
    CSS rather than JS because a seat map is 200+ nodes and every one of them
@@ -710,6 +945,15 @@ html.theme-transition *::after {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* A clip-path reveal that is cut to 0.01ms still has to *finish* at the
+     visible state, or the type is left cropped. Both reveals end fully open,
+     so this is safe — but the delay has to go too, or a staggered line waits
+     half a second before appearing instantly. */
+  .curtain,
+  .wipe {
+    animation-delay: 0ms !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -739,6 +983,9 @@ html.theme-transition *::after {
     --content-faint: #555;
     --hairline: #999;
     --hairline-strong: #666;
+    --accent: #000;
+    --accent-hot: #000;
+    --accent-contrast: #fff;
     color-scheme: light;
   }
 
@@ -771,6 +1018,7 @@ html.theme-transition *::after {
     --house-faint: #555;
     --house-rule: #999;
     --hairline: #999;
+    --accent: #000;
     background: #fff !important;
     color: #000 !important;
   }

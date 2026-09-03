@@ -47,11 +47,11 @@ export function HouseDiagram({
                 className={cn(
                   'fill-bar block h-full motion-reduce:animate-none',
                   screen.format === 'velvet'
-                    ? 'bg-marigold'
+                    ? 'bg-signal'
                     : screen.format === 'grandscreen'
-                      ? 'bg-projector'
+                      ? 'bg-steel'
                       : screen.format === 'three-d'
-                        ? 'bg-projector/60'
+                        ? 'bg-steel/60'
                         : 'bg-content/45',
                 )}
                 style={{

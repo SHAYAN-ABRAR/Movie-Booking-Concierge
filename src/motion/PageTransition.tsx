@@ -82,7 +82,7 @@ export function RouteProgress() {
             className="h-full w-[200%]"
             style={{
               backgroundImage:
-                'repeating-linear-gradient(to right, var(--marigold) 0 6px, transparent 6px 14px)',
+                'repeating-linear-gradient(to right, var(--signal) 0 6px, transparent 6px 14px)',
             }}
             {...(motion.reduced
               ? { animate: { opacity: 0.7 } }
