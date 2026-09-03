@@ -22,7 +22,8 @@ import {
 } from '@/lib/datetime';
 import { money, seatRanges } from '@/lib/format';
 import { buildIcs, downloadUrl, mapUrl } from '@/lib/external';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import { brand } from '@/config/brand';
 
 export function BookingConfirmation() {
   const { t } = useTranslation();
@@ -111,16 +112,21 @@ export function BookingConfirmation() {
     <div className="shell py-10">
       {/* ── Confirmation heading ─────────────────────────────────── */}
       <div className="max-w-2xl" data-print="hide">
-        <p className="eyebrow mb-3">Booking complete</p>
-        <h1 className="font-display text-[2.25rem] leading-[1.02] tracking-[-0.03em] sm:text-[3rem]">
-          You're booked for {booking.movieTitle}.
+        <p className="eyebrow mb-3 text-accent">{t('confirmation.complete')}</p>
+        <h1
+          className="font-display uppercase leading-[0.9] tracking-[-0.03em] [overflow-wrap:anywhere]"
+          style={{ fontSize: 'clamp(2.25rem, 6vw, 4.25rem)' }}
+        >
+          {t('confirmation.bookedFor', { title: booking.movieTitle })}
         </h1>
-        <p className="mt-4 text-[1.0625rem] leading-7 text-content-muted">
-          Your reference is{' '}
-          <span className="font-mono font-semibold tracking-[0.06em] text-content">
-            {booking.reference}
-          </span>
-          . It is saved in this browser and shown on the ticket below.
+        <p className="mt-5 text-[1.0625rem] leading-7 text-content-muted">
+          <Trans
+            i18nKey="confirmation.referenceNote"
+            values={{ reference: booking.reference }}
+            components={{
+              1: <span className="numeral font-semibold tracking-[0.06em] text-content" />,
+            }}
+          />
         </p>
       </div>
 
@@ -142,7 +148,7 @@ export function BookingConfirmation() {
             <m.span
               aria-hidden="true"
               data-print="hide"
-              className="pointer-events-none absolute inset-y-0 z-20 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-projector-lit/20 to-transparent"
+              className="pointer-events-none absolute inset-y-0 z-20 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-steel-lit/20 to-transparent"
               initial={{ left: '-40%' }}
               animate={{ left: '130%' }}
               transition={{ duration: 1.15, ease: ease.projection, delay: 0.45 }}
@@ -152,11 +158,13 @@ export function BookingConfirmation() {
           {/* Perforated top edge */}
           <div aria-hidden="true" className="sprocket-t h-3 bg-content" />
 
-          <div className="grid gap-0 sm:grid-cols-[1fr_auto]">
+          <div className="grid gap-0 sm:grid-cols-[minmax(0,1fr)_15rem]">
             <div className="p-6 sm:p-8">
-              <p className="eyebrow mb-3 text-house-muted">GrandPlex · admit {booking.seats.length}</p>
+              <p className="eyebrow mb-3 text-house-muted">
+                {t('confirmation.admit', { brand: brand.name, count: booking.seats.length })}
+              </p>
 
-              <h2 className="font-display text-[2rem] leading-[1.02] tracking-[-0.03em] text-house-ink">
+              <h2 className="font-display text-[2.25rem] uppercase leading-[0.9] text-house-ink [overflow-wrap:anywhere]">
                 {booking.movieTitle}
               </h2>
               {movie?.titleBn ? (
@@ -165,38 +173,41 @@ export function BookingConfirmation() {
                 </p>
               ) : null}
 
-              <dl className="mt-6 grid gap-x-8 gap-y-0 sm:grid-cols-2">
+              <dl className="mt-6 grid gap-x-8 gap-y-0 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                 <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">Cinema</dt>
+                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.cinema')}</dt>
                   <dd className="text-house-ink">{booking.cinemaName}</dd>
                 </div>
                 <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">Screen</dt>
+                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.screen')}</dt>
                   <dd className="text-house-ink">
                     {booking.screenName} · {formatLabels[booking.format]}
                   </dd>
                 </div>
                 <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">Date</dt>
+                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.date')}</dt>
                   <dd className="text-house-ink">{longDayLabel(booking.date)}</dd>
                 </div>
                 <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">Time</dt>
+                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.time')}</dt>
                   <dd className="numeral text-house-ink">
                     {displayTime(booking.time)}
                     {endTime ? (
-                      <span className="text-house-muted"> — ends ~{displayTime(endTime)}</span>
+                      <span className="text-house-muted">
+                        {' — '}
+                        {t('confirmation.endsAbout', { time: displayTime(endTime) })}
+                      </span>
                     ) : null}
                   </dd>
                 </div>
                 <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">Seats</dt>
+                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.seats')}</dt>
                   <dd className="numeral text-house-ink">
                     {seatRanges(booking.seats.map((s) => s.seatId))}
                   </dd>
                 </div>
                 <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">Tickets</dt>
+                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.tickets')}</dt>
                   <dd className="text-house-ink">
                     {Object.entries(categoryTally)
                       .map(([category, count]) => {
@@ -207,30 +218,31 @@ export function BookingConfirmation() {
                   </dd>
                 </div>
                 <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">Booked for</dt>
+                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.bookedFor')}</dt>
                   <dd className="text-house-ink">{booking.guestName}</dd>
                 </div>
                 <div className="border-b border-house-rule py-2.5">
-                  <dt className="eyebrow mb-0.5 text-house-faint">Paid</dt>
+                  <dt className="eyebrow mb-0.5 text-house-faint">{t('confirmation.field.paid')}</dt>
                   <dd className="numeral text-house-ink">{money(booking.total)}</dd>
                 </div>
               </dl>
 
               {booking.insurance ? (
                 <Badge tone="ok" className="mt-4">
-                  {insurancePolicy.name} included
+                  {t('confirmation.coverIncluded', { name: insurancePolicy.name })}
                 </Badge>
               ) : null}
 
               <p className="mt-6 text-[0.8125rem] leading-6 text-house-muted">
-                Aim to be at the door by{' '}
-                <span className="numeral font-semibold text-house-ink">{displayTime(arriveBy)}</span>.
-                {cinema ? ` Trailers run ${cinema.trailerMinutes} minutes before the feature.` : ''}
+                {t('confirmation.doorBy', { time: displayTime(arriveBy) })}
+                {cinema
+                  ? ` ${t('confirmation.trailersRun', { count: cinema.trailerMinutes })}`
+                  : ''}
               </p>
             </div>
 
             {/* Stub */}
-            <div className="border-t border-dashed border-house-rule p-6 sm:border-l sm:border-t-0 sm:p-8">
+            <div className="min-w-0 border-t border-dashed border-house-rule p-6 sm:border-l sm:border-t-0 sm:p-6">
               <m.div
                 className="flex flex-col items-center"
                 initial={motionPrefs.reduced ? false : { opacity: 0 }}
@@ -255,10 +267,10 @@ export function BookingConfirmation() {
                 <p className="numeral mt-3 font-mono text-lg font-semibold tracking-[0.08em] text-house-ink">
                   {booking.reference}
                 </p>
-                <p className="mt-1 text-center text-[0.6875rem] leading-4 text-house-faint">
+                <p className="mt-2 max-w-[11rem] text-center text-[0.6875rem] leading-4 text-house-faint">
                   {t('confirmation.qrNote')}
                 </p>
-                <p className="mt-4 border border-marigold px-2 py-1 text-center text-[0.625rem] font-bold uppercase tracking-[0.1em] text-marigold-lit">
+                <p className="mt-4 border border-accent px-2 py-1 text-center text-[0.625rem] font-bold uppercase tracking-[0.1em] text-accent">
                   {t('confirmation.demoTicket')}
                   <span className="block font-normal normal-case tracking-normal">
                     {t('confirmation.notValid')}
@@ -274,7 +286,7 @@ export function BookingConfirmation() {
 
       {/* ── Actions ──────────────────────────────────────────────── */}
       <div data-print="hide" className="mt-8 flex max-w-3xl flex-wrap gap-3">
-        <Button onClick={() => window.print()}>
+        <Button variant="accent" onClick={() => window.print()}>
           <Printer aria-hidden="true" />
           {t('confirmation.print')}
         </Button>
@@ -291,25 +303,22 @@ export function BookingConfirmation() {
       {/* ── What next ────────────────────────────────────────────── */}
       <div data-print="hide" className="mt-12 grid max-w-4xl gap-8 sm:grid-cols-2">
         <section aria-labelledby="next-heading">
-          <h2 id="next-heading" className="eyebrow mb-4 border-b border-hairline pb-2">
+          <h2 id="next-heading" className="eyebrow mb-4 border-b-2 border-content pb-2 text-content">
             {t('confirmation.onTheDay')}
           </h2>
           <ul className="space-y-3 text-[0.9375rem] leading-7 text-content-muted">
             <li className="flex gap-2.5">
-              <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-marigold" />
-              <span>
-                Arrive by <span className="numeral font-semibold text-content">{displayTime(arriveBy)}</span>{' '}
-                for tickets, the counter and finding your seat.
-              </span>
+              <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-accent" />
+              <span>{t('confirmation.arriveBy', { time: displayTime(arriveBy) })}</span>
             </li>
             {cinema ? (
               <li className="flex gap-2.5">
-                <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-marigold" />
+                <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-accent" />
                 <span>{cinema.lateArrivalPolicy}</span>
               </li>
             ) : null}
             <li className="flex gap-2.5">
-              <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-marigold" />
+              <span aria-hidden="true" className="mt-[0.7em] block size-1.5 shrink-0 bg-accent" />
               <span>
                 {cinema ? (
                   <>
@@ -319,7 +328,7 @@ export function BookingConfirmation() {
                       rel="noreferrer noopener"
                       className="font-semibold text-content underline underline-offset-4"
                     >
-                      Directions to {cinema.shortName}
+                      {t('confirmation.directionsTo', { cinema: cinema.shortName })}
                     </a>{' '}
                     — {cinema.addressLines.join(', ')}.
                   </>
@@ -337,7 +346,7 @@ export function BookingConfirmation() {
         </section>
 
         <section aria-labelledby="cost-heading">
-          <h2 id="cost-heading" className="eyebrow mb-4 border-b border-hairline pb-2">
+          <h2 id="cost-heading" className="eyebrow mb-4 border-b-2 border-content pb-2 text-content">
             {t('confirmation.whatYouPaid')}
           </h2>
           <dl>

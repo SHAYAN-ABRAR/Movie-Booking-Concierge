@@ -42,7 +42,7 @@ import { getMovie, cinemaById, screenFor } from '@/data';
 import { getShowtime, seatMapFor } from '@/data/schedule';
 import { checkAgeCategories, quoteBooking, totalTickets } from '@/lib/bookingMath';
 import { displayTime, formatRuntime } from '@/lib/datetime';
-import { money, pluralise, seatRanges } from '@/lib/format';
+import { money, seatRanges } from '@/lib/format';
 import { useAnnouncer } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { Trans, useTranslation } from 'react-i18next';
@@ -124,33 +124,36 @@ export function Booking() {
   const blocker = useMemo((): string | null => {
     switch (booking.step) {
       case 'session':
-        return showtime ? null : 'Choose a cinema, a day and a screening to continue.';
+        return showtime ? null : t('booking.blockers.session');
       case 'tickets':
-        if (ticketCount === 0) return 'Add at least one ticket to continue.';
-        if (ageCheck?.blocking) return 'Change the child ticket — this film is rated 18 and over.';
+        if (ticketCount === 0) return t('booking.blockers.noTickets');
+        if (ageCheck?.blocking) return t('booking.blockers.ageBlocked');
         if (ageCheck && !ageCheck.ok && !booking.ageAcknowledged) {
-          return 'Confirm that an adult will accompany the under-age tickets.';
+          return t('booking.blockers.ageUnconfirmed');
         }
         return null;
       case 'seats':
         if (booking.seatIds.length !== ticketCount) {
-          return `Choose ${pluralise(ticketCount, 'seat')} to match your tickets.`;
+          return t('booking.blockers.seatCount', { count: ticketCount });
         }
-        if (staleSeats.length > 0) return 'One of your seats is no longer available.';
+        if (staleSeats.length > 0) return t('booking.blockers.staleSeat');
         return null;
       case 'concessions':
         return null;
       case 'guest':
-        return guestValid ? null : 'Fill in your name, email and mobile number to continue.';
+        return guestValid ? null : t('booking.blockers.guest');
       case 'payment':
-        return booking.paymentMethod ? null : 'Choose how you would pay to continue.';
+        return booking.paymentMethod ? null : t('booking.blockers.payment');
       case 'review':
-        if (!guestValid) return 'Your details are incomplete.';
+        if (!guestValid) return t('booking.blockers.detailsIncomplete');
         return null;
       default:
         return null;
     }
-  }, [booking.step, booking.ageAcknowledged, booking.paymentMethod, booking.seatIds.length, showtime, ticketCount, ageCheck, guestValid, staleSeats.length]);
+  // `t` belongs in here: the blocker is now a translated string, so a language
+  // change has to recompute it or the message stays in the previous language
+  // until some unrelated dependency happens to move.
+  }, [t, booking.step, booking.ageAcknowledged, booking.paymentMethod, booking.seatIds.length, showtime, ticketCount, ageCheck, guestValid, staleSeats.length]);
 
   // Which way the customer is travelling, so the step transition can express
   // "onward" and "back" differently.
@@ -237,9 +240,7 @@ export function Booking() {
     const stored = useBookings.getState().bookings.find((b) => b.reference === reference);
     if (!stored) {
       setIsCompleting(false);
-      announce(
-        'We could not save your booking to this browser. Nothing has been charged. Please try again.',
-      );
+      announce(t('booking.saveFailed'));
       return;
     }
 
@@ -259,10 +260,13 @@ export function Booking() {
       <Announcer message={message} />
 
       {/* ── Header ───────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-hairline py-6">
+      <div className="slab flex flex-wrap items-end justify-between gap-4 py-6">
         <div className="min-w-0">
-          <p className="eyebrow mb-2">Booking · guest checkout</p>
-          <h1 className="font-display text-[1.75rem] leading-tight tracking-[-0.025em] sm:text-[2.25rem]">
+          <p className="eyebrow mb-2">{t('booking.guestCheckout')}</p>
+          <h1
+            className="font-display uppercase leading-[0.92] [overflow-wrap:anywhere]"
+            style={{ fontSize: 'clamp(1.75rem, 4.5vw, 3rem)' }}
+          >
             {movie.title}
           </h1>
         </div>
@@ -277,7 +281,7 @@ export function Booking() {
           per step, and a marker that travels rather than jumps. On small
           screens it collapses to a legible progress strip instead of a row of
           unreadable dots. */}
-      <nav aria-label={t('booking.steps')} className="border-b border-hairline py-4">
+      <nav aria-label={t('booking.steps')} className="border-b-2 border-content py-4">
         {/* Perforation rail */}
         <div aria-hidden="true" className="mb-2.5 flex gap-[7px]">
           {Array.from({ length: 28 }, (_, i) => (
@@ -285,7 +289,7 @@ export function Booking() {
               key={i}
               className={cn(
                 'block h-[5px] w-[5px] shrink-0 rounded-[1px] transition-colors duration-[--dur-base]',
-                i / 28 <= (index + 1) / bookingSteps.length ? 'bg-marigold' : 'bg-hairline-strong',
+                i / 28 <= (index + 1) / bookingSteps.length ? 'bg-accent' : 'bg-hairline-strong',
               )}
             />
           ))}
@@ -325,7 +329,8 @@ export function Booking() {
                     </span>
                     <span
                       className={cn(
-                        'truncate text-[0.8125rem] font-semibold transition-colors duration-[--dur-fast]',
+                        'truncate text-[0.6875rem] font-bold uppercase tracking-[0.1em] transition-colors duration-[--dur-fast]',
+                        '[&:lang(bn)]:text-[0.8125rem] [&:lang(bn)]:tracking-normal',
                         current
                           ? 'text-content'
                           : done
@@ -342,7 +347,7 @@ export function Booking() {
                     {current ? (
                       <m.span
                         layoutId="booking-transport"
-                        className="absolute inset-0 bg-marigold"
+                        className="absolute inset-0 bg-accent"
                         transition={motionPrefs.reduced ? { duration: 0 } : spring.marker}
                       />
                     ) : done ? (
@@ -366,13 +371,13 @@ export function Booking() {
             </p>
             {index < bookingSteps.length - 1 ? (
               <p className="text-[0.75rem] text-content-faint">
-                Next: {stepLabels[bookingSteps[index + 1]!]}
+                {t('booking.nextStep', { step: stepLabels[bookingSteps[index + 1]!] })}
               </p>
             ) : null}
           </div>
           <div aria-hidden="true" className="mt-2 h-[2px] w-full bg-hairline">
             <m.span
-              className="block h-full bg-marigold"
+              className="block h-full bg-accent"
               initial={false}
               animate={{ width: `${((index + 1) / bookingSteps.length) * 100}%` }}
               transition={motionPrefs.reduced ? { duration: 0 } : spring.marker}
@@ -387,8 +392,7 @@ export function Booking() {
           {staleSeats.length > 0 && booking.step !== 'seats' ? (
             <div className="mb-6 border-2 border-danger bg-danger-wash/50 p-4" role="alert">
               <p className="font-semibold">
-                {pluralise(staleSeats.length, 'seat')} you chose{' '}
-                {staleSeats.length === 1 ? 'is' : 'are'} no longer available
+                {t('booking.staleSeatsTitle', { count: staleSeats.length })}
               </p>
               <p className="mt-1 text-[0.9375rem] leading-6 text-content-muted">
                 {t('booking.staleSeats', { seats: seatRanges(staleSeats) })}
@@ -447,22 +451,26 @@ export function Booking() {
               ) : null}
               {isLast ? (
                 <Button
+                  variant="accent"
                   size="lg"
                   disabled={Boolean(blocker) || isCompleting}
                   aria-busy={isCompleting}
                   onClick={confirm}
                   className="min-w-52"
                 >
-                  {isCompleting ? 'Saving your booking…' : `Confirm booking · ${money(quote.total)}`}
+                  {isCompleting
+                    ? t('booking.savingBooking')
+                    : t('booking.confirmTotal', { total: money(quote.total) })}
                 </Button>
               ) : (
                 <Button
+                  variant="accent"
                   size="lg"
                   disabled={Boolean(blocker)}
                   onClick={() => goTo(nextStep(booking.step))}
                   className="min-w-40"
                 >
-                  Continue
+                  {t('booking.continue')}
                   <ArrowRight aria-hidden="true" />
                 </Button>
               )}
@@ -471,18 +479,18 @@ export function Booking() {
         </div>
 
         {/* ── Summary ────────────────────────────────────────────── */}
-        <aside className="lg:sticky lg:top-24 lg:h-fit">
+        <aside className="lg:sticky lg:top-28 lg:h-fit">
           <section
             aria-labelledby="booking-summary"
             className="border-2 border-content bg-surface-raised p-5"
           >
-            <h2 id="booking-summary" className="font-display text-xl leading-none">
+            <h2 id="booking-summary" className="eyebrow border-b-2 border-content pb-3 text-content">
               {t('booking.summary')}
             </h2>
 
             {showtime && cinema ? (
               <div className="mt-4 space-y-1 border-b border-hairline pb-4 text-[0.9375rem]">
-                <p className="font-semibold">{movie.title}</p>
+                <p className="font-display text-[1.25rem] uppercase leading-none">{movie.title}</p>
                 <p className="text-content-muted">
                   {cinema.shortName} · {screenFor(showtime)?.name}
                 </p>

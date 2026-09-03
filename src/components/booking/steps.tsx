@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
+import { useFormatters } from '@/i18n/useFormatters';
 import {
   Banknote,
   CreditCard,
@@ -64,6 +65,7 @@ import { cn } from '@/lib/utils';
    ══════════════════════════════════════════════════════════════════════ */
 
 export function SessionStep({ movie, showtime }: { movie: Movie; showtime: Showtime | null }) {
+  const { t } = useTranslation();
   const cinemaId = useBooking((s) => s.cinemaId);
   const date = useBooking((s) => s.date);
   const setCinema = useBooking((s) => s.setCinema);
@@ -86,12 +88,12 @@ export function SessionStep({ movie, showtime }: { movie: Movie; showtime: Showt
       <SelectedMovieStory movie={movie} showDetailsLink={false} />
 
       <div>
-        <RuleHeading as="h2" className="mb-4">
-          Which cinema
+        <RuleHeading as="h2" index="01" className="mb-4">
+          {t('bookingSteps.session.whichCinema')}
         </RuleHeading>
         <Select value={cinemaId ?? ''} onValueChange={setCinema}>
-          <SelectTrigger aria-label="Cinema" className="max-w-sm">
-            <SelectValue placeholder="Choose a cinema" />
+          <SelectTrigger aria-label={t('bookingSteps.session.cinema')} className="max-w-sm">
+            <SelectValue placeholder={t('bookingSteps.session.chooseCinema')} />
           </SelectTrigger>
           <SelectContent>
             {cities.map((city) => (
@@ -111,24 +113,30 @@ export function SessionStep({ movie, showtime }: { movie: Movie; showtime: Showt
       </div>
 
       <div>
-        <RuleHeading as="h2" className="mb-4">
-          Which day
+        <RuleHeading as="h2" index="02" className="mb-4">
+          {t('bookingSteps.session.whichDay')}
         </RuleHeading>
         <DateStrip value={activeDate} onChange={setDate} />
       </div>
 
       <div>
-        <RuleHeading as="h2" className="mb-4">
-          Which screening
+        <RuleHeading as="h2" index="03" className="mb-4">
+          {t('bookingSteps.session.whichScreening')}
         </RuleHeading>
 
         {!cinemaId ? (
-          <p className="text-[0.9375rem] text-content-muted">Choose a cinema first.</p>
+          <p className="text-[0.9375rem] text-content-muted">
+            {t('bookingSteps.session.cinemaFirst')}
+          </p>
         ) : options.length === 0 ? (
           <EmptyState
-            title="Nothing scheduled that day"
+            title={t('bookingSteps.session.nothingScheduled')}
             variant="schedule"
-            body={`${movie.title} is not on at ${cinemaById.get(cinemaId)?.name ?? 'this cinema'} on the day you picked. Try another date above, or another house.`}
+            body={t('bookingSteps.session.nothingScheduledBody', {
+              title: movie.title,
+              cinema:
+                cinemaById.get(cinemaId)?.name ?? t('bookingSteps.session.thisCinema'),
+            })}
           />
         ) : (
           <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(11rem,1fr))]">
@@ -175,34 +183,41 @@ export function SessionStep({ movie, showtime }: { movie: Movie; showtime: Showt
       </div>
 
       {showtime && screen ? (
-        <div className="border border-hairline-strong bg-surface-raised p-5">
-          <h3 className="eyebrow mb-3">Your screening</h3>
+        <div className="edge bg-surface-raised p-5">
+          <h3 className="eyebrow mb-3">{t('bookingSteps.session.yourScreening')}</h3>
           <dl className="grid gap-x-8 gap-y-2 sm:grid-cols-2">
-            <DataRow label="Screen">{screen.name}</DataRow>
-            <DataRow label="Format">{formatLabels[showtime.format]}</DataRow>
-            <DataRow label="Language">{languageLabels[showtime.language]}</DataRow>
-            <DataRow label="Subtitles">
+            <DataRow label={t('bookingSteps.session.screen')}>{screen.name}</DataRow>
+            <DataRow label={t('bookingSteps.session.format')}>
+              {formatLabels[showtime.format]}
+            </DataRow>
+            <DataRow label={t('bookingSteps.session.language')}>
+              {languageLabels[showtime.language]}
+            </DataRow>
+            <DataRow label={t('bookingSteps.session.subtitles')}>
               {showtime.subtitles.length
                 ? showtime.subtitles.map((s) => languageLabels[s]).join(', ')
-                : 'None'}
+                : t('bookingSteps.session.none')}
             </DataRow>
-            <DataRow label="Running time">{formatRuntime(movie.runtimeMinutes)}</DataRow>
-            <DataRow label="Certificate">{certificates[movie.certificate].label}</DataRow>
+            <DataRow label={t('bookingSteps.session.runningTime')}>
+              {formatRuntime(movie.runtimeMinutes)}
+            </DataRow>
+            <DataRow label={t('bookingSteps.session.certificate')}>
+              {certificates[movie.certificate].label}
+            </DataRow>
           </dl>
           {showtime.accessibility.length ? (
             <div className="mt-3 border-t border-hairline pt-3">
-              <p className="eyebrow mb-2">Access at this screening</p>
+              <p className="eyebrow mb-2">{t('bookingSteps.session.accessHeading')}</p>
               <AccessibilityChips features={showtime.accessibility} />
             </div>
           ) : (
             <p className="mt-3 border-t border-hairline pt-3 text-[0.8125rem] text-content-muted">
-              No additional access provisions are listed for this particular screening. The house's
-              permanent facilities still apply — see the{' '}
+              {t('bookingSteps.session.noAccessListed')}{' '}
               <Link
                 to={`/cinemas/${cinemaById.get(showtime.cinemaId)?.slug ?? ''}`}
                 className="font-semibold underline underline-offset-4"
               >
-                cinema page
+                {t('bookingSteps.session.cinemaPage')}
               </Link>
               .
             </p>
@@ -226,6 +241,7 @@ export function TicketsStep({
   showtime: Showtime;
   quote: Quote;
 }) {
+  const { t } = useTranslation();
   const counts = useBooking((s) => s.counts);
   const setCount = useBooking((s) => s.setCount);
   const ageAcknowledged = useBooking((s) => s.ageAcknowledged);
@@ -239,11 +255,10 @@ export function TicketsStep({
     <div className="space-y-8">
       <div>
         <RuleHeading as="h2" className="mb-2">
-          How many, and who for
+          {t('bookingSteps.tickets.heading')}
         </RuleHeading>
         <p className="mb-5 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
-          Pick a category for each person. We never ask for a date of birth — the category is enough
-          to price the ticket, and the door checks ID where it needs to.
+          {t('bookingSteps.tickets.lede')}
         </p>
 
         <ul className="divide-y divide-hairline border-y border-hairline">
@@ -316,13 +331,13 @@ export function TicketsStep({
         <div
           className={cn(
             'flex gap-3 border-l-2 px-4 py-4',
-            ageCheck.ok ? 'border-hairline-strong bg-surface-sunken/50' : 'border-marigold bg-marigold-wash/50',
+            ageCheck.ok ? 'border-hairline-strong bg-surface-sunken/50' : 'border-accent bg-signal-wash/50',
           )}
           role={ageCheck.ok ? undefined : 'alert'}
         >
           <TriangleAlert
             aria-hidden="true"
-            className={cn('mt-0.5 size-5 shrink-0', ageCheck.ok ? 'text-content-muted' : 'text-marigold')}
+            className={cn('mt-0.5 size-5 shrink-0', ageCheck.ok ? 'text-content-muted' : 'text-accent')}
           />
           <div className="min-w-0">
             <p className="font-semibold">{ageCheck.certificateLabel}</p>
@@ -346,7 +361,7 @@ export function TicketsStep({
 
             {ageCheck.blocking ? (
               <p className="mt-2 text-[0.875rem] font-semibold text-danger">
-                Change the child ticket to another category to continue.
+                {t('bookingSteps.tickets.changeChild')}
               </p>
             ) : null}
           </div>
@@ -355,30 +370,35 @@ export function TicketsStep({
 
       {/* ── Running cost ───────────────────────────────────────────── */}
       {total > 0 ? (
-        <div className="border border-hairline-strong bg-surface-raised p-5">
-          <h3 className="eyebrow mb-3">What that costs</h3>
+        <div className="edge bg-surface-raised p-5">
+          <h3 className="eyebrow mb-3">{t('bookingSteps.tickets.costHeading')}</h3>
           <p className="mb-3 text-[0.875rem] leading-6 text-content-muted">
-            Seats have not been chosen yet, so this uses the cheapest seat class still free at this
-            screening. It will settle once you pick seats.
+            {t('bookingSteps.tickets.costLede')}
           </p>
           <dl>
-            <DataRow label={`${pluralise(total, 'ticket')} · estimated`}>
+            <DataRow label={t('bookingSteps.tickets.estimated', { count: total })}>
               {money(quote.ticketSubtotal)}
             </DataRow>
             {quote.categorySavings > 0 ? (
-              <DataRow label="Age-category discount">− {money(quote.categorySavings)}</DataRow>
+              <DataRow label={t('bookingSteps.tickets.categoryDiscount')}>
+                − {money(quote.categorySavings)}
+              </DataRow>
             ) : null}
             {showtime.matinee ? (
-              <DataRow label="Before three">− {money(quote.matineeSavings || 60 * total)}</DataRow>
+              <DataRow label={t('bookingSteps.tickets.beforeThree')}>
+                − {money(quote.matineeSavings || 60 * total)}
+              </DataRow>
             ) : null}
-            <DataRow label={`Booking fee · ${money(20)} × ${total}`}>{money(20 * total)}</DataRow>
+            <DataRow
+              label={t('bookingSteps.tickets.bookingFeeLine', { fee: money(20), count: total })}
+            >
+              {money(20 * total)}
+            </DataRow>
           </dl>
         </div>
       ) : null}
 
-      <DemoNote>
-        Sample pricing. Nothing is charged at any point in this demonstration.
-      </DemoNote>
+      <DemoNote>{t('bookingSteps.tickets.samplePricing')}</DemoNote>
     </div>
   );
 }
@@ -394,6 +414,7 @@ export function SeatsStep({
   showtime: Showtime;
   onAnnounce: (message: string) => void;
 }) {
+  const { t } = useTranslation();
   const counts = useBooking((s) => s.counts);
   const seatIds = useBooking((s) => s.seatIds);
   const proposedSeatIds = useBooking((s) => s.proposedSeatIds);
@@ -407,12 +428,12 @@ export function SeatsStep({
     <div className="space-y-6">
       <div>
         <RuleHeading as="h2" className="mb-2">
-          Choose your seats
+          {t('bookingSteps.seats.heading')}
         </RuleHeading>
         <p className="max-w-prose text-[0.9375rem] leading-7 text-content-muted">
           {limit === 0
-            ? 'Go back a step and choose how many tickets you need first.'
-            : `Pick ${pluralise(limit, 'seat')} to match your tickets. Use the arrow keys to move around the map and Enter or Space to choose a seat.`}
+            ? t('bookingSteps.seats.needTickets')
+            : t('bookingSteps.seats.pick', { count: limit })}
         </p>
       </div>
 
@@ -468,11 +489,10 @@ export function ConcessionsStep({ quote }: { quote: Quote }) {
     <div className="space-y-8">
       <div>
         <RuleHeading as="h2" className="mb-2">
-          Anything from the counter
+          {t('bookingSteps.concessions.heading')}
         </RuleHeading>
         <p className="mb-3 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
-          Entirely optional — you can go straight on. Anything you add is paid for with your tickets
-          and collected at the counter on the day.
+          {t('bookingSteps.concessions.lede')}
         </p>
         {/* The generated-image disclosure, once, before the grid. */}
         <p className="mb-5 flex items-center gap-2 text-[0.8125rem] text-content-muted">
@@ -512,23 +532,30 @@ export function ConcessionsStep({ quote }: { quote: Quote }) {
             <p className="numeral text-[0.9375rem]">
               {pluralise(added, 'item')} · {money(quote.concessionSubtotal)}
               {quote.concessionSavings > 0 ? (
-                <span className="ml-2 text-ok">Family of Four saved {money(quote.concessionSavings)}</span>
+                <span className="ml-2 text-ok">
+                  {t('bookingSteps.concessions.familySaved', {
+                    amount: money(quote.concessionSavings),
+                  })}
+                </span>
               ) : null}
             </p>
             <Button variant="ghost" size="sm" onClick={clearConcessions}>
-              Clear add-ons
+              {t('bookingSteps.concessions.clear')}
             </Button>
           </div>
         ) : null}
       </div>
 
       {/* ── Ticket Cover ───────────────────────────────────────────── */}
-      <div className="border border-hairline-strong p-5">
+      <div className="edge p-5">
         <div className="flex items-start gap-3">
           <ShieldCheck aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-ok" />
           <div className="min-w-0 flex-1">
-            <h3 className="font-display text-lg leading-tight">
-              {insurancePolicy.name} · {money(insurancePolicy.fee)} per booking
+            <h3 className="font-display text-[1.25rem] uppercase leading-none">
+              {t('bookingSteps.concessions.coverTitle', {
+                name: insurancePolicy.name,
+                fee: money(insurancePolicy.fee),
+              })}
             </h3>
             <p className="mt-1.5 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
               {insurancePolicy.coverageSummary}
@@ -539,12 +566,11 @@ export function ConcessionsStep({ quote }: { quote: Quote }) {
                 onCheckedChange={(checked) => setInsurance(checked === true)}
                 className="mt-0.5"
               />
-              <span>Add {insurancePolicy.name} to this booking</span>
+              <span>
+                {t('bookingSteps.concessions.addCover', { name: insurancePolicy.name })}
+              </span>
             </label>
-            <DemoNote className="mt-3">
-              A sample product for this demonstration. No policy is issued, no premium is taken, and
-              no claim can actually be made — Max can walk you through what a claim would involve.
-            </DemoNote>
+            <DemoNote className="mt-3">{t('bookingSteps.concessions.coverNote')}</DemoNote>
           </div>
         </div>
       </div>
@@ -577,6 +603,7 @@ const guestSchema = z.object({
 });
 
 export function GuestStep({ onValid }: { onValid: (guest: GuestDetails | null) => void }) {
+  const { t } = useTranslation();
   const guest = useBooking((s) => s.guest);
 
   const {
@@ -616,16 +643,19 @@ export function GuestStep({ onValid }: { onValid: (guest: GuestDetails | null) =
     <div className="space-y-8">
       <div>
         <RuleHeading as="h2" className="mb-2">
-          Who is the booking for
+          {t('bookingSteps.guest.heading')}
         </RuleHeading>
         <p className="max-w-prose text-[0.9375rem] leading-7 text-content-muted">
-          Four fields, and only because a booking needs a name on it. There is no account to create,
-          no password to choose, and nothing to verify by email.
+          {t('bookingSteps.guest.lede')}
         </p>
       </div>
 
       <form className="max-w-xl space-y-5" noValidate>
-        <Field label="Full name" htmlFor="guest-name" error={errors.name?.message}>
+        <Field
+          label={t('bookingSteps.guest.name')}
+          htmlFor="guest-name"
+          error={errors.name?.message}
+        >
           <Input
             id="guest-name"
             autoComplete="name"
@@ -635,10 +665,10 @@ export function GuestStep({ onValid }: { onValid: (guest: GuestDetails | null) =
         </Field>
 
         <Field
-          label="Email"
+          label={t('bookingSteps.guest.email')}
           htmlFor="guest-email"
           error={errors.email?.message}
-          hint="Your booking reference is shown on screen — this is only kept on the booking record in this browser."
+          hint={t('bookingSteps.guest.emailHint')}
         >
           <Input
             id="guest-email"
@@ -650,7 +680,11 @@ export function GuestStep({ onValid }: { onValid: (guest: GuestDetails | null) =
           />
         </Field>
 
-        <Field label="Mobile number" htmlFor="guest-phone" error={errors.phone?.message}>
+        <Field
+          label={t('bookingSteps.guest.phone')}
+          htmlFor="guest-phone"
+          error={errors.phone?.message}
+        >
           <Input
             id="guest-phone"
             type="tel"
@@ -662,20 +696,17 @@ export function GuestStep({ onValid }: { onValid: (guest: GuestDetails | null) =
         </Field>
 
         <Field
-          label="Anything the house should know"
+          label={t('bookingSteps.guest.note')}
           htmlFor="guest-note"
           optional
           error={errors.note?.message}
-          hint="Access needs, a wheelchair transfer, a birthday — anything useful on the night."
+          hint={t('bookingSteps.guest.noteHint')}
         >
           <Textarea id="guest-note" rows={3} {...register('note')} />
         </Field>
       </form>
 
-      <DemoNote tone="loud">
-        Your details stay in this browser tab and are written onto the local booking record when you
-        confirm. They are never transmitted, because there is nowhere to transmit them to.
-      </DemoNote>
+      <DemoNote tone="loud">{t('bookingSteps.guest.privacy')}</DemoNote>
     </div>
   );
 }
@@ -723,6 +754,7 @@ const paymentMethods: Array<{
 ];
 
 export function PaymentStep({ quote }: { quote: Quote }) {
+  const { t } = useTranslation();
   const paymentMethod = useBooking((s) => s.paymentMethod);
   const setPaymentMethod = useBooking((s) => s.setPaymentMethod);
 
@@ -730,25 +762,22 @@ export function PaymentStep({ quote }: { quote: Quote }) {
     <div className="space-y-8">
       <div>
         <RuleHeading as="h2" className="mb-2">
-          How you would pay
+          {t('bookingSteps.payment.heading')}
         </RuleHeading>
         <p className="max-w-prose text-[0.9375rem] leading-7 text-content-muted">
-          Choose a method and carry on. This step records which kind of payment you would have used —
-          nothing more happens.
+          {t('bookingSteps.payment.lede')}
         </p>
       </div>
 
       <div
-        className="flex items-start gap-3 border-2 border-marigold bg-marigold-wash/50 px-4 py-4"
+        className="flex items-start gap-3 border-2 border-accent bg-signal-wash/50 px-4 py-4"
         role="note"
       >
-        <TriangleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-marigold" />
+        <TriangleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-accent" />
         <div>
-          <p className="font-semibold">This is a demonstration. No payment will be taken.</p>
+          <p className="font-semibold">{t('bookingSteps.payment.warningTitle')}</p>
           <p className="mt-1 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
-            There is no payment form on this page and never will be. This site does not ask for card
-            numbers, account details, PINs, OTPs or passwords, and it has no server to send them to
-            even if it did.
+            {t('bookingSteps.payment.warningBody')}
           </p>
         </div>
       </div>
@@ -756,7 +785,7 @@ export function PaymentStep({ quote }: { quote: Quote }) {
       <RadioGroup
         value={paymentMethod ?? ''}
         onValueChange={(value) => setPaymentMethod(value as PaymentMethodId)}
-        aria-label="Payment method"
+        aria-label={t('bookingSteps.payment.method')}
         className="gap-3"
       >
         {paymentMethods.map((method) => {
@@ -785,13 +814,17 @@ export function PaymentStep({ quote }: { quote: Quote }) {
         })}
       </RadioGroup>
 
-      <div className="border border-hairline-strong bg-surface-raised p-5">
-        <h3 className="eyebrow mb-3">Amount that would be charged</h3>
-        <p className="numeral font-display text-3xl leading-none">{money(quote.total)}</p>
+      <div className="edge bg-surface-raised p-5">
+        <h3 className="eyebrow mb-3">{t('bookingSteps.payment.amountHeading')}</h3>
+        <p className="index-mark text-[2.75rem]">{money(quote.total)}</p>
         <p className="mt-2 text-[0.8125rem] text-content-muted">
-          Including the {money(quote.bookingFee)} booking fee
-          {quote.insuranceFee > 0 ? ` and ${money(quote.insuranceFee)} Ticket Cover` : ''}. No other
-          charges.
+          {quote.insuranceFee > 0
+            ? t('bookingSteps.payment.includingCover', {
+                fee: money(quote.bookingFee),
+                cover: money(quote.insuranceFee),
+                name: insurancePolicy.name,
+              })
+            : t('bookingSteps.payment.including', { fee: money(quote.bookingFee) })}
         </p>
       </div>
     </div>
@@ -813,6 +846,8 @@ export function ReviewStep({
   quote: Quote;
   onEdit: (step: 'session' | 'tickets' | 'seats' | 'concessions' | 'guest' | 'payment') => void;
 }) {
+  const { t } = useTranslation();
+  const f = useFormatters();
   const guest = useBooking((s) => s.guest);
   const paymentMethod = useBooking((s) => s.paymentMethod);
   const insurance = useBooking((s) => s.insurance);
@@ -846,32 +881,36 @@ export function ReviewStep({
 
   return (
     <div className="space-y-8">
-      <RuleHeading as="h2">Check it over</RuleHeading>
+      <RuleHeading as="h2">{t('bookingSteps.review.heading')}</RuleHeading>
 
       {/* ── Duplicate warning ──────────────────────────────────────── */}
       {duplicate ? (
-        <div className="border-2 border-marigold bg-marigold-wash/40 p-5" role="alert">
+        <div className="border-2 border-accent bg-signal-wash/40 p-5" role="alert">
           <div className="flex items-start gap-3">
-            <TriangleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-marigold" />
+            <TriangleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-accent" />
             <div className="min-w-0">
-              <h3 className="font-display text-lg leading-tight">
-                You may already have this booking
+              <h3 className="font-display text-[1.25rem] uppercase leading-none">
+                {t('bookingSteps.review.duplicateTitle')}
               </h3>
               <p className="mt-1.5 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
-                Booking{' '}
-                <Link
-                  to={`/booking-confirmation/${duplicate.booking.reference}`}
-                  className="font-mono font-semibold text-content underline underline-offset-4"
-                >
-                  {duplicate.booking.reference}
-                </Link>{' '}
-                in this browser has {duplicate.reasons.join(', ')}. Buying a second set of tickets may
-                be exactly what you intend — more people joining, or a separate group — so this is a
-                check, not a block.
+                <Trans
+                  i18nKey="bookingSteps.review.duplicateBody"
+                  values={{
+                    reference: duplicate.booking.reference,
+                    reasons: duplicate.reasons.join(', '),
+                  }}
+                  components={{
+                    ref: (
+                      <Link
+                        to={`/booking-confirmation/${duplicate.booking.reference}`}
+                        className="numeral font-semibold text-content underline underline-offset-4"
+                      />
+                    ),
+                  }}
+                />
               </p>
               <p className="mt-2 text-[0.8125rem] leading-6 text-content-muted">
-                Only this browser's history was checked. Bookings made on another device or in another
-                browser cannot be seen from here.
+                {t('bookingSteps.review.duplicateScope')}
               </p>
 
               <label className="mt-4 flex cursor-pointer items-start gap-2.5 text-[0.9375rem] font-medium">
@@ -880,12 +919,12 @@ export function ReviewStep({
                   onCheckedChange={(checked) => acknowledgeDuplicate(checked === true)}
                   className="mt-0.5"
                 />
-                <span>Continue with another booking anyway</span>
+                <span>{t('bookingSteps.review.duplicateAcknowledge')}</span>
               </label>
 
               <Button asChild variant="outline" size="sm" className="mt-3">
                 <Link to={`/booking-confirmation/${duplicate.booking.reference}`}>
-                  Review the existing booking
+                  {t('bookingSteps.review.duplicateReview')}
                 </Link>
               </Button>
             </div>
@@ -894,30 +933,36 @@ export function ReviewStep({
       ) : null}
 
       {/* ── Screening ──────────────────────────────────────────────── */}
-      <section className="border border-hairline-strong p-5">
+      <section className="edge p-5">
         <div className="mb-4 flex items-baseline justify-between gap-4">
-          <h3 className="eyebrow">The screening</h3>
+          <h3 className="eyebrow">{t('bookingSteps.review.theScreening')}</h3>
           <Button variant="link" size="sm" className="px-0" onClick={() => onEdit('session')}>
-            Change
+            {t('bookingSteps.review.change')}
           </Button>
         </div>
-        <p className="font-display text-2xl leading-tight">{movie.title}</p>
+        <p className="font-display text-[1.5rem] uppercase leading-none">{movie.title}</p>
         <dl className="mt-3">
-          <DataRow label="Cinema">{cinema?.name}</DataRow>
-          <DataRow label="Screen">{screen?.name}</DataRow>
-          <DataRow label="Date">
-            {new Date(showtime.date).toLocaleDateString('en-GB', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
+          <DataRow label={t('bookingSteps.session.cinema')}>{cinema?.name}</DataRow>
+          <DataRow label={t('bookingSteps.session.screen')}>{screen?.name}</DataRow>
+          {/* Was `toLocaleDateString('en-GB')`, which pinned the review step's
+              date to English however the rest of the page was set. The shared
+              formatter follows the active locale and its numeral system. */}
+          <DataRow label={t('confirmation.field.date')}>
+            {f.date(showtime.date, 'full')}
+          </DataRow>
+          <DataRow label={t('confirmation.field.time')}>
+            {displayTime(showtime.time)}
+            {' · '}
+            {t('confirmation.endsAbout', {
+              time: displayTime(timeFromMinutes(screeningEndMinutes(showtime))),
             })}
           </DataRow>
-          <DataRow label="Time">
-            {displayTime(showtime.time)} · ends ~
-            {displayTime(timeFromMinutes(screeningEndMinutes(showtime)))}
+          <DataRow label={t('bookingSteps.session.format')}>
+            {formatLabels[showtime.format]}
           </DataRow>
-          <DataRow label="Format">{formatLabels[showtime.format]}</DataRow>
-          <DataRow label="Certificate">{certificates[movie.certificate].label}</DataRow>
+          <DataRow label={t('bookingSteps.session.certificate')}>
+            {certificates[movie.certificate].label}
+          </DataRow>
         </dl>
         {showtime.accessibility.length ? (
           <div className="mt-3 border-t border-hairline pt-3">
@@ -928,20 +973,20 @@ export function ReviewStep({
       </section>
 
       {/* ── Seats & tickets ────────────────────────────────────────── */}
-      <section className="border border-hairline-strong p-5">
+      <section className="edge p-5">
         <div className="mb-4 flex items-baseline justify-between gap-4">
-          <h3 className="eyebrow">Seats and tickets</h3>
+          <h3 className="eyebrow">{t('bookingSteps.review.seatsAndTickets')}</h3>
           <div className="flex gap-3">
             <Button variant="link" size="sm" className="px-0" onClick={() => onEdit('tickets')}>
-              Tickets
+              {t('bookingSteps.review.ticketsLink')}
             </Button>
             <Button variant="link" size="sm" className="px-0" onClick={() => onEdit('seats')}>
-              Seats
+              {t('bookingSteps.review.seatsLink')}
             </Button>
           </div>
         </div>
         <dl>
-          <DataRow label="Seats">{seatRanges(seatIds)}</DataRow>
+          <DataRow label={t('bookingSteps.review.seats')}>{seatRanges(seatIds)}</DataRow>
           {Object.entries(categoryTally).map(([category, count]) => {
             const rule = ticketCategories.find((c) => c.id === (category as TicketCategory));
             return (
@@ -955,27 +1000,33 @@ export function ReviewStep({
             );
           })}
           {quote.categorySavings > 0 ? (
-            <DataRow label="Age-category discount">− {money(quote.categorySavings)}</DataRow>
+            <DataRow label={t('bookingSteps.tickets.categoryDiscount')}>
+              − {money(quote.categorySavings)}
+            </DataRow>
           ) : null}
           {quote.matineeSavings > 0 ? (
-            <DataRow label="Before three">− {money(quote.matineeSavings)}</DataRow>
+            <DataRow label={t('bookingSteps.tickets.beforeThree')}>
+              − {money(quote.matineeSavings)}
+            </DataRow>
           ) : null}
-          <DataRow label="Ticket subtotal" emphasis>
+          <DataRow label={t('bookingSteps.review.ticketSubtotal')} emphasis>
             {money(quote.ticketSubtotal)}
           </DataRow>
         </dl>
       </section>
 
       {/* ── Add-ons ────────────────────────────────────────────────── */}
-      <section className="border border-hairline-strong p-5">
+      <section className="edge p-5">
         <div className="mb-4 flex items-baseline justify-between gap-4">
-          <h3 className="eyebrow">Add-ons</h3>
+          <h3 className="eyebrow">{t('bookingSteps.review.addOns')}</h3>
           <Button variant="link" size="sm" className="px-0" onClick={() => onEdit('concessions')}>
-            Change
+            {t('bookingSteps.review.change')}
           </Button>
         </div>
         {quote.concessionLines.length === 0 && !insurance ? (
-          <p className="text-[0.9375rem] text-content-muted">Nothing added.</p>
+          <p className="text-[0.9375rem] text-content-muted">
+            {t('bookingSteps.review.nothingAdded')}
+          </p>
         ) : (
           <dl>
             {quote.concessionLines.map((line) => (
@@ -984,7 +1035,9 @@ export function ReviewStep({
               </DataRow>
             ))}
             {quote.concessionSavings > 0 ? (
-              <DataRow label="Family of Four">− {money(quote.concessionSavings)}</DataRow>
+              <DataRow label={t('bookingSteps.review.familyOfFour')}>
+                − {money(quote.concessionSavings)}
+              </DataRow>
             ) : null}
             {insurance ? (
               <DataRow label={insurancePolicy.name}>{money(quote.insuranceFee)}</DataRow>
@@ -995,11 +1048,11 @@ export function ReviewStep({
 
       {/* ── Guest & payment ────────────────────────────────────────── */}
       <section className="grid gap-6 sm:grid-cols-2">
-        <div className="border border-hairline-strong p-5">
+        <div className="edge p-5">
           <div className="mb-4 flex items-baseline justify-between gap-4">
-            <h3 className="eyebrow">Booked for</h3>
+            <h3 className="eyebrow">{t('bookingSteps.review.bookedFor')}</h3>
             <Button variant="link" size="sm" className="px-0" onClick={() => onEdit('guest')}>
-              Change
+              {t('bookingSteps.review.change')}
             </Button>
           </div>
           {guest ? (
@@ -1018,16 +1071,18 @@ export function ReviewStep({
           )}
         </div>
 
-        <div className="border border-hairline-strong p-5">
+        <div className="edge p-5">
           <div className="mb-4 flex items-baseline justify-between gap-4">
             <h3 className="eyebrow">Payment</h3>
             <Button variant="link" size="sm" className="px-0" onClick={() => onEdit('payment')}>
-              Change
+              {t('bookingSteps.review.change')}
             </Button>
           </div>
-          <p className="text-[0.9375rem] font-semibold">{method?.label ?? 'Not chosen'}</p>
+          <p className="text-[0.9375rem] font-semibold">
+            {method?.label ?? t('bookingSteps.review.notChosen')}
+          </p>
           <p className="mt-1 text-[0.875rem] leading-6 text-content-muted">
-            Recorded as a category only. No payment is taken and no payment details were requested.
+            {t('bookingSteps.review.paymentNote')}
           </p>
         </div>
       </section>
@@ -1035,19 +1090,30 @@ export function ReviewStep({
       {/* ── Total ──────────────────────────────────────────────────── */}
       <section className="border-2 border-content p-5">
         <dl>
-          <DataRow label="Tickets">{money(quote.ticketSubtotal)}</DataRow>
-          <DataRow label="Add-ons">{money(quote.concessionSubtotal)}</DataRow>
+          <DataRow label={t('bookingSteps.review.ticketsLink')}>
+            {money(quote.ticketSubtotal)}
+          </DataRow>
+          <DataRow label={t('bookingSteps.review.addOns')}>
+            {money(quote.concessionSubtotal)}
+          </DataRow>
           {insurance ? <DataRow label={insurancePolicy.name}>{money(quote.insuranceFee)}</DataRow> : null}
-          <DataRow label={`Booking fee · ${money(20)} × ${quote.seatCount}`}>
+          <DataRow
+            label={t('bookingSteps.tickets.bookingFeeLine', {
+              fee: money(20),
+              count: quote.seatCount,
+            })}
+          >
             {money(quote.bookingFee)}
           </DataRow>
         </dl>
         <div className="mt-3 flex items-baseline justify-between gap-6 border-t-2 border-content pt-3">
-          <p className="font-display text-xl">Total</p>
-          <p className="numeral font-display text-3xl leading-none">{money(quote.total)}</p>
+          <p className="font-display text-[1.375rem] uppercase leading-none">
+            {t('bookingSteps.review.total')}
+          </p>
+          <p className="index-mark text-[2.5rem]">{money(quote.total)}</p>
         </div>
         <p className="mt-2 text-[0.8125rem] text-content-muted">
-          That is everything. No service charge, no card fee, nothing added at the end.
+          {t('bookingSteps.review.totalNote')}
         </p>
       </section>
     </div>

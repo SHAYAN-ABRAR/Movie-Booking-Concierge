@@ -22,20 +22,27 @@ import { BOOKING_FEE_PER_TICKET } from '@/data/pricing';
  * pattern as well, and every seat's full description is in its accessible name.
  */
 
-const seatClassLabels: Record<SeatClass, string> = {
-  regular: 'Regular',
-  premium: 'Premium',
-  recliner: 'Recliner',
-  wheelchair: 'Wheelchair space',
-  companion: 'Companion seat',
-};
+/**
+ * Seat vocabulary, as translation keys rather than English.
+ *
+ * These strings go into every seat's accessible name, so leaving them as
+ * literals made the whole auditorium English-only for a Bangla customer — the
+ * one surface in the product where a misread is expensive.
+ */
+const seatClassKeys = {
+  regular: 'seatMap.seatClass.regular',
+  premium: 'seatMap.seatClass.premium',
+  recliner: 'seatMap.seatClass.recliner',
+  wheelchair: 'seatMap.seatClass.wheelchair',
+  companion: 'seatMap.seatClass.companion',
+} as const satisfies Record<SeatClass, string>;
 
-const statusLabels: Record<Seat['status'], string> = {
-  available: 'available',
-  sold: 'sold',
-  held: 'being booked by someone else',
-  unavailable: 'not a seat',
-};
+const statusKeys = {
+  available: 'seatMap.status.available',
+  sold: 'seatMap.status.sold',
+  held: 'seatMap.status.held',
+  unavailable: 'seatMap.status.notASeat',
+} as const satisfies Record<Seat['status'], string>;
 
 /**
  * Seat silhouette.
@@ -61,18 +68,18 @@ function seatShape(seatClass: SeatClass): string {
 }
 
 function seatTone(seat: Seat, selected: boolean, proposed: boolean): string {
-  if (selected) return 'border-marigold bg-marigold text-paper';
-  if (proposed) return 'border-marigold border-dashed bg-marigold/25 text-house-ink';
+  if (selected) return 'border-accent bg-signal text-paper';
+  if (proposed) return 'border-accent border-dashed bg-accent/25 text-house-ink';
   // Sold seats recede. They were previously filled at house-ink/15, which on a
   // dark ground is *lighter* than an available seat — the unbookable seats were
   // the most prominent thing in the house.
   if (seat.status === 'sold') return 'border-transparent bg-house-sunken text-house-ink/40';
   if (seat.status === 'held') return 'border-house-ink/25 bg-transparent text-house-ink/45';
   if (seat.seatClass === 'wheelchair' || seat.seatClass === 'companion') {
-    return 'border-projector-lit/70 bg-projector-lit/10 text-projector-lit hover:bg-projector-lit/25';
+    return 'border-steel-lit/70 bg-steel-lit/10 text-steel-lit hover:bg-steel-lit/25';
   }
   if (seat.seatClass === 'recliner') {
-    return 'border-marigold-lit/60 bg-marigold-lit/10 text-marigold-lit hover:bg-marigold-lit/25';
+    return 'border-accent/60 bg-accent/10 text-accent hover:bg-accent/25';
   }
   if (seat.seatClass === 'premium') {
     return 'border-house-ink/55 bg-house-ink/12 text-house-ink hover:bg-house-ink/28';
@@ -219,8 +226,18 @@ export function SeatMap({
     onToggle(seat.id);
     onAnnounce?.(
       isSelected
-        ? `Seat ${seat.row}${seat.number} released. ${selected.length - 1} of ${limit} chosen.`
-        : `Seat ${seat.row}${seat.number}, ${seatClassLabels[seat.seatClass]}, ${money(priceFor(seat.seatClass))}. ${selected.length + 1} of ${limit} chosen.`,
+        ? t('seatMap.released', {
+            seat: `${seat.row}${seat.number}`,
+            chosen: selected.length - 1,
+            limit,
+          })
+        : t('seatMap.taken', {
+            seat: `${seat.row}${seat.number}`,
+            seatClass: t(seatClassKeys[seat.seatClass]),
+            price: money(priceFor(seat.seatClass)),
+            chosen: selected.length + 1,
+            limit,
+          }),
     );
   }
 
@@ -233,7 +250,7 @@ export function SeatMap({
   }, 0);
 
   return (
-    <div className="auditorium auditorium-enter relative overflow-hidden border border-house-rule">
+    <div className="auditorium auditorium-enter relative overflow-hidden border-2 border-house-rule">
       {/* Light thrown from the screen, falling off toward the back of the
           house. Purely atmospheric; it sits behind everything and is inert. */}
       <div
@@ -241,7 +258,7 @@ export function SeatMap({
         className="screen-enter pointer-events-none absolute inset-x-0 top-0 h-2/3"
         style={{
           background:
-            'radial-gradient(120% 70% at 50% 0%, rgb(147 178 243 / 0.16) 0%, rgb(147 178 243 / 0.05) 42%, transparent 72%)',
+            'radial-gradient(120% 70% at 50% 0%, rgb(255 92 54 / 0.10) 0%, rgb(239 235 227 / 0.05) 42%, transparent 72%)',
         }}
       />
 
@@ -255,9 +272,9 @@ export function SeatMap({
         >
           <defs>
             <linearGradient id="screen-glow" x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0%" stopColor="var(--projector-lit)" stopOpacity="0.15" />
-              <stop offset="50%" stopColor="var(--projector-lit)" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="var(--projector-lit)" stopOpacity="0.15" />
+              <stop offset="0%" stopColor="var(--steel-lit)" stopOpacity="0.15" />
+              <stop offset="50%" stopColor="var(--steel-lit)" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="var(--steel-lit)" stopOpacity="0.15" />
             </linearGradient>
           </defs>
           <path
@@ -268,7 +285,7 @@ export function SeatMap({
             strokeLinecap="round"
           />
         </svg>
-        <p className="eyebrow mt-1 text-center text-house-muted">Screen</p>
+        <p className="eyebrow mt-1 text-center text-house-muted">{t('seatMap.screen')}</p>
       </div>
 
       {/* ── Zoom (small screens) ────────────────────────────────────── */}
@@ -276,8 +293,7 @@ export function SeatMap({
         <p className="text-[0.8125rem] text-house-muted">
           {screen?.name}
           <span aria-hidden="true"> · </span>
-          <span className="numeral">{selected.length}</span> of{' '}
-          <span className="numeral">{limit}</span> chosen
+          {t('seatMap.chosenOf', { chosen: selected.length, limit })}
         </p>
         <div className="flex items-center gap-1 lg:hidden">
           <Button
@@ -308,7 +324,10 @@ export function SeatMap({
         <div
           role="listbox"
           aria-multiselectable="true"
-          aria-label={`Seat map for ${screen?.name ?? 'this screen'}. Use the arrow keys to move between seats and Enter or Space to choose one. ${limit} ${limit === 1 ? 'seat' : 'seats'} to choose.`}
+          aria-label={t('seatMap.listbox', {
+            screen: screen?.name ?? t('seatMap.thisScreen'),
+            limit: t('seatMap.seatsToChoose', { count: limit }),
+          })}
           className="mx-auto w-fit origin-top space-y-1.5"
           style={{ zoom }}
         >
@@ -316,7 +335,7 @@ export function SeatMap({
             <div
               key={row.row}
               role="group"
-              aria-label={`Row ${row.row}`}
+              aria-label={t('seatMap.rowLabel', { row: row.row })}
               className="row-enter flex items-center gap-1.5"
               style={{ '--row': rowIndex } as React.CSSProperties}
             >
@@ -350,16 +369,12 @@ export function SeatMap({
                         onClick={() => toggle(seat)}
                         onKeyDown={(event) => onKeyDown(event, rowIndex, seatIndex)}
                         aria-label={[
-                          `Row ${seat.row}, seat ${seat.number}`,
-                          seatClassLabels[seat.seatClass],
-                          disabled ? statusLabels[seat.status] : money(price),
-                          seat.aisleRight || seat.aisleLeft ? 'beside an aisle' : null,
-                          row.band === 'front'
-                            ? 'front of the house'
-                            : row.band === 'back'
-                              ? 'back of the house'
-                              : 'middle of the house',
-                          isProposed ? 'suggested by Max' : null,
+                          t('seatMap.seatLabel', { row: seat.row, number: seat.number }),
+                          t(seatClassKeys[seat.seatClass]),
+                          disabled ? t(statusKeys[seat.status]) : money(price),
+                          seat.aisleRight || seat.aisleLeft ? t('seatMap.besideAisle') : null,
+                          t(`seatMap.band.${row.band}` as const),
+                          isProposed ? t('seatMap.suggestedByMax') : null,
                         ]
                           .filter(Boolean)
                           .join(', ')}
@@ -404,37 +419,45 @@ export function SeatMap({
       </div>
 
       {/* ── Legend ──────────────────────────────────────────────────── */}
-      <div className="border-t border-house-rule px-4 py-4 sm:px-6">
-        <h3 className="eyebrow mb-3 text-house-muted">Legend</h3>
+      <div className="border-t-2 border-house-rule px-4 py-4 sm:px-6">
+        <h3 className="eyebrow mb-3 text-house-muted">{t('seatMap.legend')}</h3>
         <ul className="flex flex-wrap gap-x-5 gap-y-2.5 text-[0.75rem] text-house-muted">
           {(
             [
-              { key: 'regular', shape: 'regular', label: `Regular · ${money(priceFor('regular'))}` },
-              { key: 'premium', shape: 'premium', label: `Premium · ${money(priceFor('premium'))}` },
+              {
+                key: 'regular',
+                shape: 'regular',
+                label: `${t('seatMap.seatClass.regular')} · ${money(priceFor('regular'))}`,
+              },
+              {
+                key: 'premium',
+                shape: 'premium',
+                label: `${t('seatMap.seatClass.premium')} · ${money(priceFor('premium'))}`,
+              },
               ...(screen?.layout.reclinerRows.length
                 ? [
                     {
                       key: 'recliner',
                       shape: 'recliner',
-                      label: `Recliner · ${money(priceFor('recliner'))}`,
+                      label: `${t('seatMap.seatClass.recliner')} · ${money(priceFor('recliner'))}`,
                     } as const,
                   ]
                 : []),
               {
                 key: 'wheelchair',
                 shape: 'wheelchair',
-                label: `Wheelchair space · ${money(priceFor('wheelchair'))}`,
+                label: `${t('seatMap.seatClass.wheelchair')} · ${money(priceFor('wheelchair'))}`,
               },
               {
                 key: 'companion',
                 shape: 'companion',
-                label: `Companion · ${money(priceFor('companion'))}`,
+                label: `${t('seatMap.seatClass.companionShort')} · ${money(priceFor('companion'))}`,
               },
               // The three status swatches use the ordinary seat silhouette —
               // status is what varies, not the class.
-              { key: 'selected', shape: 'regular', label: 'Chosen' },
-              { key: 'held', shape: 'regular', label: 'Being booked' },
-              { key: 'sold', shape: 'regular', label: 'Sold' },
+              { key: 'selected', shape: 'regular', label: t('seatMap.state.chosen') },
+              { key: 'held', shape: 'regular', label: t('seatMap.state.held') },
+              { key: 'sold', shape: 'regular', label: t('seatMap.state.sold') },
             ] as const
           ).map((entry) => (
             <li key={entry.key} className="flex items-center gap-2">
@@ -446,15 +469,15 @@ export function SeatMap({
                   'relative grid shrink-0 place-items-center border text-[0.5rem] font-bold',
                   seatShape(entry.shape),
                   entry.key === 'selected'
-                    ? 'border-marigold bg-marigold text-paper'
+                    ? 'border-accent bg-signal text-paper'
                     : entry.key === 'sold'
                       ? 'border-transparent bg-house-sunken text-house-ink/40'
                       : entry.key === 'held'
                         ? 'border-house-ink/25 text-house-ink/45'
                         : entry.key === 'wheelchair' || entry.key === 'companion'
-                          ? 'border-projector-lit/70 bg-projector-lit/10 text-projector-lit'
+                          ? 'border-steel-lit/70 bg-steel-lit/10 text-steel-lit'
                           : entry.key === 'recliner'
-                            ? 'border-marigold-lit/60 bg-marigold-lit/10 text-marigold-lit'
+                            ? 'border-accent/60 bg-accent/10 text-accent'
                             : entry.key === 'premium'
                               ? 'border-house-ink/55 bg-house-ink/12'
                               : 'border-house-ink/40',
