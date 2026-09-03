@@ -117,8 +117,9 @@ React 18 · TypeScript (strict, `noUncheckedIndexedAccess`) · Vite 6 · Tailwin
 React Router 6 · Zustand (persisted) · React Hook Form + Zod · date-fns · Framer Motion (two
 elements) · Lucide · qrcode.react · Vitest + Testing Library.
 
-Fonts are self-hosted: **Fraunces** (display), **Archivo** (text, tabular figures), **Anek Bangla**
-(Bengali), **JetBrains Mono** (references). No external font request is ever made.
+Fonts are self-hosted: **Archivo** (display at `wdth 62`, text at `wdth 100` — one family, two
+widths), **Anek Bangla** (Bengali, on the same two settings), **JetBrains Mono** (references, times,
+prices). No external font request is ever made.
 
 ```
 src/
