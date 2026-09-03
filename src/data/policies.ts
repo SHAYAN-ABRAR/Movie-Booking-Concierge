@@ -9,7 +9,7 @@ import type { FaqEntry, InsurancePolicy } from './types';
 
 export const COMPANY = {
   name: 'GrandPlex',
-  nameBn: 'নকশী সিনেমাস',
+  nameBn: 'গ্র্যান্ডপ্লেক্স',
   foundedYear: 2009,
   supportEmail: 'hello@grandplexcinemas.example',
   supportPhone: '+880 9600 665 700',
@@ -204,7 +204,7 @@ export const faq: FaqEntry[] = [
     answer:
       'No. GrandPlex is a demonstration build. The films, venues, schedules, seat availability, prices, offers and policies are all sample data authored for this project. No payment is taken, nothing is sent anywhere, and every booking is stored only in this browser.',
     answerBn:
-      'না। নকশী সিনেমাস একটি ডেমো সংস্করণ। এখানকার ছবি, হল, সময়সূচি, আসন, দাম, অফার ও নীতিমালা সবই এই প্রকল্পের জন্য তৈরি নমুনা তথ্য। কোনো পেমেন্ট নেওয়া হয় না, কিছু কোথাও পাঠানো হয় না, এবং প্রতিটি বুকিং শুধু এই ব্রাউজারেই সংরক্ষিত থাকে।',
+      'না। গ্র্যান্ডপ্লেক্স একটি ডেমো সংস্করণ। এখানকার ছবি, হল, সময়সূচি, আসন, দাম, অফার ও নীতিমালা সবই এই প্রকল্পের জন্য তৈরি নমুনা তথ্য। কোনো পেমেন্ট নেওয়া হয় না, কিছু কোথাও পাঠানো হয় না, এবং প্রতিটি বুকিং শুধু এই ব্রাউজারেই সংরক্ষিত থাকে।',
     keywords: ['real', 'demo', 'fake', 'sample', 'actual', 'genuine', 'ডেমো'],
   },
   {

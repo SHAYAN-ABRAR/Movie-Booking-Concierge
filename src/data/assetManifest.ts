@@ -8,9 +8,13 @@
  * The outcome of that audit was unusual and worth stating plainly: all six
  * supplied files are design-reference recordings of a third-party concept UI
  * ("WATCHER"). None is a logo, poster, backdrop, venue photograph, concession
- * photograph, offer graphic or trailer. They were studied and are never
- * rendered as page content, so this application deploys **no** raster media
- * at all. See docs/asset-inventory.md for the full audit.
+ * photograph, offer graphic or trailer, and none is ever rendered as page
+ * content. See docs/asset-inventory.md for the full audit.
+ *
+ * The raster media this application *does* ship was sourced separately and is
+ * recorded in its own manifests: film posters and backdrops in
+ * `mediaManifest.ts` (TMDB, with attribution) and the generated counter
+ * imagery in `concessionMedia.ts`. Neither is covered by this file.
  *
  * The one-image-one-slot rule is enforced by `npm run check:assets`.
  */
@@ -154,5 +158,5 @@ export const assetSummary = {
    * in the UI where a reader might otherwise expect an image.
    */
   rationale:
-    'No logo, poster, backdrop, venue or product photography was supplied with this project — the six supplied files are all design-reference recordings of a third-party concept UI. Rather than filling the gap with unrelated stock or generated imagery, every visual in this build is drawn with type, rule, colour and layout.',
+    'None of the six files supplied with this project is usable as page content — they are all design-reference recordings of a third-party concept UI. The film artwork you see instead is real: posters and backdrops obtained from TMDB under its terms and recorded, with attribution, in `mediaManifest.ts`. The counter carries AI-generated food photography, declared as such in `concessionMedia.ts`. Everything else — venue diagrams, offer artwork, empty states — is drawn with type, rule, colour and layout.',
 } as const;

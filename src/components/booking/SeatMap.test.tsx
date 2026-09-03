@@ -10,6 +10,21 @@ const showtime = showtimesForDate(today).find(
   (s) => seatMapFor(s).flatMap((r) => r.seats).filter((seat) => seat.status === 'available').length > 20,
 )!;
 
+/**
+ * A screening that genuinely holds both seat classes.
+ *
+ * The general fixture above takes the first sufficiently-full screening of the
+ * day, and the schedule is generated relative to *today* — so on a day when
+ * that happens to be the Velvet Room (every seat a recliner) a test asserting
+ * on regular-versus-premium silhouettes fails for a reason that has nothing to
+ * do with the code. Selecting for the property under test makes the assertion
+ * mean what it says on every date.
+ */
+const mixedShowtime = showtimesForDate(today).find((s) => {
+  const classes = new Set(seatMapFor(s).flatMap((r) => r.seats.map((seat) => seat.seatClass)));
+  return classes.has('regular') && classes.has('premium');
+})!;
+
 function renderMap(overrides: Partial<Parameters<typeof SeatMap>[0]> = {}) {
   const onToggle = vi.fn();
   const onReset = vi.fn();
@@ -158,7 +173,7 @@ describe('the seat map', () => {
   });
 
   it('distinguishes seat classes by silhouette, not only by colour', () => {
-    renderMap();
+    renderMap({ showtime: mixedShowtime });
     const options = screen.getAllByRole('option');
     const classOf = (name: RegExp) =>
       options.find((node) => name.test(node.getAttribute('aria-label') ?? ''))?.className ?? '';

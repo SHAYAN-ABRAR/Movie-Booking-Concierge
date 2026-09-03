@@ -53,8 +53,11 @@ const STORAGE_KEY = /(['"`])nokshi\.[a-z]+\.v\d\1/g;
 const FORBIDDEN = [
   { pattern: /Nokshi\s+Cinemas/g, what: 'the old two-word brand' },
   { pattern: /\bNokshi\b/g, what: 'the old brand' },
-  { pattern: /নকশি\s+সিনেমাস/g, what: 'the old Bangla brand' },
-  { pattern: /নকশি/g, what: 'the old Bangla brand' },
+  // Both vowel signs. The catalogue was written with দীর্ঘ-ঈ (নকশী) while
+  // this pattern only knew হ্রস্ব-ই (নকশি), so five venue names and the
+  // company record kept the pre-rebrand name through a green check.
+  { pattern: /নকশ[িী]\s+সিনেমাস/g, what: 'the old Bangla brand' },
+  { pattern: /নকশ[িী]/g, what: 'the old Bangla brand' },
   { pattern: /nokshi-cinemas/g, what: 'the old package name' },
   {
     // Generation, not recognition: `'NK-'` being built into a new reference.

@@ -25,6 +25,7 @@ export const en = {
       book: 'Book',
     },
     labels: {
+      optional: 'Optional',
       loading: 'Loading',
       demonstration: 'Demonstration',
       today: 'Today',
@@ -77,8 +78,9 @@ export const en = {
 
   footer: {
     blurb:
-      'Nine screens across five houses in Dhaka, Chattogram and Sylhet. The programme changes every Thursday.',
+      'Seventeen screens across five houses in Dhaka, Chattogram and Sylhet. The programme changes every Thursday.',
     columns: {
+      contact: 'Contact',
       programme: 'Programme',
       visiting: 'Visiting',
       yourVisit: 'Your visit',
@@ -189,7 +191,7 @@ export const en = {
     eyebrow: 'Five houses',
     title: 'Our cinemas',
     lede:
-      'Three cities, nineteen screens. Each house runs its own programme — the strands below are what makes each one different.',
+      'Three cities, seventeen screens. Each house runs its own programme — the strands below are what makes each one different.',
     nothingToday: 'Nothing scheduled here today.',
   },
 
@@ -219,6 +221,44 @@ export const en = {
   },
 
   seatMap: {
+    screen: 'Screen',
+    legend: 'Legend',
+    chosenOf: '{{chosen}} of {{limit}} chosen',
+    listbox:
+      'Seat map for {{screen}}. Use the arrow keys to move between seats and Enter or Space to choose one. {{limit}} to choose.',
+    thisScreen: 'this screen',
+    rowLabel: 'Row {{row}}',
+    seatLabel: 'Row {{row}}, seat {{number}}',
+    besideAisle: 'beside an aisle',
+    suggestedByMax: 'suggested by Max',
+    band: {
+      front: 'front of the house',
+      middle: 'middle of the house',
+      back: 'back of the house',
+    },
+    seatClass: {
+      regular: 'Regular',
+      premium: 'Premium',
+      recliner: 'Recliner',
+      wheelchair: 'Wheelchair space',
+      companion: 'Companion seat',
+      companionShort: 'Companion',
+    },
+    status: {
+      available: 'available',
+      sold: 'sold',
+      held: 'being booked by someone else',
+      notASeat: 'not a seat',
+    },
+    state: {
+      chosen: 'Chosen',
+      held: 'Being booked',
+      sold: 'Sold',
+    },
+    seatsToChoose_one: '{{count, number}} seat',
+    seatsToChoose_other: '{{count, number}} seats',
+    released: 'Seat {{seat}} released. {{chosen}} of {{limit}} chosen.',
+    taken: 'Seat {{seat}}, {{seatClass}}, {{price}}. {{chosen}} of {{limit}} chosen.',
     screenEnd: 'The screen is at this end of the house',
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',
@@ -275,16 +315,49 @@ export const en = {
   },
 
   concessionCard: {
+    dietary: {
+      vegetarian: 'Vegetarian',
+      vegan: 'Vegan',
+      halal: 'Halal',
+      'contains-dairy': 'Contains dairy',
+      spicy: 'Spicy',
+    },
+    allergen: {
+      milk: 'Milk',
+      nuts: 'Nuts',
+      peanuts: 'Peanuts',
+      gluten: 'Gluten',
+      soy: 'Soy',
+      egg: 'Egg',
+    },
+    allergensLabel: 'Allergens',
+    noneDeclared: 'none declared',
+    serves_one: 'Serves one',
+    serves_other: 'Serves {{count, number}}',
+    add: 'Add',
+    removeOne: 'Remove one {{item}}',
+    addOne: 'Add one {{item}}',
+    quantityOf: 'Quantity of {{item}}',
     allergenIncompleteTip:
       'The kitchen has not confirmed a full allergen declaration for this item. Ask at the counter before ordering if you have an allergy.',
     allergenIncomplete: 'Allergen list incomplete — check at the counter',
   },
 
   movieCard: {
+    viewShowtimes: 'View showtimes',
+    releaseDetails: 'Release details',
     notYetRated: 'Not yet rated',
   },
 
   featured: {
+    nowShowing: 'Now showing',
+    bookFilm: 'Book {{title}}',
+    fullDetails: 'Full details',
+    programmeNotes: "From this week's programme notes",
+    showFilm: 'Show {{title}} ({{position}} of {{total}})',
+    pauseSequence: 'Pause the featured film sequence',
+    resumeSequence: 'Resume the featured film sequence',
+    directedBy: 'Directed by',
     demoNote:
       'GrandPlex is a demonstration build — the films, schedules and prices are sample data. You can complete a booking as a guest; no payment is taken.',
   },
@@ -340,7 +413,140 @@ export const en = {
       "Add-ons are paid for with your tickets at the booking's payment step, and collected from the counter on the day.",
   },
 
+  bookingSteps: {
+    session: {
+      whichCinema: 'Which cinema',
+      cinema: 'Cinema',
+      chooseCinema: 'Choose a cinema',
+      whichDay: 'Which day',
+      whichScreening: 'Which screening',
+      cinemaFirst: 'Choose a cinema first.',
+      nothingScheduled: 'Nothing scheduled that day',
+      nothingScheduledBody:
+        '{{title}} is not on at {{cinema}} on the day you picked. Try another date above, or another house.',
+      thisCinema: 'this cinema',
+      yourScreening: 'Your screening',
+      screen: 'Screen',
+      format: 'Format',
+      language: 'Language',
+      subtitles: 'Subtitles',
+      none: 'None',
+      runningTime: 'Running time',
+      certificate: 'Certificate',
+      accessHeading: 'Access at this screening',
+      noAccessListed:
+        "No additional access provisions are listed for this particular screening. The house's permanent facilities still apply — see the",
+      cinemaPage: 'cinema page',
+    },
+    tickets: {
+      heading: 'How many, and who for',
+      lede:
+        'Pick a category for each person. We never ask for a date of birth — the category is enough to price the ticket, and the door checks ID where it needs to.',
+      changeChild: 'Change the child ticket to another category to continue.',
+      costHeading: 'What that costs',
+      costLede:
+        'Seats have not been chosen yet, so this uses the cheapest seat class still free at this screening. It will settle once you pick seats.',
+      estimated_one: '{{count, number}} ticket · estimated',
+      estimated_other: '{{count, number}} tickets · estimated',
+      categoryDiscount: 'Age-category discount',
+      beforeThree: 'Before three',
+      bookingFeeLine: 'Booking fee · {{fee}} × {{count, number}}',
+      samplePricing: 'Sample pricing. Nothing is charged at any point in this demonstration.',
+    },
+    seats: {
+      heading: 'Choose your seats',
+      needTickets: 'Go back a step and choose how many tickets you need first.',
+      pick_one:
+        'Pick {{count, number}} seat to match your tickets. Use the arrow keys to move around the map and Enter or Space to choose a seat.',
+      pick_other:
+        'Pick {{count, number}} seats to match your tickets. Use the arrow keys to move around the map and Enter or Space to choose a seat.',
+    },
+    concessions: {
+      heading: 'Anything from the counter',
+      lede:
+        'Entirely optional — you can go straight on. Anything you add is paid for with your tickets and collected at the counter on the day.',
+      familySaved: 'Family of Four saved {{amount}}',
+      clear: 'Clear add-ons',
+      coverTitle: '{{name}} · {{fee}} per booking',
+      addCover: 'Add {{name}} to this booking',
+      coverNote:
+        'A sample product for this demonstration. No policy is issued, no premium is taken, and no claim can actually be made — Max can walk you through what a claim would involve.',
+    },
+    guest: {
+      heading: 'Who is the booking for',
+      lede:
+        'Four fields, and only because a booking needs a name on it. There is no account to create, no password to choose, and nothing to verify by email.',
+      name: 'Full name',
+      email: 'Email',
+      emailHint:
+        'Your booking reference is shown on screen — this is only kept on the booking record in this browser.',
+      phone: 'Mobile number',
+      note: 'Anything the house should know',
+      noteHint: 'Access needs, a wheelchair transfer, a birthday — anything useful on the night.',
+      privacy:
+        'Your details stay in this browser tab and are written onto the local booking record when you confirm. They are never transmitted, because there is nowhere to transmit them to.',
+    },
+    payment: {
+      heading: 'How you would pay',
+      lede:
+        'Choose a method and carry on. This step records which kind of payment you would have used — nothing more happens.',
+      warningTitle: 'This is a demonstration. No payment will be taken.',
+      warningBody:
+        'There is no payment form on this page and never will be. This site does not ask for card numbers, account details, PINs, OTPs or passwords, and it has no server to send them to even if it did.',
+      method: 'Payment method',
+      amountHeading: 'Amount that would be charged',
+      including: 'Including the {{fee}} booking fee. No other charges.',
+      includingCover: 'Including the {{fee}} booking fee and {{cover}} {{name}}. No other charges.',
+    },
+    review: {
+      heading: 'Check it over',
+      duplicateTitle: 'You may already have this booking',
+      duplicateBody: 'Booking <ref>{{reference}}</ref> in this browser has {{reasons}}. Buying a second set of tickets may be exactly what you intend — more people joining, or a separate group — so this is a check, not a block.',
+      duplicateScope:
+        "Only this browser's history was checked. Bookings made on another device or in another browser cannot be seen from here.",
+      duplicateAcknowledge: 'Continue with another booking anyway',
+      duplicateReview: 'Review the existing booking',
+      theScreening: 'The screening',
+      seatsAndTickets: 'Seats and tickets',
+      ticketsLink: 'Tickets',
+      seatsLink: 'Seats',
+      seats: 'Seats',
+      ticketSubtotal: 'Ticket subtotal',
+      addOns: 'Add-ons',
+      change: 'Change',
+      nothingAdded: 'Nothing added.',
+      familyOfFour: 'Family of Four',
+      bookedFor: 'Booked for',
+      payment: 'Payment',
+      notChosen: 'Not chosen',
+      paymentNote:
+        'Recorded as a category only. No payment is taken and no payment details were requested.',
+      total: 'Total',
+      totalNote: 'That is everything. No service charge, no card fee, nothing added at the end.',
+    },
+  },
   booking: {
+    guestCheckout: 'Booking · guest checkout',
+    nextStep: 'Next: {{step}}',
+    continue: 'Continue',
+    savingBooking: 'Saving your booking…',
+    confirmTotal: 'Confirm booking · {{total}}',
+    saveFailed:
+      'We could not save your booking to this browser. Nothing has been charged. Please try again.',
+    staleSeatsTitle_one: 'The seat you chose is no longer available',
+    staleSeatsTitle_other: 'The seats you chose are no longer available',
+    blockers: {
+      session: 'Choose a cinema, a day and a screening to continue.',
+      noTickets: 'Add at least one ticket to continue.',
+      ageBlocked: 'Change the child ticket — this film is rated 18 and over.',
+      ageUnconfirmed: 'Confirm that an adult will accompany the under-age tickets.',
+      seatCount_one: 'Choose {{count, number}} seat to match your tickets.',
+      seatCount_other: 'Choose {{count, number}} seats to match your tickets.',
+      staleSeat: 'One of your seats is no longer available.',
+      guest: 'Fill in your name, email and mobile number to continue.',
+      payment: 'Choose how you would pay to continue.',
+      detailsIncomplete: 'Your details are incomplete.',
+    },
     startOver: 'Start over',
     steps: 'Booking steps',
     stepOf: '{{step}} · step {{index, number}} of {{total, number}}',
@@ -370,6 +576,28 @@ export const en = {
   },
 
   confirmation: {
+    complete: 'Booking complete',
+    bookedFor: "You're booked for {{title}}.",
+    referenceNote:
+      'Your reference is {{reference}}. It is saved in this browser and shown on the ticket below.',
+    admit_one: '{{brand}} · admit {{count, number}}',
+    admit_other: '{{brand}} · admit {{count, number}}',
+    field: {
+      cinema: 'Cinema',
+      screen: 'Screen',
+      date: 'Date',
+      time: 'Time',
+      seats: 'Seats',
+      tickets: 'Tickets',
+      bookedFor: 'Booked for',
+      paid: 'Paid',
+    },
+    endsAbout: 'ends ~{{time}}',
+    coverIncluded: '{{name}} included',
+    doorBy: 'Aim to be at the door by {{time}}.',
+    trailersRun: 'Trailers run {{count, number}} minutes before the feature.',
+    arriveBy: 'Arrive by {{time}} for tickets, the counter and finding your seat.',
+    directionsTo: 'Directions to {{cinema}}',
     notFoundEyebrow: 'Not found on this device',
     seeBookings: 'See bookings on this device',
     bookAScreening: 'Book a screening',
@@ -454,6 +682,9 @@ export const en = {
   },
 
   maxPanel: {
+    ask: 'Ask Max',
+    askUnread_one: 'Ask Max — {{count, number}} new reply',
+    askUnread_other: 'Ask Max — {{count, number}} new replies',
     role: 'Booking concierge · runs on this device',
     you: 'You',
     settings: 'About Max and settings',
@@ -551,6 +782,10 @@ export const en = {
     restrictionNote:
       'The booking flow will check the ticket categories you choose against this. This site does not verify anyone’s age — the door does.',
     credits: {
+      runtime: 'Running time',
+      language: 'Language',
+      genre: 'Genre',
+      certificate: 'Certificate',
       director: 'Director',
       cast: 'Cast',
       released: 'Released',

@@ -41,18 +41,24 @@ const listOnly = process.argv.includes('--list');
  * maintained, so it stays honest.
  *
  * Remaining, and why each is prose rather than chrome:
- *   src/components/booking/steps.tsx  56  wizard step copy and guidance
  *   src/routes/Contact.tsx            22  contact routes, forms, hours
- *   src/routes/About.tsx              16  the essay about the build
+ *   src/routes/About.tsx              22  the essay about the build
  *   src/routes/TicketPrices.tsx       11  the worked pricing example
  *
- * The Max panel chrome (23 strings) was translated during the GrandPlex pass,
- * because a bilingual product with an English concierge panel in Bangla mode is
- * a visible seam, not deferrable prose. The About essay gained one sentence
- * during the concession-imagery pass (the AI-image note); the customer-facing
- * disclosure itself is translated — this is the essay's own English prose.
+ * Two passes have eaten into this. The Max panel chrome (23 strings) went
+ * during the GrandPlex pass, because a bilingual product with an English
+ * concierge panel in Bangla mode is a visible seam. The booking wizard's own
+ * copy (56 strings — every step heading, every field label, every blocking
+ * message) went during the Cinematic Monolith redesign, for the stronger
+ * version of the same reason: the wizard is the one path a customer *must*
+ * walk, and walking it in a language you did not choose is not a seam, it is a
+ * wall. The seat map, the confirmation ticket and the counter's allergen
+ * vocabulary went with it.
+ *
+ * What is left is three pages of essay and reference prose. They are read
+ * once, they are not on the booking path, and none of them is chrome.
  */
-const BASELINE = 105;
+const BASELINE = 55;
 
 /**
  * Files exempt from the sweep, each for a stated reason. "It is hard" is not a

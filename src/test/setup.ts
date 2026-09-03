@@ -30,6 +30,22 @@ function installStorage(key: 'localStorage' | 'sessionStorage') {
 installStorage('localStorage');
 installStorage('sessionStorage');
 
+/**
+ * Real translations, in every test.
+ *
+ * `@/i18n` initialises i18next synchronously from bundled resources, so a
+ * component calling `t()` renders the English catalogue rather than echoing its
+ * own key back. Without this, any component that localises its copy becomes
+ * untestable by the words it actually shows — which is how a test ends up
+ * asserting on a hard-coded English constant and quietly blocking that string
+ * from ever being translated.
+ *
+ * Dynamically imported rather than declared at the top: static imports are
+ * hoisted above this file's body, and the preference store reads Web Storage
+ * the moment it is created, so it has to load *after* the shims above.
+ */
+await import('@/i18n');
+
 afterEach(() => {
   cleanup();
   window.localStorage?.clear();
