@@ -192,6 +192,8 @@ export const bn: LocaleResource = {
   },
 
   cinemas: {
+    aiDisclosure:
+      'হলের ছবিগুলো এআই দিয়ে তৈরি নমুনা চিত্র। গ্র্যান্ডপ্লেক্স একটি ডেমো — এই কক্ষগুলো বাস্তবে নেই।',
     eyebrow: 'পাঁচটি হল',
     title: 'আমাদের হলগুলো',
     lede:

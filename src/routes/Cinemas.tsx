@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { ExternalLink, MapPin, Phone } from 'lucide-react';
 import { PageHeader } from '@/components/common';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/misc';
+import { Badge, DemoNote } from '@/components/ui/misc';
+import { VenueImage } from '@/components/visual/VenueImage';
 import { HouseDiagram } from '@/components/cinema/HouseDiagram';
 import { cinemas, cities, moviesAtCinema } from '@/data';
 import { todayIso } from '@/lib/datetime';
@@ -39,7 +40,22 @@ export function Cinemas() {
               .filter((cinema) => cinema.city === city)
               .map((cinema) => (
                 <li key={cinema.id}>
-                  <article className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-14">
+                  <article>
+                    {/* The foyer. A venue is a room before it is an address,
+                        and five identical text blocks told you nothing about
+                        which one you were choosing. */}
+                    <Link
+                      to={`/cinemas/${cinema.slug}`}
+                      className="group mb-7 block overflow-hidden border-2 border-content"
+                    >
+                      <VenueImage
+                        slug={cinema.slug}
+                        sizes="(max-width: 1024px) 100vw, 1100px"
+                        imgClassName="transition-transform duration-[--dur-slow] ease-[--ease-out] group-hover:scale-[1.02] motion-reduce:transform-none"
+                      />
+                    </Link>
+
+                    <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr] lg:gap-14">
                     <div>
                       <h3 className="font-display text-[1.75rem] leading-tight tracking-[-0.025em] sm:text-[2.25rem]">
                         <Link to={`/cinemas/${cinema.slug}`} className="underline-offset-4 hover:underline">
@@ -139,12 +155,17 @@ export function Cinemas() {
                         )}
                       </div>
                     </div>
+                    </div>
                   </article>
                 </li>
               ))}
           </ul>
         </section>
       ))}
+
+      <DemoNote className="pb-4" tone="loud">
+        {t('cinemas.aiDisclosure')}
+      </DemoNote>
     </div>
   );
 }

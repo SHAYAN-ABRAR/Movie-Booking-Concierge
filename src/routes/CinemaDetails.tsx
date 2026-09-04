@@ -4,6 +4,7 @@ import { ExternalLink, Mail, MapPin, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge, DemoNote, RuleHeading } from '@/components/ui/misc';
 import { HouseDiagram } from '@/components/cinema/HouseDiagram';
+import { VenueImage } from '@/components/visual/VenueImage';
 import { DateStrip } from '@/components/showtime/DateStrip';
 import { ShowtimePill } from '@/components/showtime/ShowtimeButton';
 import { AccessibilityLegend, AccessibilityChips, CertificateChip } from '@/components/movie/Chips';
@@ -47,12 +48,25 @@ export function CinemaDetails() {
             </Link>
           </nav>
 
+          <figure className="mb-9">
+            <div className="overflow-hidden border-2 border-content">
+              <VenueImage slug={cinema.slug} priority sizes="(max-width: 1280px) 100vw, 1200px" />
+            </div>
+            {/* Disclosed next to the thing being disclosed, once, quietly. */}
+            <figcaption className="mt-2.5 text-[0.75rem] leading-5 text-content-faint">
+              {t('cinemas.aiDisclosure')}
+            </figcaption>
+          </figure>
+
           <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
             <div>
               <p className="eyebrow mb-3">
                 {cinema.area}, {cinema.city}
               </p>
-              <h1 className="font-display text-[2.5rem] leading-[0.96] tracking-[-0.035em] sm:text-[3.5rem]">
+              <h1
+                className="font-display uppercase leading-[0.9] tracking-[-0.035em] [overflow-wrap:anywhere]"
+                style={{ fontSize: 'clamp(2.25rem, 6vw, 4rem)' }}
+              >
                 {cinema.name}
               </h1>
               <p lang="bn" className="mt-2 font-display text-2xl text-content-muted">

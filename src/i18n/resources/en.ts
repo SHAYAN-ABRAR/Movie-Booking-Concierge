@@ -188,6 +188,8 @@ export const en = {
   },
 
   cinemas: {
+    aiDisclosure:
+      'Venue images are AI-generated illustrations. GrandPlex is a demonstration — these rooms do not exist.',
     eyebrow: 'Five houses',
     title: 'Our cinemas',
     lede:

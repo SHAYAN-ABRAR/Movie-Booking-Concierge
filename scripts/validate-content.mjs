@@ -251,6 +251,69 @@ for (const [, id, block] of imageBlocks) {
 const imageDupes = imagePaths.filter((p, i) => imagePaths.indexOf(p) !== i);
 if (imageDupes.length) fail(`concession images reused: ${[...new Set(imageDupes)].join(', ')}`);
 
+/* ── Venues ───────────────────────────────────────────────────────────────
+ * Generated venue imagery is legitimate where a generated film poster is not:
+ * GrandPlex is fictional, so an image of one of its lobbies misrepresents
+ * nobody. That licence holds only while the provenance is recorded and the
+ * disclosure is on the page, so both are enforced here.
+ * ─────────────────────────────────────────────────────────────────────── */
+
+const venueMediaSource = readFileSync('src/data/venueMedia.ts', 'utf8');
+const cinemaSource = readFileSync('src/data/cinemas.ts', 'utf8');
+
+const cinemaSlugs = [...cinemaSource.matchAll(/slug: '([a-z-]+)'/g)].map((m) => m[1]);
+const venueSlugs = [...venueMediaSource.matchAll(/cinemaSlug: '([a-z-]+)'/g)].map((m) => m[1]);
+
+for (const slug of cinemaSlugs) {
+  if (!venueSlugs.includes(slug)) fail(`cinema ${slug} has no venue image`);
+}
+
+const venueBlocks = [
+  ...venueMediaSource.matchAll(/\{\s*\r?\n\s*cinemaSlug: '([a-z-]+)',([\s\S]*?)\r?\n  \},/g),
+];
+const venuePaths = [];
+
+for (const [, slug, block] of venueBlocks) {
+  const base = field(block, 'basePath');
+  const alt = field(block, 'alt');
+  const sourceType = field(block, 'sourceType');
+  const model = field(block, 'model');
+  const generatedAt = field(block, 'generatedAt');
+
+  if (!base) { fail(`venue ${slug}: no basePath`); continue; }
+  if (/^https?:/.test(base)) fail(`venue ${slug}: image uses an external runtime URL`);
+  if (!alt || alt.length < 20) fail(`venue ${slug}: alt text is missing or too short`);
+
+  if (sourceType !== 'ai-generated') fail(`venue ${slug}: sourceType must be 'ai-generated'`);
+  if (!model) fail(`venue ${slug}: no generation model recorded`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(generatedAt ?? '')) {
+    fail(`venue ${slug}: no generation date recorded`);
+  }
+  if (/creator:|licence:|licenceUrl:|sourcePage:/.test(block)) {
+    fail(`venue ${slug}: carries photographer attribution on a generated image`);
+  }
+  venuePaths.push(base);
+
+  const widths =
+    block.match(/widths: \[([^\]]+)\]/)?.[1]?.split(',').map((w) => Number(w.trim())) ?? [];
+  if (widths.length === 0) fail(`venue ${slug}: no rendered widths`);
+  for (const width of widths) {
+    for (const ext of ['avif', 'webp', 'jpg']) {
+      const path = join('public', `${base}-${width}.${ext}`);
+      if (!existsSync(path)) fail(`venue ${slug}: missing image file ${path}`);
+    }
+  }
+}
+
+const venueDupes = venuePaths.filter((p, i) => venuePaths.indexOf(p) !== i);
+if (venueDupes.length) fail(`venue images reused: ${[...new Set(venueDupes)].join(', ')}`);
+
+// The disclosure is the price of the licence. If the imagery ships, the
+// sentence saying it is generated ships with it.
+if (!/aiDisclosure/.test(readFileSync('src/routes/CinemaDetails.tsx', 'utf8'))) {
+  fail('CinemaDetails.tsx renders venue imagery without the AI disclosure');
+}
+
 /* ── No illustration component may return to the counter ──────────────── */
 
 if (existsSync('src/components/visual/CounterIllustration.tsx')) {
@@ -273,5 +336,5 @@ if (problems.length) {
 
 console.log(
   `validate:content — ${movieBlocks.length} films (${nowShowing} now showing, ${comingSoon} coming soon), ` +
-    `${itemIds.length} counter items with local AI-generated imagery.`,
+    `${itemIds.length} counter items and ${venueSlugs.length} venues with local AI-generated imagery.`,
 );

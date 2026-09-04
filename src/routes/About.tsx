@@ -120,19 +120,25 @@ export function About() {
             <p className="mt-4 text-[1.0625rem] leading-[1.7]">
               Every one of them was downloaded once at authoring time and committed to the
               repository. The running site never contacts an image host, and there is no API key of
-              any kind in the browser. Venues are drawn as true diagrams of their screens, sized by
-              seat count; offers are set as type.
+              any kind in the browser. Each venue is also drawn as a true diagram of its screens,
+              sized by seat count; offers are set as type.
             </p>
 
             <h3 className="mt-9 font-display text-[1.5rem] uppercase leading-none">
-              The one exception: the counter
+              The two exceptions: the counter and the foyers
             </h3>
             <p className="mt-3 text-[1.0625rem] leading-[1.7]">
-              The concession items carry generated food photography, produced once with an AI image
-              model and committed as local files. They are illustrations, not photographs of real
-              GrandPlex servings, and every counter surface says so. Film posters and backdrops are
-              never AI-generated: inventing a face or a piece of studio artwork would be a
-              different, dishonest thing.
+              The concession items carry generated food photography, and each of the five houses
+              carries a generated photograph of its foyer. Both were produced once with an AI image
+              model and committed as local files; both are illustrations rather than photographs of
+              anything real, and both say so where they appear.
+            </p>
+            <p className="mt-4 text-[1.0625rem] leading-[1.7]">
+              The line is drawn at whether the thing exists. A dish nobody cooked and a lobby nobody
+              built misrepresent no one — GrandPlex is a demonstration, and its rooms are as
+              fictional as its schedule. Film posters, backdrops and stills are the opposite: real
+              studio artwork, often containing real faces. Those stay real or stay absent. Inventing
+              one would be a different, dishonest thing.
             </p>
 
             <h3 className="mt-9 font-display text-[1.5rem] uppercase leading-none">About Max</h3>
