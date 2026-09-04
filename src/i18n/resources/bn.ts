@@ -589,6 +589,14 @@ export const bn: LocaleResource = {
   },
 
   confirmation: {
+    viewTicket: 'আপনার টিকিট দেখুন',
+    ticketDialogTitle: 'আপনার টিকিট',
+    ticketDialogBody:
+      'দরজায় মুড়িটি ছিঁড়ে নেওয়া হয়, বাকিটা আপনার। নিচের রেফারেন্স রসিদের সঙ্গে একই।',
+    ticketFor: '{{title}} ছবির টিকিট',
+    admitLabel: 'প্রবেশ',
+    referenceLabel: 'রেফারেন্স',
+    barcodeNote: 'সাজসজ্জা মাত্র। স্ক্যানযোগ্য কোডটি রসিদে আছে।',
     complete: 'বুকিং সম্পন্ন',
     bookedFor: '{{title}} ছবির জন্য আপনার বুকিং হয়ে গেছে।',
     referenceNote:

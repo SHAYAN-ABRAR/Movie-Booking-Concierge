@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
-import { CalendarPlus, Home, MessageSquare, Printer, Ticket } from 'lucide-react';
+import { CalendarPlus, Home, MessageSquare, Printer, Ticket as TicketIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DemoNote } from '@/components/ui/misc';
 import { DataRow } from '@/components/common';
@@ -21,11 +21,22 @@ import { money, seatRanges } from '@/lib/format';
 import { buildIcs, downloadUrl, mapUrl } from '@/lib/external';
 import { Trans, useTranslation } from 'react-i18next';
 import { brand } from '@/config/brand';
+import { useFormatters } from '@/i18n/useFormatters';
 import { Logo } from '@/components/brand/Logo';
 import { ReceiptPrinter, useReceiptPrinterStage } from '@/components/receipt';
+import { Ticket } from '@/components/receipt/Ticket';
+import { MovieImageDecorative } from '@/components/visual/MovieImage';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/overlay';
 
 export function BookingConfirmation() {
   const { t } = useTranslation();
+  const f = useFormatters();
   const { bookingId } = useParams<{ bookingId: string }>();
   const [, setParams] = useSearchParams();
   const bookings = useBookings((s) => s.bookings);
@@ -55,6 +66,7 @@ export function BookingConfirmation() {
   }, [booking]);
 
   const stage = useReceiptPrinterStage(justBooked);
+  const [ticketOpen, setTicketOpen] = useState(false);
 
   if (!booking) {
     return (
@@ -310,7 +322,13 @@ export function BookingConfirmation() {
         <div className="min-w-0">
       {/* ── Actions ──────────────────────────────────────────────── */}
       <div data-print="hide" className="flex flex-wrap gap-3">
-        <Button variant="accent" onClick={() => window.print()}>
+        {/* The one accented action on this page. The receipt is what the
+            machine produced; this is the thing you actually hold. */}
+        <Button variant="accent" onClick={() => setTicketOpen(true)}>
+          <TicketIcon aria-hidden="true" />
+          {t('confirmation.viewTicket')}
+        </Button>
+        <Button variant="primary" onClick={() => window.print()}>
           <Printer aria-hidden="true" />
           {t('confirmation.print')}
         </Button>
@@ -397,7 +415,7 @@ export function BookingConfirmation() {
       <div data-print="hide" className="slab mt-10 flex flex-wrap gap-3 pt-6">
         <Button asChild variant="outline">
           <Link to="/bookings">
-            <Ticket aria-hidden="true" />
+            <TicketIcon aria-hidden="true" />
             {t('nav.myBookings')}
           </Link>
         </Button>
@@ -415,6 +433,135 @@ export function BookingConfirmation() {
       <DemoNote className="mt-8" tone="loud">
         {t('confirmation.demoNote')}
       </DemoNote>
+
+      {/* ── The ticket ─────────────────────────────────────────── */}
+      <Dialog open={ticketOpen} onOpenChange={setTicketOpen}>
+        {/* The printable deliverable is the receipt, not this. A dialog left
+            open when someone reaches for Ctrl+P must not end up on the page. */}
+        <DialogContent data-print="hide" className="max-w-[22rem] bg-surface">
+          <DialogHeader>
+            <DialogTitle>{t('confirmation.ticketDialogTitle')}</DialogTitle>
+            <DialogDescription>{t('confirmation.ticketDialogBody')}</DialogDescription>
+          </DialogHeader>
+
+          <div className="flex justify-center pb-1 pt-2">
+            <Ticket
+              aria-label={t('confirmation.ticketFor', { title: booking.movieTitle })}
+              className="h-[30rem]"
+              body={
+                <div className="grid h-full grid-rows-[auto_minmax(0,1fr)_auto_auto] gap-3.5 p-5">
+                  <div className="flex items-baseline justify-between gap-3 font-mono text-[0.5625rem] font-bold uppercase leading-none tracking-[0.12em] opacity-75">
+                    <span>{brand.name}</span>
+                    <span>{cinema?.city ?? booking.cinemaName}</span>
+                  </div>
+
+                  {/* The film, screen-printed. `luminosity` keeps the poster's
+                      tones but takes the card's hue, so the artwork reads as
+                      one ink on the ticket stock rather than a photo pasted
+                      onto it. Falls back to the sprocket rhythm when a film has
+                      left the programme and its artwork with it. */}
+                  <div className="relative -mx-5 min-h-0 overflow-hidden">
+                    {movie ? (
+                      <MovieImageDecorative
+                        movie={movie}
+                        role="backdrop"
+                        sizes="272px"
+                        className="size-full opacity-95 mix-blend-luminosity aspect-auto!"
+                      />
+                    ) : (
+                      <div
+                        aria-hidden="true"
+                        className="size-full opacity-30"
+                        style={{
+                          backgroundImage:
+                            'repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 18px)',
+                          backgroundSize: '100% 10px',
+                          backgroundRepeat: 'repeat-y',
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex min-w-0 flex-col justify-end">
+                    <h3 className="font-display text-[1.75rem] uppercase leading-[0.86] [overflow-wrap:anywhere]">
+                      {booking.movieTitle}
+                    </h3>
+                    <p className="mt-2 font-mono text-[0.625rem] leading-[1.5] opacity-80">
+                      {booking.cinemaName}
+                      <br />
+                      {booking.screenName} · {formatLabels[booking.format]}
+                    </p>
+                  </div>
+
+                  <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                    {[
+                      {
+                        label: t('confirmation.field.date'),
+                        // The long-form date overruns a half-width column on a
+                        // 17rem card; the ticket gets the short form.
+                        value: f.date(booking.date, 'weekdayDayMonth'),
+                      },
+                      { label: t('confirmation.field.time'), value: displayTime(booking.time) },
+                      {
+                        label: t('confirmation.field.seats'),
+                        value: seatRanges(booking.seats.map((seat) => seat.seatId)),
+                      },
+                      { label: t('confirmation.field.paid'), value: money(booking.total) },
+                    ].map((row) => (
+                      <div key={row.label} className="flex min-w-0 flex-col gap-1">
+                        <dt className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-70">
+                          {row.label}
+                        </dt>
+                        <dd className="truncate font-mono text-[0.6875rem] font-bold leading-none">
+                          {row.value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              }
+              stub={
+                <div className="flex h-full flex-col justify-between gap-3 p-5 pt-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <span className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-70">
+                        {t('confirmation.admitLabel')}
+                      </span>
+                      <strong className="font-display text-[1.125rem] uppercase leading-none">
+                        {booking.seats.length}
+                      </strong>
+                    </div>
+                    <div className="flex min-w-0 flex-col items-end gap-1.5 text-right">
+                      <span className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-70">
+                        {t('confirmation.referenceLabel')}
+                      </span>
+                      <strong className="font-mono text-[0.75rem] font-bold leading-none tracking-[0.04em]">
+                        {booking.reference}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {/* Decorative. The scannable code is the QR on the receipt,
+                      and saying so is cheaper than implying this scans. */}
+                  <div
+                    aria-hidden="true"
+                    className="h-5 w-full"
+                    style={{
+                      background:
+                        'repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 4px, currentColor 4px 5px, transparent 5px 8px, currentColor 8px 12px, transparent 12px 14px)',
+                    }}
+                  />
+                  <p className="sr-only">{t('confirmation.barcodeNote')}</p>
+                </div>
+              }
+            />
+          </div>
+
+          <p className="text-center text-[0.6875rem] uppercase tracking-[0.12em] text-content-faint">
+            {t('confirmation.demoTicket')} · {t('confirmation.notValid')}
+          </p>
+        </DialogContent>
+      </Dialog>
         </div>
       </div>
     </div>

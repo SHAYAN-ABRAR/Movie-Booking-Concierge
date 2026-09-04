@@ -95,6 +95,38 @@ few pixels — and `PAPER_TUCK` is how far the emerging sheet is pulled up behin
 the machine, far enough that its top edge sits inside the slot. The lip throws a
 shade down the first few millimetres of paper as it clears.
 
+## The ticket
+
+The receipt is what the machine produced; `Ticket.tsx` is what you actually
+hold. It is die-cut rather than rectangular — clipped corners, a notch on each
+side where the stub tears away, a dashed tear line meeting the notches — and it
+is the one surface in the product that is vermilion all over. That is
+deliberate: everything else spends the accent a few pixels at a time, so
+spending all of it in one place, once, at the end of a booking, is what makes
+it land. `#FF5C36` paper with `#140602` ink is the same 6.2:1 pair the accent
+buttons use.
+
+The film's own backdrop is screen-printed into the card at `mix-blend-luminosity`,
+so the artwork takes the ticket's hue and reads as one ink on the stock rather
+than a photograph pasted onto it. A film that has left the programme takes the
+sprocket rhythm instead.
+
+Reached from the one accented button on the confirmation page; printing steps
+down to ink, because a view never carries two accents. The dialog is
+`data-print="hide"` — the printable deliverable is the receipt, and a dialog
+left open when someone reaches for Ctrl+P must not end up on the page. The
+barcode is decorative and says so in its accessible text; the scannable code is
+the QR on the receipt.
+
+**Built on Framer Motion, not a tilt library.** The reference implementation
+used `react-parallax-tilt`; the project already ships Framer Motion for the
+stage, the wizard transport and the catalogue's layout projection, and adding a
+second animation dependency to rotate one card would be a poor trade. It also
+means the tilt inherits `MotionConfig reducedMotion="user"` for free. Tilt is
+suppressed unless the device has a fine pointer that hovers — on a touch screen
+there is no hover state to enter, so the effect would only ever fire as a jolt
+on tap.
+
 The compound namespace lives in `index.ts` rather than beside the components: a
 module exporting both components and a plain object is not hot-reloadable, and
 every component in it gets flagged.

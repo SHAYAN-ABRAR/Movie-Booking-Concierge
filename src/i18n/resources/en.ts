@@ -584,6 +584,14 @@ export const en = {
   },
 
   confirmation: {
+    viewTicket: 'View your ticket',
+    ticketDialogTitle: 'Your ticket',
+    ticketDialogBody:
+      'The stub is torn at the door and the rest is yours. The reference below is the same one on the receipt.',
+    ticketFor: 'Ticket for {{title}}',
+    admitLabel: 'Admit',
+    referenceLabel: 'Reference',
+    barcodeNote: 'Decorative. The scannable code is on the receipt.',
     complete: 'Booking complete',
     bookedFor: "You're booked for {{title}}.",
     referenceNote:
