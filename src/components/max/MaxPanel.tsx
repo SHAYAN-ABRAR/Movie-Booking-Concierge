@@ -21,6 +21,7 @@ import { LocalMaxAssistantProvider } from '@/max/localProvider';
 import { createOllamaProvider, detectOllama, OLLAMA_MODEL } from '@/max/ollamaProvider';
 import type { MaxAction, MaxMessage } from '@/max/types';
 import { cn } from '@/lib/utils';
+import { HoldToConfirm } from '@/components/ui/hold-to-confirm';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -202,11 +203,13 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
               </p>
             )}
 
-            <Button
-              variant="ghost"
+            {/* A hold rather than a click. There is no undo behind this one —
+                the conversation is not recoverable once cleared — so the
+                friction is the whole safeguard. */}
+            <HoldToConfirm
               size="sm"
-              className="mt-3 px-0 text-danger"
-              onClick={() => {
+              className="mt-3"
+              onConfirm={() => {
                 clearConversation();
                 setUndoOffer(null);
                 announce(t('maxPanel.conversationCleared'));
@@ -214,7 +217,7 @@ export function MaxPanel({ onClose, headingId }: { onClose: () => void; headingI
             >
               <Trash2 aria-hidden="true" />
               {t('maxPanel.clearConversation')}
-            </Button>
+            </HoldToConfirm>
           </div>
         ) : null}
 

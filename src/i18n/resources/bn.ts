@@ -369,6 +369,9 @@ export const bn: LocaleResource = {
   },
 
   bookings: {
+    removeTitle: 'এই বুকিংটি সরাবেন?',
+    removeBody:
+      '{{reference}} বুকিংটি এই ব্রাউজার থেকে মুছে যাবে। কয়েক সেকেন্ডের মধ্যে আপনি এটি ফিরিয়ে আনতে পারবেন।',
     eyebrow: 'এই ডিভাইসে',
     title: 'আমার বুকিং',
     lede:
@@ -588,6 +591,18 @@ export const bn: LocaleResource = {
     complete: 'বুকিং সম্পন্ন',
     machineLabel: 'বক্স অফিস প্রিন্টার',
     tearOff: 'ছিদ্ররেখা বরাবর ছিঁড়ুন',
+  },
+
+  confirmHold: {
+    hold: 'নিশ্চিত করতে চেপে ধরুন',
+    holdToRemove: 'সরাতে চেপে ধরুন',
+    holdToDelete: 'সব মুছতে চেপে ধরুন',
+    confirmed: 'হয়ে গেছে',
+    undo: 'ফিরিয়ে আনুন',
+    removed: '{{reference}} বুকিং সরানো হয়েছে।',
+    clearedAll_one: '{{count, number}}টি বুকিং মুছে ফেলা হয়েছে।',
+    clearedAll_other: '{{count, number}}টি বুকিং মুছে ফেলা হয়েছে।',
+    restored: 'ফিরিয়ে আনা হয়েছে।',
   },
 
   confirmation: {

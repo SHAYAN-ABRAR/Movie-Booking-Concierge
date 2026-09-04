@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarPlus, Printer, Trash2 } from 'lucide-react';
-import { PageHeader, EmptyState } from '@/components/common';
+import { Announcer, PageHeader, EmptyState } from '@/components/common';
 import { Button } from '@/components/ui/button';
+import { HoldToConfirm, UndoNotice } from '@/components/ui/hold-to-confirm';
 import { Badge, DemoNote } from '@/components/ui/misc';
 import {
   Dialog,
@@ -167,6 +168,45 @@ export function Bookings() {
   const clear = useBookings((s) => s.clear);
   const [confirmClear, setConfirmClear] = useState(false);
   const [pendingRemove, setPendingRemove] = useState<string | null>(null);
+  const add = useBookings((s) => s.add);
+
+  /*
+   * What was just deleted, and how to say so.
+   *
+   * A hold guards against the accidental press; this guards against the
+   * deliberate press that turns out to be a mistake. The records are kept in
+   * state rather than dropped, so Undo restores the real bookings — an undo
+   * affordance that cannot actually undo is worse than none.
+   */
+  const [undo, setUndo] = useState<{ records: CompletedBooking[]; message: string } | null>(null);
+  const [announcement, setAnnouncement] = useState('');
+
+  const removeWithUndo = (reference: string) => {
+    const record = bookings.find((b) => b.reference === reference);
+    remove(reference);
+    setPendingRemove(null);
+    if (record) {
+      setUndo({ records: [record], message: t('confirmHold.removed', { reference }) });
+    }
+  };
+
+  const clearWithUndo = () => {
+    const records = [...bookings];
+    clear();
+    setConfirmClear(false);
+    setUndo({
+      records,
+      message: t('confirmHold.clearedAll', { count: records.length }),
+    });
+  };
+
+  const restore = () => {
+    // `add` puts each record back at the head, so replaying in reverse
+    // restores the original order rather than inverting it.
+    for (const record of [...(undo?.records ?? [])].reverse()) add(record);
+    setUndo(null);
+    setAnnouncement(t('confirmHold.restored'));
+  };
 
   const upcoming = upcomingBookings(bookings);
   const past = pastBookings(bookings);
@@ -234,6 +274,17 @@ export function Bookings() {
         </div>
       )}
 
+      {undo ? (
+        <UndoNotice
+          className="mb-8"
+          message={undo.message}
+          onExpire={() => setUndo(null)}
+          onUndo={restore}
+        />
+      ) : null}
+
+      <Announcer message={announcement} />
+
       <DemoNote className="mb-10" tone="loud">
         {t('bookings.demoNote')}
       </DemoNote>
@@ -250,15 +301,9 @@ export function Bookings() {
             <Button variant="outline" onClick={() => setConfirmClear(false)}>
               {t('bookings.keepThem')}
             </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                clear();
-                setConfirmClear(false);
-              }}
-            >
-              {t('bookings.deleteEverything')}
-            </Button>
+            <HoldToConfirm onConfirm={clearWithUndo}>
+              {t('confirmHold.holdToDelete')}
+            </HoldToConfirm>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -266,24 +311,20 @@ export function Bookings() {
       <Dialog open={pendingRemove !== null} onOpenChange={(open) => !open && setPendingRemove(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove this booking?</DialogTitle>
+            <DialogTitle>{t('bookings.removeTitle')}</DialogTitle>
             <DialogDescription>
-              Booking {pendingRemove} will be deleted from this browser. You cannot get it back.
+              {t('bookings.removeBody', { reference: pendingRemove ?? '' })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setPendingRemove(null)}>
-              Cancel
+              {t('common.actions.cancel')}
             </Button>
-            <Button
-              variant="danger"
-              onClick={() => {
-                if (pendingRemove) remove(pendingRemove);
-                setPendingRemove(null);
-              }}
+            <HoldToConfirm
+              onConfirm={() => pendingRemove && removeWithUndo(pendingRemove)}
             >
-              Remove
-            </Button>
+              {t('confirmHold.holdToRemove')}
+            </HoldToConfirm>
           </DialogFooter>
         </DialogContent>
       </Dialog>

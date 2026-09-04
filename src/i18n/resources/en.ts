@@ -365,6 +365,9 @@ export const en = {
   },
 
   bookings: {
+    removeTitle: 'Remove this booking?',
+    removeBody:
+      'Booking {{reference}} will be deleted from this browser. You can undo it for a few seconds afterwards.',
     eyebrow: 'On this device',
     title: 'My bookings',
     lede:
@@ -583,6 +586,18 @@ export const en = {
     complete: 'Booking complete',
     machineLabel: 'Box office printer',
     tearOff: 'Tear along the perforation',
+  },
+
+  confirmHold: {
+    hold: 'Hold to confirm',
+    holdToRemove: 'Hold to remove',
+    holdToDelete: 'Hold to delete everything',
+    confirmed: 'Done',
+    undo: 'Undo',
+    removed: 'Booking {{reference}} removed.',
+    clearedAll_one: '{{count, number}} booking deleted.',
+    clearedAll_other: '{{count, number}} bookings deleted.',
+    restored: 'Restored.',
   },
 
   confirmation: {
