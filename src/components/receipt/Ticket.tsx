@@ -7,10 +7,20 @@ import { cn } from '@/lib/utils';
  *
  * The receipt is what the printer produces; this is what you are actually
  * holding. It is die-cut rather than rectangular — clipped corners, a notch on
- * each side where the stub tears away — and it is the one surface in the
- * product that is vermilion all over. That is deliberate: everything else in
- * the system spends the accent a few pixels at a time, so spending all of it in
- * one place, once, at the end of a booking, is what makes it land.
+ * each side where the stub tears away.
+ *
+ * The card is cream stock with near-black ink and vermilion picked out on the
+ * two things a doorman reads — the admit count and the reference. It is a
+ * *card*, and it is meant to look like one.
+ *
+ * Two earlier versions were wrong in opposite directions and both are worth
+ * recording. Flooding the whole card with vermilion was louder than it was
+ * premium. Answering that by making the card near-black was worse: in dark
+ * mode a near-black card sits on a near-black dialog and simply vanishes, and
+ * no amount of hairline tuning fixes two dark surfaces stacked on each other.
+ * Cream cannot disappear on either theme, and it is the highest-contrast
+ * ground there is for the film's own artwork — which is the point of putting
+ * the artwork there at all.
  *
  * The tilt is built on Framer Motion rather than a tilt library. The project
  * already ships Framer Motion for the stage, the wizard transport and the
@@ -53,6 +63,8 @@ export type TicketProps = {
   /** Cut depth at each of the four corners. */
   cornerSize?: number;
   ink?: string;
+  /** The one accent on the card — the reference, the admit count. */
+  accent?: string;
   /** Depth of the tear notch on each side. */
   notchSize?: number;
   paper?: string;
@@ -63,12 +75,13 @@ export type TicketProps = {
 
 export function Ticket({
   'aria-label': ariaLabel,
+  accent = '#be2a10',
   body,
   className,
   cornerSize = 10,
-  ink = '#140602',
+  ink = '#111113',
   notchSize = 13,
-  paper = '#ff5c36',
+  paper = '#f4f1eb',
   stub,
   stubHeight = 116,
   tilt = true,
@@ -115,6 +128,7 @@ export function Ticket({
   }, [px, py]);
 
   const style: TicketStyle = {
+    '--ticket-accent': accent,
     '--ticket-corner': `${cornerSize}px`,
     '--ticket-ink': ink,
     '--ticket-notch': `${notchSize}px`,
@@ -123,7 +137,7 @@ export function Ticket({
     // A drop-shadow filter rather than a box-shadow: the card is clipped to a
     // die-cut outline, and box-shadow would draw the shadow of the rectangle
     // the outline was cut from.
-    filter: 'drop-shadow(0 2px 2px rgb(15 15 15 / 0.16)) drop-shadow(0 20px 30px rgb(15 15 15 / 0.22))',
+    filter: 'drop-shadow(0 2px 3px rgb(0 0 0 / 0.22)) drop-shadow(0 22px 34px rgb(0 0 0 / 0.3))',
   };
 
   return (
@@ -144,10 +158,18 @@ export function Ticket({
       >
         <article
           aria-label={ariaLabel}
-          className="relative grid h-full w-full grid-rows-[minmax(0,1fr)_var(--ticket-stub)] overflow-hidden text-[var(--ticket-ink)]"
+          className={cn(
+            'relative grid h-full w-full grid-rows-[minmax(0,1fr)_var(--ticket-stub)]',
+            'overflow-hidden text-[var(--ticket-ink)]',
+            // A hairline edge, inset so the parent's clip-path carries it
+            // around the die cut rather than around the rectangle the die was
+            // cut from. It is what keeps the card's outline legible on a light
+            // ground, where the drop shadow alone is nearly nothing.
+            'shadow-[inset_0_0_0_1px_rgb(0_0_0/0.12)]',
+          )}
           style={{
             background:
-              'linear-gradient(145deg, rgb(255 255 255 / 0.12), transparent 42%), var(--ticket-paper)',
+              'linear-gradient(145deg, rgb(255 255 255 / 0.55), transparent 45%), var(--ticket-paper)',
           }}
         >
           <div className="relative min-h-0 min-w-0 overflow-hidden">
@@ -155,7 +177,7 @@ export function Ticket({
             {/* The tear line. Inset past the notches so it meets them. */}
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute bottom-px left-[calc(var(--ticket-notch)+6px)] right-[calc(var(--ticket-notch)+6px)] z-[2] border-b border-dashed border-current opacity-40"
+              className="pointer-events-none absolute bottom-px left-[calc(var(--ticket-notch)+6px)] right-[calc(var(--ticket-notch)+6px)] z-[2] border-b border-dashed border-current opacity-35"
             />
           </div>
           <div className="relative min-h-0 min-w-0 overflow-hidden">{stub}</div>
@@ -165,7 +187,7 @@ export function Ticket({
           {active ? (
             <m.span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-[3] mix-blend-soft-light"
+              className="pointer-events-none absolute inset-0 z-[3] opacity-40 mix-blend-soft-light"
               style={{ background: glare }}
             />
           ) : null}

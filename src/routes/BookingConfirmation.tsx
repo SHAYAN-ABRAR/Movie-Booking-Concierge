@@ -450,23 +450,23 @@ export function BookingConfirmation() {
               className="h-[30rem]"
               body={
                 <div className="grid h-full grid-rows-[auto_minmax(0,1fr)_auto_auto] gap-3.5 p-5">
-                  <div className="flex items-baseline justify-between gap-3 font-mono text-[0.5625rem] font-bold uppercase leading-none tracking-[0.12em] opacity-75">
-                    <span>{brand.name}</span>
-                    <span>{cinema?.city ?? booking.cinemaName}</span>
+                  <div className="flex items-baseline justify-between gap-3 font-mono text-[0.5625rem] font-bold uppercase leading-none tracking-[0.12em]">
+                    <span className="text-[var(--ticket-accent)]">{brand.name}</span>
+                    <span className="opacity-60">{cinema?.city ?? booking.cinemaName}</span>
                   </div>
 
-                  {/* The film, screen-printed. `luminosity` keeps the poster's
-                      tones but takes the card's hue, so the artwork reads as
-                      one ink on the ticket stock rather than a photo pasted
-                      onto it. Falls back to the sprocket rhythm when a film has
-                      left the programme and its artwork with it. */}
-                  <div className="relative -mx-5 min-h-0 overflow-hidden">
+                  {/* The film, in its own colour. On a near-black card the
+                      artwork is the brightest thing on the surface, which is
+                      the whole point of putting it there. Falls back to the
+                      sprocket rhythm when a film has left the programme and its
+                      artwork with it. */}
+                  <div className="relative -mx-5 min-h-0 overflow-hidden border-y border-[var(--ticket-ink)]/12">
                     {movie ? (
                       <MovieImageDecorative
                         movie={movie}
                         role="backdrop"
                         sizes="272px"
-                        className="size-full opacity-95 mix-blend-luminosity aspect-auto!"
+                        className="size-full aspect-auto!"
                       />
                     ) : (
                       <div
@@ -486,7 +486,7 @@ export function BookingConfirmation() {
                     <h3 className="font-display text-[1.75rem] uppercase leading-[0.86] [overflow-wrap:anywhere]">
                       {booking.movieTitle}
                     </h3>
-                    <p className="mt-2 font-mono text-[0.625rem] leading-[1.5] opacity-80">
+                    <p className="mt-2 font-mono text-[0.625rem] leading-[1.5] opacity-65">
                       {booking.cinemaName}
                       <br />
                       {booking.screenName} · {formatLabels[booking.format]}
@@ -509,7 +509,7 @@ export function BookingConfirmation() {
                       { label: t('confirmation.field.paid'), value: money(booking.total) },
                     ].map((row) => (
                       <div key={row.label} className="flex min-w-0 flex-col gap-1">
-                        <dt className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-70">
+                        <dt className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-55">
                           {row.label}
                         </dt>
                         <dd className="truncate font-mono text-[0.6875rem] font-bold leading-none">
@@ -521,21 +521,21 @@ export function BookingConfirmation() {
                 </div>
               }
               stub={
-                <div className="flex h-full flex-col justify-between gap-3 p-5 pt-4">
+                <div className="flex h-full flex-col justify-between gap-3 bg-black/[0.035] p-5 pt-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex flex-col gap-1.5">
-                      <span className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-70">
+                      <span className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-55">
                         {t('confirmation.admitLabel')}
                       </span>
-                      <strong className="font-display text-[1.125rem] uppercase leading-none">
+                      <strong className="font-display text-[1.375rem] uppercase leading-none text-[var(--ticket-accent)]">
                         {booking.seats.length}
                       </strong>
                     </div>
                     <div className="flex min-w-0 flex-col items-end gap-1.5 text-right">
-                      <span className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-70">
+                      <span className="font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] opacity-55">
                         {t('confirmation.referenceLabel')}
                       </span>
-                      <strong className="font-mono text-[0.75rem] font-bold leading-none tracking-[0.04em]">
+                      <strong className="font-mono text-[0.75rem] font-bold leading-none tracking-[0.04em] text-[var(--ticket-accent)]">
                         {booking.reference}
                       </strong>
                     </div>
