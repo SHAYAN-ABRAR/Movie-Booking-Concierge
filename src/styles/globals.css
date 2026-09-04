@@ -288,6 +288,39 @@ html.theme-transition *::after {
   background-color: var(--surface);
 }
 
+/**
+ * The box-office printer.
+ *
+ * The one object in the product that is genuinely a *thing* rather than a
+ * surface — so, like the auditorium, it carries its own palette and looks the
+ * same under either theme. A printer is moulded charcoal plastic; it does not
+ * turn bone-coloured because the customer prefers a light interface.
+ *
+ * Everything inside it addresses the ordinary semantic tokens, so the header,
+ * the screen and the status line all adapt without knowing they are sitting on
+ * a machine.
+ */
+.printer {
+  --printer-body: #26262a;
+  --printer-body-lit: #34343a;
+  --printer-body-deep: #17171a;
+  --printer-edge: #0d0d0f;
+  --printer-slot: #060607;
+
+  --surface: var(--printer-body);
+  --surface-raised: var(--printer-body-lit);
+  --surface-sunken: var(--printer-body-deep);
+  --content: #f0ece4;
+  --content-muted: #a5a49f;
+  --content-faint: #85847f;
+  --hairline: #35353b;
+  --hairline-strong: #4a4a52;
+  --accent: var(--signal-lit);
+  --accent-contrast: #140602;
+  --focus: var(--signal-lit);
+  color: var(--content);
+}
+
 @theme inline {
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
@@ -692,6 +725,47 @@ html.theme-transition *::after {
   gap: 1px;
 }
 
+/**
+ * Moulded plastic.
+ *
+ * The single exception to the system's no-elevation rule, and a deliberate
+ * one: the printer is an object sitting on the page, not a panel drawn on it,
+ * and an object that casts no shadow reads as a sticker. A top highlight and a
+ * bottom shade give the moulding its edge; the two outer shadows put it on the
+ * desk.
+ */
+@utility printer-shell {
+  background-image: linear-gradient(
+    to bottom,
+    var(--printer-body-lit) 0%,
+    var(--printer-body) 42%,
+    var(--printer-body-deep) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.09),
+    inset 0 -1px 0 rgb(0 0 0 / 0.55),
+    inset 0 0 0 1px rgb(255 255 255 / 0.04),
+    0 2px 4px -2px rgb(0 0 0 / 0.4),
+    0 18px 34px -18px rgb(0 0 0 / 0.55);
+}
+
+/** The recessed aperture the paper is driven through. */
+@utility printer-slot {
+  background: var(--printer-slot);
+  box-shadow:
+    inset 0 2px 5px rgb(0 0 0 / 0.9),
+    inset 0 -1px 0 rgb(255 255 255 / 0.06),
+    0 1px 0 rgb(255 255 255 / 0.05);
+}
+
+/** The lit panel, recessed into the fascia. */
+@utility printer-screen {
+  box-shadow:
+    inset 0 2px 6px rgb(0 0 0 / 0.75),
+    inset 0 0 0 1px rgb(0 0 0 / 0.6),
+    0 1px 0 rgb(255 255 255 / 0.06);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    OVERLAY MOTION
    Radix drives `data-state`; these utilities are the whole vocabulary.
@@ -960,6 +1034,11 @@ html.theme-transition *::after {
    PRINT — the confirmation ticket is a real deliverable
    ═══════════════════════════════════════════════════════════════════════ */
 @media print {
+  /* A printed ticket needs a margin like any other document. */
+  @page {
+    margin: 16mm;
+  }
+
   /*
    * `html[data-theme]` rather than `:root`.
    *
@@ -1046,12 +1125,18 @@ html.theme-transition *::after {
    * is black on white, and a page that depends on a background colour reaching
    * the paper is a page that prints wrong on every device set to drop them.
    */
+  /*
+   * `padding: 0` here was wrong: it stripped the *horizontal* padding too, so
+   * a saved PDF put the type hard against both edges of the sheet. The vertical
+   * padding is what needed to go — there is no slot to clear on paper.
+   */
   [data-receipt='paper'] {
     clip-path: none !important;
     background: #fff !important;
     color: #000 !important;
-    padding: 0 !important;
-    max-width: 24rem;
+    padding: 0.5rem 1.75rem 1rem !important;
+    max-width: 26rem;
+    margin-inline: auto;
   }
 
   [data-receipt='paper'] * {

@@ -158,7 +158,9 @@ export function BookingConfirmation() {
         <ReceiptPrinter.Root stage={stage}>
           <ReceiptPrinter.Machine aria-label={t('receipt.machineLabel')}>
             <ReceiptPrinter.Header>
-              <Logo size="sm" />
+              {/* `onDark` — the machine is charcoal in both themes, so the
+                  wordmark cannot follow the page's ink. */}
+              <Logo size="sm" onDark />
               <p className="eyebrow">{t('receipt.machineLabel')}</p>
             </ReceiptPrinter.Header>
 

@@ -81,6 +81,17 @@ const steppedFeed = [
   '-45%', '-32%', '-32%', '-20%', '-20%', '-10%', '-10%', '-3%', '-3%', '0%',
 ];
 
+/* ── Where the paper meets the machine ─────────────────────────────────────
+ * `SLOT_FROM_BOTTOM` is the front lip: the depth of moulding below the
+ * aperture. `PAPER_TUCK` is how far the emerging sheet is pulled up behind the
+ * machine — far enough that its top edge sits *inside* the slot rather than
+ * below the casing. The two are declared together because the illusion breaks
+ * the moment they disagree.
+ * ───────────────────────────────────────────────────────────────────────── */
+const SLOT_FROM_BOTTOM = 5;
+const SLOT_HEIGHT = 12;
+const PAPER_TUCK = SLOT_FROM_BOTTOM + SLOT_HEIGHT - 2;
+
 const steppedFeedTimes = [
   0, 0.075, 0.105, 0.18, 0.21, 0.285, 0.315, 0.39, 0.42, 0.495, 0.525, 0.6, 0.63,
   0.705, 0.735, 0.81, 0.84, 0.915, 0.945, 1,
@@ -137,21 +148,22 @@ export function ReceiptPrinterMachine({
     <div
       data-print="hide"
       className={cn(
-        'relative isolate z-10 w-full overflow-hidden border-2 border-content bg-surface-sunken',
-        'p-3 pb-7',
-        // The moulding: a hairline highlight along the top edge and a shadow
-        // along the bottom. Two 1px rules, no gradient, no bevel.
-        'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-0 before:h-px',
-        "before:bg-content/10 before:content-['']",
+        // `PAPER_TUCK` of bottom padding below the slot is the machine's front
+        // lip. The paper's top edge is pulled up behind exactly that much, so
+        // the sheet is hidden until it has passed the aperture — which is what
+        // makes it read as coming *through* the slot rather than out from
+        // under the box.
+        'printer printer-shell relative isolate z-10 w-full overflow-hidden',
+        'rounded-[1.25rem] p-3.5',
         className,
       )}
+      style={{ paddingBottom: PAPER_TUCK }}
       {...props}
     >
-      {/* Casing grain. The same turbulence the page uses, so the machine is
-          made of the same material as everything else. */}
+      {/* Casing grain — moulded plastic, not a flat fill. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.045] mix-blend-multiply"
+        className="pointer-events-none absolute inset-0 z-0 opacity-[0.07] mix-blend-overlay"
         style={{
           backgroundImage:
             "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E\")",
@@ -160,10 +172,20 @@ export function ReceiptPrinterMachine({
 
       {children}
 
-      {/* The slot the paper comes out of. */}
+      {/* The aperture. A recess, not a printed bar: the paper is driven up
+          through it from inside the machine. */}
       <span
         aria-hidden="true"
-        className="absolute inset-x-3 bottom-3 z-40 block h-2 bg-content"
+        className="printer-slot absolute inset-x-5 z-40 block rounded-[3px]"
+        style={{ bottom: SLOT_FROM_BOTTOM, height: SLOT_HEIGHT }}
+      />
+
+      {/* The front lip. It is only a few pixels deep, so the sheet appears to
+          leave the aperture rather than the casing — and it catches a highlight
+          along its front edge the way a moulded edge does. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-30 block h-3 bg-gradient-to-t from-black/55 to-transparent"
       />
     </div>
   );
@@ -198,8 +220,9 @@ export function ReceiptPrinterScreen({
       className={cn(
         // `.auditorium` rather than a bespoke dark panel: a lit display in a
         // dark housing is the same material the seat map is made of, and it is
-        // dark in both themes for the same reason.
-        'auditorium relative isolate z-10 overflow-hidden border-2 border-content p-4',
+        // dark in both themes for the same reason. It is *recessed* into the
+        // fascia rather than drawn on it, which is what the inset shadow buys.
+        'auditorium printer-screen relative isolate z-10 overflow-hidden rounded-[0.6rem] p-4',
         className,
       )}
       {...props}
@@ -314,15 +337,18 @@ export function ReceiptPrinterOutput({
   return (
     <div
       data-receipt="output"
-      className={cn('relative z-0 -mt-5 w-[calc(100%-1.5rem)] overflow-hidden px-1', className)}
+      className={cn('relative z-0 w-[calc(100%-2.75rem)] overflow-hidden', className)}
+      style={{ marginTop: -PAPER_TUCK }}
       {...props}
     >
-      {/* The shadow the slot's lip casts onto the emerging paper. */}
+      {/* The shade the machine's lip throws across the sheet as it clears the
+          aperture. Without it the paper looks pasted on rather than fed. */}
       {out ? (
         <span
           aria-hidden="true"
           data-print="hide"
-          className="pointer-events-none absolute inset-x-1 top-0 z-20 block h-3 bg-gradient-to-b from-content/35 to-transparent"
+          className="pointer-events-none absolute inset-x-0 z-20 block h-5 bg-gradient-to-b from-black/45 to-transparent"
+          style={{ top: PAPER_TUCK }}
         />
       ) : null}
 

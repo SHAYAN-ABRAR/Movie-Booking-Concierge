@@ -74,11 +74,26 @@ Three rules keep it from being a toy:
    and its feed transform in print, and goes black on white rather than
    depending on a background colour reaching the paper.
 
+The casing is a fixed material. `.printer` carries its own palette the way
+`.auditorium` does, so the machine is moulded charcoal under either theme — a
+printer does not turn bone-coloured because the customer prefers a light
+interface. It is also the one place in the system with real elevation: a
+gradient body, a top highlight, a bottom shade and two outer shadows. An object
+that casts no shadow reads as a sticker, and this is the only thing in the
+product that is an object.
+
 The screen reuses `.auditorium` rather than a bespoke dark panel — a lit
 display in a dark housing is the same material the seat map is made of, and it
 is dark in both themes for the same reason. The paper takes the *raised* bone
 stock so the roll reads as a separate object in light mode instead of
 dissolving into the page.
+
+Getting the sheet to leave the *aperture* rather than the casing is two
+constants declared together, because the illusion breaks the moment they
+disagree: `SLOT_FROM_BOTTOM` is the depth of moulding below the slot — only a
+few pixels — and `PAPER_TUCK` is how far the emerging sheet is pulled up behind
+the machine, far enough that its top edge sits inside the slot. The lip throws a
+shade down the first few millimetres of paper as it clears.
 
 The compound namespace lives in `index.ts` rather than beside the components: a
 module exporting both components and a plain object is not hot-reloadable, and
