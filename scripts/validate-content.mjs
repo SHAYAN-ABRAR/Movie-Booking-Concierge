@@ -314,6 +314,80 @@ if (!/aiDisclosure/.test(readFileSync('src/routes/CinemaDetails.tsx', 'utf8'))) 
   fail('CinemaDetails.tsx renders venue imagery without the AI disclosure');
 }
 
+/* -- Offers ---------------------------------------------------------------
+ * Offer artwork is generated illustration. It is legitimate for the same
+ * reason the counter and the foyers are - a promotion is not a real object or
+ * a real person - and it carries the same obligations: recorded provenance,
+ * and no lettering baked into the picture. That second rule matters here more
+ * than anywhere else, because the figure is the whole message: it is rendered
+ * as real translatable text over a region the prompt kept clear, so it must
+ * never be drawn into the image.
+ * ----------------------------------------------------------------------- */
+
+const offerMediaSource = readFileSync('src/data/offerMedia.ts', 'utf8');
+const offersSource = readFileSync('src/data/offers.ts', 'utf8');
+
+const offerIds = [...offersSource.matchAll(/id: '(off-[a-z-]+)'/g)].map((m) => m[1]);
+const artIds = [...offerMediaSource.matchAll(/offerId: '(off-[a-z-]+)'/g)].map((m) => m[1]);
+
+for (const id of offerIds) {
+  if (!artIds.includes(id)) fail(`offer ${id} has no artwork`);
+}
+
+const offerBlocks = [
+  ...offerMediaSource.matchAll(/\{\s*\r?\n\s*offerId: '(off-[a-z-]+)',([\s\S]*?)\r?\n  \},/g),
+];
+const offerPaths = [];
+
+for (const [, id, block] of offerBlocks) {
+  const base = field(block, 'basePath');
+  const alt = field(block, 'alt');
+  const sourceType = field(block, 'sourceType');
+  const model = field(block, 'model');
+  const generatedAt = field(block, 'generatedAt');
+  const anchor = field(block, 'textAnchor');
+  const tone = field(block, 'textTone');
+
+  if (!base) { fail(`offer ${id}: no basePath`); continue; }
+  if (/^https?:/.test(base)) fail(`offer ${id}: artwork uses an external runtime URL`);
+  if (!alt || alt.length < 20) fail(`offer ${id}: alt text is missing or too short`);
+  if (sourceType !== 'ai-generated') fail(`offer ${id}: sourceType must be 'ai-generated'`);
+  if (!model) fail(`offer ${id}: no generation model recorded`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(generatedAt ?? '')) fail(`offer ${id}: no generation date`);
+  if (anchor !== 'left' && anchor !== 'right') {
+    fail(`offer ${id}: textAnchor must say which half was left clear`);
+  }
+  if (tone !== 'ink' && tone !== 'paper') {
+    fail(`offer ${id}: textTone must say which ink reads on that half`);
+  }
+  const align = field(block, 'textAlign');
+  if (!['top', 'center', 'bottom'].includes(align ?? '')) {
+    fail(`offer ${id}: textAlign must say where in that half the region is clear`);
+  }
+  offerPaths.push(base);
+
+  const widths =
+    block.match(/widths: \[([^\]]+)\]/)?.[1]?.split(',').map((w) => Number(w.trim())) ?? [];
+  if (widths.length === 0) fail(`offer ${id}: no rendered widths`);
+  for (const width of widths) {
+    for (const ext of ['avif', 'webp', 'jpg']) {
+      const path = join('public', `${base}-${width}.${ext}`);
+      if (!existsSync(path)) fail(`offer ${id}: missing artwork file ${path}`);
+    }
+  }
+}
+
+const offerDupes = offerPaths.filter((p, i) => offerPaths.indexOf(p) !== i);
+if (offerDupes.length) fail(`offer artwork reused: ${[...new Set(offerDupes)].join(', ')}`);
+
+// The figure is text, not picture. If the component stops setting it over the
+// artwork, the amount silently stops being translatable - and on a promotion
+// the amount is the entire point.
+if (!/offerArtFor/.test(readFileSync('src/components/visual/OfferArtwork.tsx', 'utf8'))) {
+  fail('OfferArtwork.tsx no longer renders the offer figure as real text');
+}
+
+
 /* ── No illustration component may return to the counter ──────────────── */
 
 if (existsSync('src/components/visual/CounterIllustration.tsx')) {
@@ -336,5 +410,5 @@ if (problems.length) {
 
 console.log(
   `validate:content — ${movieBlocks.length} films (${nowShowing} now showing, ${comingSoon} coming soon), ` +
-    `${itemIds.length} counter items and ${venueSlugs.length} venues with local AI-generated imagery.`,
+    `${itemIds.length} counter items, ${venueSlugs.length} venues and ${artIds.length} offers with local AI-generated imagery.`,
 );

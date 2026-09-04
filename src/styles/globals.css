@@ -661,6 +661,15 @@ html.theme-transition *::after {
   line-height: 0.8;
 }
 
+/* Bengali numerals come through `--font-display`'s second family, Anek Bangla,
+   by per-glyph fallback. Anek carries the same width axis but does not take
+   62% the way Archivo does — the same 75% the rest of the Bangla setting uses.
+   Reached wherever a figure is localised, such as ৳২০০ on an offer poster. */
+:lang(bn) .index-mark {
+  font-stretch: 75%;
+  letter-spacing: 0;
+}
+
 /**
  * Container.
  *

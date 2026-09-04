@@ -13,8 +13,9 @@
  *
  * The raster media this application *does* ship was sourced separately and is
  * recorded in its own manifests: film posters and backdrops in
- * `mediaManifest.ts` (TMDB, with attribution) and the generated counter
- * imagery in `concessionMedia.ts`. Neither is covered by this file.
+ * `mediaManifest.ts` (TMDB, with attribution), and three generated sets in
+ * `concessionMedia.ts`, `venueMedia.ts` and `offerMedia.ts`. None of them is
+ * covered by this file.
  *
  * The one-image-one-slot rule is enforced by `npm run check:assets`.
  */
@@ -158,5 +159,5 @@ export const assetSummary = {
    * in the UI where a reader might otherwise expect an image.
    */
   rationale:
-    'None of the six files supplied with this project is usable as page content — they are all design-reference recordings of a third-party concept UI. The film artwork you see instead is real: posters and backdrops obtained from TMDB under its terms and recorded, with attribution, in `mediaManifest.ts`. Two sets of imagery are AI-generated and declared as such in their own manifests: the food photography on the counter, in `concessionMedia.ts`, and the five venue foyers, in `venueMedia.ts`. Both are legitimate for the same reason — a dish and a lobby that do not exist misrepresent nobody, where a film poster is real studio artwork and a still contains real faces. Everything else — the screen diagrams, offer artwork, empty states — is drawn with type, rule, colour and layout.',
+    'None of the six files supplied with this project is usable as page content — they are all design-reference recordings of a third-party concept UI. The film artwork you see instead is real: posters and backdrops obtained from TMDB under its terms and recorded, with attribution, in `mediaManifest.ts`. Three sets of imagery are AI-generated and declared as such in their own manifests: the food photography on the counter, in `concessionMedia.ts`; the five venue foyers, in `venueMedia.ts`; and the five offer posters, in `offerMedia.ts`. All three are legitimate for the same reason — a dish, a lobby and a promotion that do not exist misrepresent nobody, where a film poster is real studio artwork and a still contains real faces. The offer posters carry no lettering at all: the figure is set as real text over them. Everything else — the screen diagrams, empty states, the wordmark — is drawn with type, rule, colour and layout.',
 } as const;

@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import type { ReactElement } from 'react';
 
 import { MotionProvider } from '@/motion/MotionProvider';
-import { OfferComposition } from './OfferComposition';
+import { OfferArtwork } from './OfferArtwork';
 import { ConcessionImage } from './ConcessionImage';
 import { concessionImageById } from '@/data/concessionMedia';
 import { EmptyDrawing } from './EmptyStates';
@@ -12,6 +12,8 @@ import type { EmptyVariant } from './EmptyStates';
 import { EmptyState } from '@/components/common';
 import { offerArtFor, undesignedOfferIds } from '@/data/offerArt';
 import { offers } from '@/data/offers';
+import { en } from '@/i18n/resources/en';
+import { bn } from '@/i18n/resources/bn';
 import { concessions } from '@/data/concessions';
 
 function renderMotion(element: ReactElement) {
@@ -66,24 +68,49 @@ describe('offer compositions', () => {
     }
   });
 
-  it('keeps the drawing out of the accessibility tree', () => {
-    const { container } = renderMotion(<OfferComposition offer={offers[0]!} />);
-    const svg = container.querySelector('svg');
-    expect(svg).not.toBeNull();
-    expect(svg).toHaveAttribute('aria-hidden', 'true');
+  it('sets the figure as real text rather than baking it into the artwork', () => {
+    // The whole reason the artwork is generated with an empty region. A figure
+    // drawn into the picture could not be translated, selected or read aloud —
+    // and on a promotion the figure is the entire message.
+    for (const offer of offers) {
+      const { container, unmount } = renderMotion(<OfferArtwork offer={offer} />);
+      const figure = offerArtFor(offer.id).figure;
+      expect(container.textContent).toContain(figure);
+      unmount();
+    }
   });
 
-  it('re-composes rather than scales between the full and tile variants', () => {
-    const full = renderMotion(<OfferComposition offer={offers[1]!} variant="full" />);
-    const fullBox = full.container.querySelector('svg')?.getAttribute('viewBox');
-    full.unmount();
+  it('keeps the translated figure identical to the one checked against the copy', () => {
+    // The figure is honesty-checked against the offer's own mechanic on
+    // `offerArt`, but what actually renders is the locale resource. If the two
+    // drift, the poster starts advertising a discount the page never states —
+    // and the honesty check would not notice.
+    for (const offer of offers) {
+      const art = offerArtFor(offer.id);
+      expect(art.figureKey, `${offer.id} has no figure key`).toBeDefined();
+      const pair = en.offers.figures[art.figureKey!];
+      expect(pair.figure, offer.id).toBe(art.figure);
+      expect(pair.note, offer.id).toBe(art.figureNote);
+    }
+  });
 
-    const tile = renderMotion(<OfferComposition offer={offers[1]!} variant="tile" />);
-    const tileBox = tile.container.querySelector('svg')?.getAttribute('viewBox');
+  it('prints the figure in Bengali numerals in Bangla', () => {
+    // ৳200 is not readable copy in Bangla, and a number baked into the picture
+    // could never have become ৳২০০. Latin digits surviving here would mean the
+    // whole keep-it-out-of-the-image decision bought nothing.
+    for (const offer of offers) {
+      const key = offerArtFor(offer.id).figureKey!;
+      const figure = bn.offers.figures[key].figure;
+      expect(figure, `${offer.id} is still in Latin digits`).not.toMatch(/[0-9]/);
+      expect(bn.offers.figures[key].note, offer.id).not.toBe(en.offers.figures[key].note);
+    }
+  });
 
-    expect(fullBox).toBeTruthy();
-    expect(tileBox).toBeTruthy();
-    expect(fullBox).not.toEqual(tileBox);
+  it('describes the artwork for anyone who cannot see it', () => {
+    const { container } = renderMotion(<OfferArtwork offer={offers[0]!} />);
+    const img = container.querySelector('img');
+    expect(img).not.toBeNull();
+    expect(img?.getAttribute('alt')?.length ?? 0).toBeGreaterThan(20);
   });
 });
 

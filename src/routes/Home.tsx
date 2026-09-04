@@ -7,7 +7,7 @@ import { Stagger, StaggerItem } from '@/motion';
 import { MovieCard } from '@/components/movie/MovieCard';
 import { CertificateChip } from '@/components/movie/Chips';
 import { ShowtimePill } from '@/components/showtime/ShowtimeButton';
-import { OfferComposition } from '@/components/visual/OfferComposition';
+import { OfferArtwork } from '@/components/visual/OfferArtwork';
 import { QuickBook } from '@/components/home/QuickBook';
 import { FeaturedStage } from '@/components/home/FeaturedStage';
 import { brand } from '@/config/brand';
@@ -265,7 +265,7 @@ export function Home() {
               >
                 <div className="overflow-hidden">
                   <div className="transition-transform duration-[--dur-slow] ease-[--ease-out] group-hover:scale-[1.02] group-focus-visible:scale-[1.02] motion-reduce:transform-none">
-                    <OfferComposition offer={offer} variant="tile" />
+                    <OfferArtwork offer={offer} sizes="(max-width: 768px) 100vw, 560px" />
                   </div>
                 </div>
                 <div className="border-t-2 border-hairline-strong p-5 transition-colors group-hover:border-content">

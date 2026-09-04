@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '@/components/common';
 import { Button } from '@/components/ui/button';
 import { Badge, DemoNote } from '@/components/ui/misc';
-import { OfferComposition } from '@/components/visual/OfferComposition';
+import { OfferArtwork } from '@/components/visual/OfferArtwork';
 import { Reveal } from '@/motion';
 import { cinemaById, offers } from '@/data';
 import { useTranslation } from 'react-i18next';
@@ -120,10 +120,7 @@ export function Offers() {
                 <Reveal>
                   {/* Depth level 2 — a printed insert lying on the programme
                       page, not a card floating above the interface. */}
-                  <OfferComposition
-                    offer={offer}
-                    className="shadow-[0_10px_28px_-18px_rgb(20_22_31_/_0.45)]"
-                  />
+                  <OfferArtwork offer={offer} className="border-2 border-content" />
                 </Reveal>
               </div>
             </article>

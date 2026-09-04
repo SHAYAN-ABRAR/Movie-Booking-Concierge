@@ -31,6 +31,9 @@ reference-assets/generated/concessions/*
 !reference-assets/generated/venues/
 reference-assets/generated/venues/*
 !reference-assets/generated/venues/source/
+!reference-assets/generated/offers/
+reference-assets/generated/offers/*
+!reference-assets/generated/offers/source/
 
 # Playwright artefacts — generated, never committed
 test-results/

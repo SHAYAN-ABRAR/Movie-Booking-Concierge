@@ -302,6 +302,21 @@ export const bn: LocaleResource = {
       friday: 'শুক্রবার',
       saturday: 'শনিবার',
     },
+    /**
+     * Bengali numerals, not transliterated Latin ones. A price is the part of
+     * a promotion a reader must not have to decode, and ৳২০০ is how it is
+     * written on a Bangladeshi box-office board.
+     *
+     * "10 pm" becomes "রাত ১০টা" — Bangla names the part of the day rather
+     * than carrying am/pm — and the ordinal "1st" becomes "১ম".
+     */
+    figures: {
+      matinee: { figure: '৳৬০', note: 'প্রতি আসনে ছাড়' },
+      familyFour: { figure: '৳২০০', note: 'ফ্যামিলি বক্সে ছাড়' },
+      lateRepertory: { figure: 'রাত ১০টা', note: 'বৃহস্পতিবার, ধানমন্ডি' },
+      sensory: { figure: '১ম', note: 'মাসের শনিবার' },
+      studentWeeknight: { figure: '১৫%', note: 'আসনের দামে ছাড়' },
+    },
   },
 
   max: {

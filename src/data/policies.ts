@@ -13,7 +13,7 @@ export const COMPANY = {
   foundedYear: 2009,
   supportEmail: 'hello@grandplexcinemas.example',
   supportPhone: '+880 9600 665 700',
-  supportHours: 'Daily, 09:00 – 22:00',
+  supportHours: 'Daily, 9:00 am – 10:00 pm',
   pressEmail: 'press@grandplexcinemas.example',
   accessibilityEmail: 'access@grandplexcinemas.example',
   registeredOffice: ['GrandPlex Ltd.', 'Level 6, Shatabdi Centre', 'Road 27, Dhanmondi, Dhaka 1209'],
@@ -81,7 +81,7 @@ export const faq: FaqEntry[] = [
     question: 'How is a ticket price worked out?',
     questionBn: 'টিকিটের দাম কীভাবে হিসাব হয়?',
     answer:
-      'A seat starts at its class price — ৳350 regular, ৳450 premium, ৳650 recliner. The format is added on top: ৳100 for 3D, ৳150 for Grandscreen, ৳250 for the Velvet Room. Screenings before 15:00 take ৳60 off, and Friday and Saturday add ৳50. Your age category is applied last: child 0.7×, student 0.85×, senior 0.75×. A ৳20 booking fee is added per ticket and is shown in every total.',
+      'A seat starts at its class price — ৳350 regular, ৳450 premium, ৳650 recliner. The format is added on top: ৳100 for 3D, ৳150 for Grandscreen, ৳250 for the Velvet Room. Screenings before 3:00 pm take ৳60 off, and Friday and Saturday add ৳50. Your age category is applied last: child 0.7×, student 0.85×, senior 0.75×. A ৳20 booking fee is added per ticket and is shown in every total.',
     answerBn:
       'সিট ক্লাস অনুযায়ী দাম শুরু হয় — রেগুলার ৳৩৫০, প্রিমিয়াম ৳৪৫০, রিক্লাইনার ৳৬৫০। এরপর ফরম্যাট যোগ হয়: 3D ৳১০০, গ্র্যান্ডস্ক্রিন ৳১৫০, ভেলভেট রুম ৳২৫০। বিকেল ৩টার আগের শোতে ৳৬০ ছাড়, শুক্র ও শনিবার ৳৫০ বেশি। সবশেষে বয়স অনুযায়ী ছাড়: শিশু ০.৭×, শিক্ষার্থী ০.৮৫×, প্রবীণ ০.৭৫×। প্রতি টিকিটে ৳২০ বুকিং ফি যোগ হয়, যা সব হিসাবে দেখানো হয়।',
     keywords: ['price', 'cost', 'how much', 'fee', 'charge', 'discount', 'taka', 'দাম', 'মূল্য'],

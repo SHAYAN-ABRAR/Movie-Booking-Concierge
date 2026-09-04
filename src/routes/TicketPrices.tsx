@@ -114,7 +114,7 @@ export function TicketPrices() {
                     <dt>
                       <span className="font-medium">Before three</span>
                       <span className="block text-[0.8125rem] text-content-muted">
-                        Any screening starting before 15:00, seven days a week.
+                        Any screening starting before 3:00 pm, seven days a week.
                       </span>
                     </dt>
                     <dd className="numeral shrink-0 font-semibold text-ok">
@@ -185,7 +185,7 @@ export function TicketPrices() {
               A worked example
             </RuleHeading>
             <p className="mb-4 max-w-prose text-[0.9375rem] leading-7 text-content-muted">
-              Two adults and one child, in premium seats, at a Grandscreen screening at 18:30 on a
+              Two adults and one child, in premium seats, at a Grandscreen screening at 6:30 pm on a
               Saturday.
             </p>
             <dl className="max-w-lg border-t-2 border-content">

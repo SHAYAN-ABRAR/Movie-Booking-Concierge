@@ -66,8 +66,8 @@ export const cinemas: Cinema[] = [
     mapQuery: 'Shatabdi Centre, Road 27, Dhanmondi, Dhaka 1209',
     phone: '+880 2 9110 480',
     email: 'dhanmondi@grandplexcinemas.example',
-    openingHours: 'Daily, 10:30 – 00:30',
-    boxOfficeHours: 'Daily, 10:00 – 23:00',
+    openingHours: 'Daily, 10:30 am – 12:30 am',
+    boxOfficeHours: 'Daily, 10:00 am – 11:00 pm',
     screens: [
       screen(
         'scr-dh-1',
@@ -118,12 +118,12 @@ export const cinemas: Cinema[] = [
     lostAndFound: {
       email: 'lostandfound.dhanmondi@grandplexcinemas.example',
       phone: '+880 2 9110 484',
-      hours: 'Daily, 11:00 – 20:00',
+      hours: 'Daily, 11:00 am – 8:00 pm',
       holdingPeriodDays: 21,
     },
     description:
       'The first house we opened, and still the one that sets the programme. Six floors up, with a lobby that keeps its lights low and its ceiling high, Dhanmondi runs the widest slate — first-run features in House One, and a late repertory strand that rarely plays anywhere else in the city.',
-    signature: 'Home of the late repertory strand, Thursdays at 22:45.',
+    signature: 'Home of the late repertory strand, Thursdays at 10:45 pm.',
   },
   {
     id: 'cin-bashundhara',
@@ -137,8 +137,8 @@ export const cinemas: Cinema[] = [
     mapQuery: 'Meridian Tower, Block C, Bashundhara R/A, Dhaka 1229',
     phone: '+880 2 8412 700',
     email: 'bashundhara@grandplexcinemas.example',
-    openingHours: 'Daily, 10:00 – 01:00',
-    boxOfficeHours: 'Daily, 09:30 – 23:30',
+    openingHours: 'Daily, 10:00 am – 1:00 am',
+    boxOfficeHours: 'Daily, 9:30 am – 11:30 pm',
     screens: [
       screen(
         'scr-bs-1',
@@ -196,7 +196,7 @@ export const cinemas: Cinema[] = [
     lostAndFound: {
       email: 'lostandfound.bashundhara@grandplexcinemas.example',
       phone: '+880 2 8412 706',
-      hours: 'Daily, 10:30 – 21:00',
+      hours: 'Daily, 10:30 am – 9:00 pm',
       holdingPeriodDays: 30,
     },
     description:
@@ -215,8 +215,8 @@ export const cinemas: Cinema[] = [
     mapQuery: 'Sector 7 Arcade, Sonargaon Janapath, Uttara, Dhaka 1230',
     phone: '+880 2 5895 220',
     email: 'uttara@grandplexcinemas.example',
-    openingHours: 'Daily, 11:00 – 00:00',
-    boxOfficeHours: 'Daily, 10:30 – 22:30',
+    openingHours: 'Daily, 11:00 am – 12:00 am',
+    boxOfficeHours: 'Daily, 10:30 am – 10:30 pm',
     screens: [
       screen(
         'scr-ut-1',
@@ -258,12 +258,12 @@ export const cinemas: Cinema[] = [
     lostAndFound: {
       email: 'lostandfound.uttara@grandplexcinemas.example',
       phone: '+880 2 5895 224',
-      hours: 'Daily, 12:00 – 20:00',
+      hours: 'Daily, 12:00 pm – 8:00 pm',
       holdingPeriodDays: 14,
     },
     description:
-      'The neighbourhood house. Three modest screens, a short walk from the sector roundabout, and the earliest first show in the circuit at 11:15. Uttara programmes for families before three in the afternoon and for everyone else after it.',
-    signature: 'Earliest first show in the circuit — 11:15 daily.',
+      'The neighbourhood house. Three modest screens, a short walk from the sector roundabout, and the earliest first show in the circuit at 11:15 am. Uttara programmes for families before three in the afternoon and for everyone else after it.',
+    signature: 'Earliest first show in the circuit — 11:15 am daily.',
   },
   {
     id: 'cin-agrabad',
@@ -277,8 +277,8 @@ export const cinemas: Cinema[] = [
     mapQuery: 'Harbour Point, Agrabad Commercial Area, Chattogram 4100',
     phone: '+880 31 2510 900',
     email: 'agrabad@grandplexcinemas.example',
-    openingHours: 'Daily, 11:00 – 23:45',
-    boxOfficeHours: 'Daily, 10:30 – 22:30',
+    openingHours: 'Daily, 11:00 am – 11:45 pm',
+    boxOfficeHours: 'Daily, 10:30 am – 10:30 pm',
     screens: [
       screen(
         'scr-ag-1',
@@ -321,7 +321,7 @@ export const cinemas: Cinema[] = [
     lostAndFound: {
       email: 'lostandfound.agrabad@grandplexcinemas.example',
       phone: '+880 31 2510 906',
-      hours: 'Daily, 11:30 – 20:00',
+      hours: 'Daily, 11:30 am – 8:00 pm',
       holdingPeriodDays: 21,
     },
     description:
@@ -340,8 +340,8 @@ export const cinemas: Cinema[] = [
     mapQuery: 'Kotwali Plaza, Zindabazar Road, Sylhet 3100',
     phone: '+880 821 726 340',
     email: 'zindabazar@grandplexcinemas.example',
-    openingHours: 'Daily, 11:30 – 23:30',
-    boxOfficeHours: 'Daily, 11:00 – 22:00',
+    openingHours: 'Daily, 11:30 am – 11:30 pm',
+    boxOfficeHours: 'Daily, 11:00 am – 10:00 pm',
     screens: [
       screen(
         'scr-zb-1',
@@ -370,7 +370,7 @@ export const cinemas: Cinema[] = [
     lostAndFound: {
       email: 'lostandfound.zindabazar@grandplexcinemas.example',
       phone: '+880 821 726 344',
-      hours: 'Daily, 12:00 – 19:30',
+      hours: 'Daily, 12:00 pm – 7:30 pm',
       holdingPeriodDays: 14,
     },
     description:

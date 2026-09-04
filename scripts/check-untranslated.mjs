@@ -42,7 +42,7 @@ const listOnly = process.argv.includes('--list');
  *
  * Remaining, and why each is prose rather than chrome:
  *   src/routes/Contact.tsx            22  contact routes, forms, hours
- *   src/routes/About.tsx              22  the essay about the build
+ *   src/routes/About.tsx              23  the essay about the build
  *   src/routes/TicketPrices.tsx       11  the worked pricing example
  *
  * Two passes have eaten into this. The Max panel chrome (23 strings) went
@@ -58,7 +58,7 @@ const listOnly = process.argv.includes('--list');
  * What is left is three pages of essay and reference prose. They are read
  * once, they are not on the booking path, and none of them is chrome.
  */
-const BASELINE = 55;
+const BASELINE = 56;
 
 /**
  * Files exempt from the sweep, each for a stated reason. "It is hard" is not a

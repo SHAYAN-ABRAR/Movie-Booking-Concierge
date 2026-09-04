@@ -38,7 +38,29 @@ export interface OfferArt {
   figure: string;
   /** What the figure means. Set small, directly beneath it. */
   figureNote: string;
+  /**
+   * Sub-key under `offers.figures` holding the translated pair.
+   *
+   * `figure` and `figureNote` above are the English source of truth: they are
+   * what the honesty test checks against the offer's own `mechanic`. What is
+   * actually *rendered* is the translation at this key, so that ৳200 can be
+   * ৳২০০ in Bangla. A test asserts the English resource still matches the two
+   * fields above, so the two copies cannot drift.
+   *
+   * Absent only on the fallback direction below, which by definition belongs
+   * to an offer nobody has designed yet. That one prints its English literal
+   * rather than borrowing another offer's translated value.
+   */
+  figureKey?: OfferFigureKey;
 }
+
+/** The five sub-keys under `offers.figures` in the locale resources. */
+export type OfferFigureKey =
+  | 'matinee'
+  | 'familyFour'
+  | 'lateRepertory'
+  | 'sensory'
+  | 'studentWeeknight';
 
 /** Grounds and tones are the documented palette — no new hues. */
 const ground = {
@@ -79,6 +101,7 @@ const directions: Record<string, OfferArt> = {
     figureTone: tone.ink,
     figure: '৳60',
     figureNote: 'off each seat',
+    figureKey: 'matinee',
   },
 
   // Two adults, two children, one box between them — four admissions on a
@@ -91,17 +114,19 @@ const directions: Record<string, OfferArt> = {
     figureTone: tone.paper,
     figure: '৳200',
     figureNote: 'off the Family box',
+    figureKey: 'familyFour',
   },
 
-  // The 22:45 Thursday strand. Leader running down to a late feature.
+  // The 10:45 pm Thursday strand. Leader running down to a late feature.
   'off-late-repertory': {
     composition: 'leader',
     ground: ground.house,
     ink: tone.steelLit,
     accent: tone.signalLit,
     figureTone: tone.paper,
-    figure: '22:00',
+    figure: '10 pm',
     figureNote: 'Thursdays, Dhanmondi',
+    figureKey: 'lateRepertory',
   },
 
   // House lights half up, sound brought down, no trailers. The composition is
@@ -114,6 +139,7 @@ const directions: Record<string, OfferArt> = {
     figureTone: tone.ink,
     figure: '1st',
     figureNote: 'Saturday of the month',
+    figureKey: 'sensory',
   },
 
   // The door checks a student ID, so the offer is a card you carry.
@@ -125,6 +151,7 @@ const directions: Record<string, OfferArt> = {
     figureTone: tone.paper,
     figure: '15%',
     figureNote: 'off the seat price',
+    figureKey: 'studentWeeknight',
   },
 };
 

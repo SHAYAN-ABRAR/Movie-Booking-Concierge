@@ -121,24 +121,31 @@ export function About() {
               Every one of them was downloaded once at authoring time and committed to the
               repository. The running site never contacts an image host, and there is no API key of
               any kind in the browser. Each venue is also drawn as a true diagram of its screens,
-              sized by seat count; offers are set as type.
+              sized by seat count.
             </p>
 
             <h3 className="mt-9 font-display text-[1.5rem] uppercase leading-none">
-              The two exceptions: the counter and the foyers
+              Where the generated images are
             </h3>
             <p className="mt-3 text-[1.0625rem] leading-[1.7]">
-              The concession items carry generated food photography, and each of the five houses
-              carries a generated photograph of its foyer. Both were produced once with an AI image
-              model and committed as local files; both are illustrations rather than photographs of
-              anything real, and both say so where they appear.
+              Three sets. The concession items carry generated food photography; each of the five
+              houses carries a generated photograph of its foyer; and each offer carries a
+              screenprinted poster. All were produced once with an AI image model and committed as
+              local files, all are illustrations rather than photographs of anything real, and all
+              say so where they appear.
             </p>
             <p className="mt-4 text-[1.0625rem] leading-[1.7]">
-              The line is drawn at whether the thing exists. A dish nobody cooked and a lobby nobody
-              built misrepresent no one — GrandPlex is a demonstration, and its rooms are as
-              fictional as its schedule. Film posters, backdrops and stills are the opposite: real
-              studio artwork, often containing real faces. Those stay real or stay absent. Inventing
-              one would be a different, dishonest thing.
+              The line is drawn at whether the thing exists. A dish nobody cooked, a lobby nobody
+              built and a promotion nobody ran misrepresent no one — GrandPlex is a demonstration,
+              and its rooms are as fictional as its schedule. Film posters, backdrops and stills are
+              the opposite: real studio artwork, often containing real faces. Those stay real or
+              stay absent. Inventing one would be a different, dishonest thing.
+            </p>
+            <p className="mt-4 text-[1.0625rem] leading-[1.7]">
+              None of the offer posters contains a single letter or number. An image model cannot
+              set legible type, and a figure baked into a picture could not be translated or read
+              aloud — so each poster was generated with a deliberately empty region, and the amount
+              is set into it as real text.
             </p>
 
             <h3 className="mt-9 font-display text-[1.5rem] uppercase leading-none">About Max</h3>

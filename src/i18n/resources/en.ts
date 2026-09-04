@@ -298,6 +298,26 @@ export const en = {
       friday: 'Friday',
       saturday: 'Saturday',
     },
+    /**
+     * The figure printed on each offer poster, and the line under it.
+     *
+     * These live here rather than only in `offerArt.ts` because they are the
+     * one thing on a promotion a reader actually has to understand, and a
+     * number set in Latin digits is not readable copy in Bangla. The artwork
+     * is generated with an empty region precisely so this can be real,
+     * translatable text.
+     *
+     * `figure` must stay identical to the same offer's `figure` in
+     * `offerArt.ts` — that file is checked against the offer's own mechanic,
+     * and `stationery.test.tsx` fails if the two ever drift apart.
+     */
+    figures: {
+      matinee: { figure: '৳60', note: 'off each seat' },
+      familyFour: { figure: '৳200', note: 'off the Family box' },
+      lateRepertory: { figure: '10 pm', note: 'Thursdays, Dhanmondi' },
+      sensory: { figure: '1st', note: 'Saturday of the month' },
+      studentWeeknight: { figure: '15%', note: 'off the seat price' },
+    },
   },
 
   max: {

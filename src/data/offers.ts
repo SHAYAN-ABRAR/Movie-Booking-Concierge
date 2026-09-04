@@ -13,10 +13,10 @@ export const offers: Offer[] = [
     slug: 'before-three',
     title: 'Before Three',
     titleBn: 'তিনটার আগে',
-    summary: 'Every screening that starts before 15:00 is ৳60 cheaper per seat.',
+    summary: 'Every screening that starts before 3:00 pm is ৳60 cheaper per seat.',
     detail:
       'This is not a coupon and there is nothing to enter. Any screening starting before three in the afternoon is priced down automatically, on every seat class and in every house. It applies seven days a week, including holidays.',
-    mechanic: '৳60 off each seat, applied automatically to screenings starting before 15:00.',
+    mechanic: '৳60 off each seat, applied automatically to screenings starting before 3:00 pm.',
     days: [],
     terms: [
       'Applies to the seat price before the ticket-category discount.',
@@ -51,12 +51,12 @@ export const offers: Offer[] = [
     titleBn: 'নৈশ রেপার্টরি',
     summary: 'Thursday nights at Dhanmondi, every seat at the regular rate whatever the house.',
     detail:
-      'The 22:45 Thursday strand at GrandPlex Dhanmondi is priced flat: premium and recliner seats are charged at the regular seat rate. Format uplifts still apply, so a 3D screening is still a 3D screening.',
-    mechanic: 'Premium and recliner seats charged at the regular seat base for Thursday screenings from 22:00 at Dhanmondi.',
+      'The 10:45 pm Thursday strand at GrandPlex Dhanmondi is priced flat: premium and recliner seats are charged at the regular seat rate. Format uplifts still apply, so a 3D screening is still a 3D screening.',
+    mechanic: 'Premium and recliner seats charged at the regular seat base for Thursday screenings from 10 pm at Dhanmondi.',
     days: [4],
     terms: [
       'GrandPlex Dhanmondi only.',
-      'Screenings starting at or after 22:00 on Thursdays.',
+      'Screenings starting at or after 10 pm on Thursdays.',
       'Format uplifts and the booking fee are unchanged.',
     ],
     cinemaIds: ['cin-dhanmondi'],
