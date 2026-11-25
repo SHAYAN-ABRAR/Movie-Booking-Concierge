@@ -3,10 +3,10 @@
 Movie discovery and ticket booking, with **Max**: a booking concierge that runs on your device and
 answers in English or Bangla.
 
-[![Max answering a Bangla request with the same seats it found in English](docs/media/grandplex-launch.jpg)](docs/media/grandplex-launch.mp4)
+https://github.com/user-attachments/assets/e6a72222-89db-4a4e-b88e-bdc3255f4eb3
 
-▶ **[Watch the 21-second walkthrough](docs/media/grandplex-launch.mp4)** (MP4, 1080p, with sound):
-asking Max for seats in English and Bangla, choosing them on the seat map, and printing the ticket.
+A 21-second walkthrough, with sound (unmute the player): asking Max for seats in English and
+Bangla, choosing them on the seat map, and printing the ticket.
 
 > [!NOTE]
 > GrandPlex is a **demonstration build**, not a real cinema chain. Venues, schedules, seat
